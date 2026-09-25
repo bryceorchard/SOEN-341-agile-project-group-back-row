@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@angular/cli": "^22.2.0",
+    "angular": "^1.8.2",
+    "http-server": "^14.1.1"
+  }
+}
