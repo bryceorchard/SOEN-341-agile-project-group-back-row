@@ -6,10 +6,20 @@
   "scripts": {
     "db:migrate": "node db/migrate.js",
     "db:seed": "node db/seed.js",
-    "db:reset": "node db/migrate.js --reset && node db/seed.js"
+    "db:reset": "node db/migrate.js --reset && node db/seed.js",
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^11.5.0"
+    "better-sqlite3": "^11.5.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.4.0"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.0"
   }
 }
