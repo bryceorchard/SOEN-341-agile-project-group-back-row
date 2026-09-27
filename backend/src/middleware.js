@@ -8,7 +8,7 @@ export function requireAuth(req, _res, next) {
   if (scheme !== 'Bearer' || !token) return next(new HttpError(401, 'Missing bearer token'));
   try {
     const payload = jwt.verify(token, JWT_SECRET);
-    req.user = { id: payload.sub, role: payload.role };
+    req.user = { id: Number(payload.sub), role: payload.role };
     next();
   } catch {
     next(new HttpError(401, 'Invalid or expired token'));
