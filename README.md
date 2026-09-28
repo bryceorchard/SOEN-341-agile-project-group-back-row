@@ -8,16 +8,16 @@ General Responsibilities:
   - Gabriel (Frontend):&emspRegistration/Login UI, Profile/Resume Upload UI  
   - Lucas   (Integration and QA):&enspCI setup, Tests for Both Features, Demo Prep, AI_Log structure and Contribution Log  
 ## Table Of Contents
-1. [Project Overview] (#project-overview)  
-2. [Technologies Used] (#technologies-used)  
-3. [Setup Instructions] (#setup-instructions)  
-4. [Proposed Features] (#proposed-features)
+1. [Project Overview](#project-overview)  
+2. [Technologies Used](#technologies-used)  
+3. [Setup Instructions](#setup-instructions)  
+4. [Proposed Features](#proposed-features)
 
 ## Project Overview
-# Problem
+### Problem
 Job Seeking is often a very variable process split across many different mediums, whether it be online applications through multiple intermediaries, through a companies website, an in-person paper submission. Same can be said for recruitement, when trying to find a suitable candidate when many are qualified but not all are suitable. It can take many attempts with many different people/groups to properly find a job/employee suited to what one is looking for. 
 
-# Solution: Project Description  
+### Solution: Project Description  
 CareerConnect is a web-based platform designed for the ease of use of job seekers and recruiters.   By creating a profile, CareerConnect allows job-seekers to upload and manage their resumes while simultaneously managing any job application submissions and their current status. They can also search and filter for jobs.  Simultaneously recruiters can post and manage their  The ultimate goal of the platform is to simplify organization and management of users as they progress and transition through their careers and/or move through job recruitment. 
 
 ## Technologies Used
@@ -25,7 +25,7 @@ Frontend: Angular, TypeScript
 Backend: Express5(Node), SQLite (SQL)  
 Authentication: Json Web Tokens (Session Management & Tokens), Bcrypt (Hashing)   
 CI/CD: Github Actions  
-## Setup Instruction
+## Setup Instructions
 Prerequisites:
     git and Node Version Manager (nvm)
 To set it up the following steps need to be done.   
