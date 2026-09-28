@@ -36,7 +36,7 @@ the next set of GitHub issues for the CareerConnect repo.
 - Script is idempotent for labels/milestone; issue creation should be run once.
 
 ## Decision
-
+**Bryce:** Went with the full Sprint 1 set delivered as a runnable gh script. Left the backlog stories unassigned on purpose and kept the assignee handles as variables at the top so they're easy to fill in. Ran the issue creation once since it isn't idempotent.
 
 ## Reflection
-
+**Bryce:** Grounding the issues in the actual rubric weighting (user stories and sprint planning being the heaviest) helped me prioritise what to get right. Turning the whole backlog into structured issues with labels and tasks was a useful exercise in breaking the project down.

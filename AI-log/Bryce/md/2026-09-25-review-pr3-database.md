@@ -41,7 +41,7 @@ database schema").
   against the schema) can't be confirmed until the API PR lands.
 
 ## Decision
-
+**Bryce:** The review lined up with what I expected from issue #1, so I passed the findings along and we moved ahead with the PR. The minor notes (updated_at not refreshing, single-file schema instead of versioned migrations, DBMS decision documented in the backend README) were left as non-blocking — worth mentioning to the team but not enough to hold the merge.
 
 ## Reflection
-
+**Bryce:** This was my first real code review on someone else's backend work, and running the branch from a clean checkout to actually confirm the migrations and constraints behaved gave me a lot more confidence than just reading the diff. I picked up on what to look for in a schema — constraints, indexes, cascade behaviour — that I wouldn't have thought to check before.

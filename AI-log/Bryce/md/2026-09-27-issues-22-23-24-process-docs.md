@@ -55,7 +55,7 @@ Flagged for Bryce (not actioned in code):
   `main` — the correct file is now `docs/sprint-1/appendix-a.md`.
 
 ## Decision
-**Bryce:**
+**Bryce:** Kept all the process and planning docs under docs/ and went with just a PR template (no issue templates) to keep things simple. Used the generated files mostly as written, with the understanding that the team process doc (branching, PR, DoR/DoD) is something the whole team needs to sign off on rather than just me imposing it.
 
 ## Reflection
-**Bryce:**
+**Bryce:** As scrum lead this was the part of the sprint I owned, so getting the process pieces grounded in the actual rubric and the live issue set was useful. It also flagged the gap between our documented branch convention and what branches actually exist, which is something I still need to reconcile with the team.

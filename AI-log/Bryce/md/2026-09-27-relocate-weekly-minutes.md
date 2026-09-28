@@ -36,7 +36,7 @@ contribution. There is a closed PR for the minutes.
   location changes.
 
 ## Decision
-**Bryce:**
+**Bryce:** Went with the history-preserving recipe so Gene's three commits stay his and the move shows up as its own commit. Didn't touch the content of his file at all, just the location, since the minutes are his contribution.
 
 ## Reflection
-**Bryce:**
+**Bryce:** I wanted to integrate this without stepping on Gene's authorship, and it made me think more carefully about how git handles moving files and preserving history. Using git mv and a no-ff merge rather than just copying the file over was new to me.

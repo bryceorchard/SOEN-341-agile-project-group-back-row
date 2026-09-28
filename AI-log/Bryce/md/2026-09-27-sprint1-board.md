@@ -30,7 +30,7 @@ Clarify what Sprint 1 requires (only a plan vs. the whole sprint), then set up a
   #1/#2 should be dragged to Done.
 
 ## Decision
-
+**Bryce:** Went with a single Sprint 1 board rather than two, since the spec only asks for one and Appendix A is a table anyway. Ran the script to create the board, add every issue, and generate the appendix, then moved the closed issues into Done manually.
 
 ## Reflection
-
+**Bryce:** Sorting out up front that Sprint 1 is a full delivery sprint and not just a planning exercise saved me from under-scoping the work. Using the gh CLI instead of the web UI was also a good fallback to learn, given the buttons weren't rendering for me.

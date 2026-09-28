@@ -27,7 +27,7 @@ Gabriel (gabibdods) to all 10; add Bryce (bryceorchard) to the AI story.
   regenerate appendix-a.md.
 
 ## Decision
-
+**Bryce:** Ran the script to clear the old stories and create Zohair's ten approved ones. The delete went through but the create step errored partway, so the missing stories were finished off in a follow-up (see fix-missing-user-stories).
 
 ## Reflection
-
+**Bryce:** Good reminder that a script touching the live issue tracker is worth running carefully and verifying afterwards, since deletion is permanent. It worked out because the failure was a clean skip rather than corruption, but I'll be more cautious running bulk operations like this in the future.

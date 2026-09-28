@@ -36,7 +36,7 @@ the Node version so the team doesn't hit the same wall.
   only a symptom of being on Node 26 and is unnecessary on Node 22.
 
 ## Decision
-
+**Bryce:** Followed the cleanup steps, moved back to Node 22 LTS via nvm, and confirmed the install and all seven tests pass. Pinned it with .nvmrc and the engines field so nobody else hits the same wall. Left the install-scripts approve step out of the README since it was only a symptom of being on Node 26.
 
 ## Reflection
-
+**Bryce:** This was a good lesson in native modules being tied to a specific platform and Node version — the earlier attempt that built a Linux binary on a macOS project made that really clear. I now understand why pinning the runtime matters on a shared repo instead of just letting everyone run whatever brew gave them.

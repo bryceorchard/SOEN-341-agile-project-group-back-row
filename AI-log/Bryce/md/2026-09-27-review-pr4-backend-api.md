@@ -47,7 +47,7 @@ Sprint 1 features").
   merge them in a way that double-applies or drops the DB work.
 
 ## Decision
-
+**Bryce:** Flagged the UPLOAD_DIR bug as the one real blocker and passed the rest as non-blocking notes; the fix was handled in a follow-up (see fix-pr4-backend-api). Also noted the merge ordering with PR #3 so we didn't double-apply or drop the database work.
 
 ## Reflection
-
+**Bryce:** Actually running the branch and reproducing the bug with a spaced path made the review a lot more convincing than just reading the code. It also drove home why tests can miss things — the upload path bug was invisible because the tests override that value. Reviewing the whole auth flow taught me a fair bit about what a secure endpoint set looks like.

@@ -27,7 +27,7 @@ creating the new ones. Diagnose and finish creating the replacement stories.
   regenerate appendix-a.md.
 
 ## Decision
-
+**Bryce:** Ran the follow-up script to create the six stories that got skipped, then re-ran the board setup so all ten ended up on the board and the appendix regenerated. Confirmed the first four that had already gone through correctly weren't touched.
 
 ## Reflection
-
+**Bryce:** The bug turned out to be a bash quoting issue rather than anything about the stories themselves, which was a good reminder that heredocs are fragile when you shove them straight into a command substitution. Good to know the read-into-variable pattern is the safer way to do this.

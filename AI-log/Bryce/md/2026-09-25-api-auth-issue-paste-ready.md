@@ -36,7 +36,7 @@ in the same paste-ready format.
   documented; merged via reviewed PR.
 
 ## Decision
-**Bryce:** todo
+**Bryce:** Used the issue body mostly as-is, with a few wording tweaks for clarity. Kept the three open decisions (framework, JWT vs sessions, upload handling) flagged rather than deciding them myself, since those are calls for the whole team to make once we're all in the same room. A couple of the tasks might get trimmed depending on how far we actually get this sprint.
 
 ## Reflection
-**Bryce:** todo
+**Bryce:** I don't have much backend/API experience, so having the endpoints and the definition of ready/done laid out gave me a clear picture of what building the auth layer actually involves. It also made the dependency on the database issue obvious, which helped me sequence the work for whoever picks it up.

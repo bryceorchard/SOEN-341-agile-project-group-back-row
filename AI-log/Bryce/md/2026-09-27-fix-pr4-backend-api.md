@@ -35,7 +35,7 @@ to the PR commit description describing the fixes. (PR #3 was already merged int
 - Delivered the changes as `cc-fix-pr4.patch` in the repo root (apply with `git apply`).
 
 ## Decision
-
+**Bryce:** Applied the patch and re-ran the tests to confirm all seven passed, including the new regression test for the upload path. Kept the stateless logout as-is since that matches the issue spec and a real token blocklist is out of scope for this sprint.
 
 ## Reflection
-
+**Bryce:** The UPLOAD_DIR bug was interesting because it only showed up thanks to our own iCloud path having a space in it — a good example of how an environment-specific thing can hide a real bug that the tests miss when they override the value. I hadn't run into fileURLToPath vs .pathname before.

@@ -32,7 +32,7 @@ referenced issue.
 - Recommendation: move into `docs/minutes/`, add a template block, fix name/typo, then merge.
 
 ## Decision
-
+**Bryce:** Passed the feedback to Gene rather than merging as-is — the main asks being to move the file into docs/minutes/, split out a reusable template, and fix the name/typo nits. Also flagged that our documented branch convention isn't actually being followed, which is a team-wide thing to sort out.
 
 ## Reflection
-
+**Bryce:** Reviewing a docs PR is different from reviewing code, but it was still useful to check it against the actual issue rather than just eyeballing it. It surfaced some inconsistencies in how we're naming things across the repo that are easy to miss until you line them up side by side.

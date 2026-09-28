@@ -29,7 +29,7 @@ reflects the repository's current structure.
 - Left the change unstaged on `main` (no commit) for Bryce to review and commit.
 
 ## Decision
-**Bryce:**
+**Bryce:** Reviewed the rewritten index against the current docs/ tree and kept it. Made sure to pull before committing since local main was slightly behind origin at the time.
 
 ## Reflection
-**Bryce:**
+**Bryce:** Keeping a docs index in sync with a repo that several people are pushing to is more of a moving target than I expected. It's a small thing, but it's the difference between the docs folder being navigable and being stale.
