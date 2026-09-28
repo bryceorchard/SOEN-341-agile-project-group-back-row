@@ -32,7 +32,8 @@ To set it up the following steps need to be done.
 In a Command terminal needed to set up:
 1. git clone https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row.git  
 2. cd SOEN-341-agile-project-group-back-row/backend  
-3. nvm install  
+3. nvm install lts 
+- Note: the above command is specifically for **Windows**. If on Mac OS or Linux OS, run "nvm install --lts"
 4. nvm use  
 5. npm install  
 6. npm test  
