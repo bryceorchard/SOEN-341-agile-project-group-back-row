@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'login',
@@ -9,30 +11,53 @@ import { Router } from '@angular/router';
     <p>Username</p>
     <input type="text" [formControl]="user" />
     <p>Password</p>
-    <input type="text" [formControl]="pass" />
+    <input type="password" [formControl]="pass" />
 
-    <button (click)="redirect()">Login</button>
+    <button (click)="login()">Login</button>
+    <button (click)="register()">Register</button>
+
+    <div *ngIf="WRONG_PASSWORD == display_error">Wrong Password</div>
+    <div *ngIf="USERNAME_TAKEN == display_error">Username Taken</div>
   `,
-  imports: [ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
 })
 
 export class Login {
   private router = inject(Router);
+  private http_client = inject(HttpClient);
 
   user = new FormControl('');
   pass = new FormControl('');
 
-  redirect() {
+  USERNAME_TAKEN = 1;
+  WRONG_PASSWORD = 2;
+  display_error = 0;
+
+  login() {
     let u = this.user.getRawValue();
     let p = this.pass.getRawValue();
 
-    if (0 == this.authenticate()) {
-      this.router.navigateByUrl(`/profile/${u}`);
-    }
+    this.http_client.post<string>('/api/login', u).subscribe(
+      (res) => {
+        if (res == p) {
+          this.router.navigateByUrl(`/profile/${u}`);
+        }
+      },
+      (err) => this.display_error = this.WRONG_PASSWORD,
+    );
   }
 
-  authenticate(): number {
-    // get password from database and authenticate
-    return 0;
+  register() {
+    let u = this.user.getRawValue();
+    let p = this.pass.getRawValue();
+
+    this.http_client.post<string>('/api/register', u).subscribe(
+      (res) => {
+        if (res == p) {
+          this.router.navigateByUrl(`/profile/${u}`);
+        }
+      },
+      (err) => this.display_error = this.USERNAME_TAKEN,
+    );
   }
 }
