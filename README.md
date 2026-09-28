@@ -1,8 +1,8 @@
-# SOEN-341-agile-project-group-back-row: Careeer Connect
+# SOEN-341-agile-project-group-back-row: Career Connect
 Members: Mahmoud Abdalla, Zohair Ameeri, Gene Feng, Luca Mancini, Gabriel Oliviera da Silva, Bryce Orchard 
 General Responsibilities:  
   - Bryce   (Scrum lead):&emspGitHub Setup, Project Board, Labels, Team Process (Branching, PRs, DoR/DoD), Sprint Planning,  Appendix A.  
-  - Gene    (Documentation):&emspREADME, Cover Page, Submission Document, Meeting Minutes Template, Upkeep, Distributed Aid other's. bugs problems.  
+  - Gene    (Documentation):&emspREADME, Cover Page, Submission Document, Meeting Minutes Template, Upkeep, Distributed Aid, debug problems.  
   - Zohair  (Requirements):&emspAI-generated 10 user stories (logged), Team brainstorm section, "Team-Generated User Stories and Features", 15+ issues with tasks  
   - Mahmoud (Backend):&emspDB schema, Auth API (signup/login), backend of profile/resume.   
   - Gabriel (Frontend):&emspRegistration/Login UI, Profile/Resume Upload UI  
@@ -37,7 +37,7 @@ In a Command terminal needed to set up:
 5. npm install  
 6. npm test  
 7. npm start  
-The previous commands downloads a copy of the repository (command #1), goes into hte backend file (command #2), then installs/uses the most up to date for Node (commands #3 & #4) and Javascript (command #5). Finally commands #6 & #7 are used for the platform to test then start up the platform. 
+The previous commands downloads a copy of the repository (command #1), goes into the backend file (command #2), then installs/uses the most up to date for Node (commands #3 & #4) and Javascript (command #5). Finally commands #6 & #7 are used for the platform to test then start up the platform. 
 
 ## Proposed Features
 - User registration, authentication, and profile management.
