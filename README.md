@@ -40,5 +40,12 @@ In a Command terminal needed to set up:
 The previous commands downloads a copy of the repository (command #1), goes into hte backend file (command #2), then installs/uses the most up to date for Node (commands #3 & #4) and Javascript (command #5). Finally commands #6 & #7 are used for the platform to test then start up the platform. 
 
 ## Proposed Features
-Login Features  
-
+- User registration, authentication, and profile management.
+- Resume upload and management.
+- Job posting management for recruiters.
+- Job search and filtering capabilities.
+- Job application submission.
+- Application status tracking (Applied, Interview, Offered, Rejected).
+- Application history dashboard.
+- Notifications and reminders for application deadlines.
+- Saved jobs and favourites.
