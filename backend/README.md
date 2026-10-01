@@ -22,16 +22,16 @@ Env: `JWT_SECRET` (set in production), `CORS_ORIGIN` (default `http://localhost:
 Errors are always `{ "error": "message" }` with status 400 / 401 / 404 / 409.
 Protected routes need `Authorization: Bearer <token>`.
 
-| Method | Route | Body | Success |
-|---|---|---|---|
-| POST | `/auth/signup` | `{ email, password (min 8), role? }` | 201 `{ user }` (409 if email taken) |
-| POST | `/auth/login` | `{ email, password }` | 200 `{ token, user }` |
-| POST | `/auth/logout` | – | 204 (client discards token) |
-| GET | `/auth/me` | – | 200 `{ user }` |
-| GET | `/profile` | – | 200 `{ profile }` |
-| PUT | `/profile` | any of `{ fullName, headline, location, phone, bio }` | 200 `{ profile }` |
-| POST | `/resumes` | multipart field `resume` (PDF/DOC/DOCX, max 5 MB) | 201 `{ resume }` |
-| GET | `/resumes` | – | 200 `{ resumes }` |
-| DELETE | `/resumes/:id` | – | 204 |
+| Method | Route          | Body                                                  | Success                             |
+| ------ | -------------- | ----------------------------------------------------- | ----------------------------------- |
+| POST   | `/auth/signup` | `{ email, password (min 8), role? }`                  | 201 `{ user }` (409 if email taken) |
+| POST   | `/auth/login`  | `{ email, password }`                                 | 200 `{ token, user }`               |
+| POST   | `/auth/logout` | –                                                     | 204 (client discards token)         |
+| GET    | `/auth/me`     | –                                                     | 200 `{ user }`                      |
+| GET    | `/profile`     | –                                                     | 200 `{ profile }`                   |
+| PUT    | `/profile`     | any of `{ fullName, headline, location, phone, bio }` | 200 `{ profile }`                   |
+| POST   | `/resumes`     | multipart field `resume` (PDF/DOC/DOCX, max 5 MB)     | 201 `{ resume }`                    |
+| GET    | `/resumes`     | –                                                     | 200 `{ resumes }`                   |
+| DELETE | `/resumes/:id` | –                                                     | 204                                 |
 
 `user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`.

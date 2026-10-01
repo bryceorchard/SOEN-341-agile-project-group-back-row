@@ -22,12 +22,3 @@ docs/
     └── Team Generated User Stories/
         └── Team-Generated User Stories and Features.pdf
 ```
-
-- **Documentation** lives in `docs/`.
-- **Minutes** live in `docs/minutes/` — use `minutes-template.md` for each new meeting;
-  `WeeklyMinutes.md` is the running log.
-- **User stories** live in `docs/user-stories/`, with AI-generated and team-generated
-  content in **separate** folders so the two sources are never mixed (assignment requirement).
-- **Sprint deliverables** live in `docs/sprint-<n>/`.
-- **AI usage logs** are kept per member under `AI-log/<Name>/` at the repo root
-  (per-interaction markdown entries plus each member's Sprint PDF).
