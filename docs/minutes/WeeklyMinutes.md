@@ -1,9 +1,21 @@
 # Back Row Weekly Minutes
 
 ## Meeting #1 
-Date: 24-09-2026  
-Attendance: All Present   
-Meeting Location: Within the H819 Lab  
+**Date:** 24-09-2026  
+**Time:** HH:MM–HH:MM
+**Meeting Location/Medium:** Within the H819 Lab  
+**Scribe:** Gene
+
+## Attendance
+
+| Member  | Present |
+| ------- | :-----: |
+| Bryce   | Present |
+| Gene    | Present |
+| Zohair  | Present |
+| Mahmoud | Present |
+| Gabriel | Present |
+| Luca    | Present |
 
 ### Agenda:
 Establishing group task distribution, discussions on Sprint 1  
@@ -27,5 +39,8 @@ Nothing started as of this meeting outside of GitHub Repo Creation.
 Discussions around dependencies among each branch (Just Mahmoud and Bryce), everyone should have independent work.  
 Included mandatory meeting with TA  
 
-### Upcoming Tasks:  
-Sprint 1 requirement completion
+## Decisions
+Complete tasks assigned to each person for Sprint 1 - Due Sept 28, 2026 (2026-09-28)
+
+### Action Items:  
+Sprint 1 Issues and requirement completion
