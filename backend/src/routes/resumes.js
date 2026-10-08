@@ -39,6 +39,20 @@ export default function resumeRoutes(db) {
     res.json({ resumes: rows.map(toApi) });
   });
 
+  // Replace the file on an existing resume record; the old file on disk is removed.
+  r.put('/:id', upload.single('resume'), (req, res) => {
+    const row = db.prepare('SELECT * FROM resumes WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
+    if (!row) throw new HttpError(404, 'Resume not found');
+    if (!req.file) throw new HttpError(400, 'No file uploaded (multipart field name: "resume")');
+
+    db.prepare(
+      "UPDATE resumes SET file_path = ?, original_filename = ?, file_type = ?, uploaded_at = datetime('now') WHERE id = ?"
+    ).run(req.file.path, req.file.originalname, req.file.mimetype, row.id);
+    rmSync(row.file_path, { force: true });
+
+    res.json({ resume: toApi(db.prepare('SELECT * FROM resumes WHERE id = ?').get(row.id)) });
+  });
+
   r.delete('/:id', (req, res) => {
     const row = db.prepare('SELECT * FROM resumes WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
     if (!row) throw new HttpError(404, 'Resume not found');
