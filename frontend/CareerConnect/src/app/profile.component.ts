@@ -15,26 +15,71 @@ interface Resume {
 @Component({
   selector: 'profile',
   template: `
-    <h1>{{ user() }}</h1>
+  <div class="profile-upload">
+    <h1>Welcome, {{ user() }}!</h1>
 
-    <form [formGroup]="upload_form" (ngSubmit)="onSubmit()">
-      <div>
-        <input type="file" name="resume" (change)="onFileSelect($event)" />
-      </div>
-      <div>
-        <button type="submit">Upload</button>
-      </div>
-    </form>
+    <div>
+      <form class="profile-upload-form "[formGroup]="upload_form" (ngSubmit)="onSubmit()">
+        <div>
+          <input class="profile-button" type="file" name="resume" (change)="onFileSelect($event)" />
+        </div>
+        <div>
+          <button class="profile-button" type="submit">Upload</button>
+        </div>
+      </form>
+    </div>
 
-    <div *ngIf="upload_error()">{{ upload_error() }}</div>
+    <div *ngIf="upload_error()" class="error">{{ upload_error() }}</div>
+  </div>
 
+  <div class="profile-display">
     <h2>Your resumes</h2>
-    <ul>
-      <li *ngFor="let r of resumes()">
-        {{ r.originalFilename }}
-        <button (click)="deleteResume(r.id)">Delete</button>
-      </li>
-    </ul>
+    <div class="profile-resume">
+      <ul>
+        <li *ngFor="let r of resumes()">
+          {{ r.originalFilename }}
+          <button class="profile-button" (click)="deleteResume(r.id)">Delete</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+  `,
+  styles: `
+    .profile-upload {
+      justify-items: center;
+      border-radius: 10px;
+      background: white;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .profile-upload-form {
+      display: flex;
+      justify-items: center;
+    }
+    .profile-button {
+      border-radius: 10px;
+      border-color: white;
+      border-width: thin;
+      background: midnightblue;
+      color: white;
+      padding: 5px;
+    }
+    input[type="file"]::file-selector-button {
+      display: none;
+    }
+    .profile-display {
+      justify-items: center;
+      border-radius: 10px;
+      background: white;
+      padding: 15px;
+    }
+    .error {
+      background: red;
+      color: white;
+      margin-top: 20px;
+      border-radius: 10px;
+      padding: 5px;
+    }
   `,
   imports: [CommonModule, ReactiveFormsModule],
 })
