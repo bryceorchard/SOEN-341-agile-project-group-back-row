@@ -1,0 +1,5 @@
+default:
+  true
+
+serve:
+  npx ng serve
