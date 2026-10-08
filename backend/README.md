@@ -32,6 +32,15 @@ Protected routes need `Authorization: Bearer <token>`.
 | PUT    | `/profile`     | any of `{ fullName, headline, location, phone, bio }` | 200 `{ profile }`                   |
 | POST   | `/resumes`     | multipart field `resume` (PDF/DOC/DOCX, max 5 MB)     | 201 `{ resume }`                    |
 | GET    | `/resumes`     | –                                                     | 200 `{ resumes }`                   |
+| PUT    | `/resumes/:id` | multipart field `resume` (replaces the file)          | 200 `{ resume }`                    |
 | DELETE | `/resumes/:id` | –                                                     | 204                                 |
+| GET    | `/jobs`        | query: `keyword?`, `location?`, `category?`           | 200 `{ jobs }` (no auth required)   |
+| GET    | `/jobs/:id`    | –                                                     | 200 `{ job }` (no auth required)    |
+| POST   | `/jobs`        | `{ title, description, location?, category?, deadline? }` (recruiter only) | 201 `{ job }` (403 if not a recruiter) |
+| POST   | `/applications`     | `{ jobId, resumeId? }`                           | 201 `{ application }` (409 if already applied) |
+| GET    | `/applications`     | –                                                 | 200 `{ applications }` (current user's own) |
+| PATCH  | `/applications/:id` | `{ status }` one of Applied/Under Review/Interview/Offered/Rejected (recruiter who owns the job only) | 200 `{ application }` |
 
-`user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`.
+`user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`;
+`job` = `{ id, recruiterId, title, description, location, category, deadline, createdAt }`;
+`application` = `{ id, jobId, jobTitle, resumeId, status, appliedAt, updatedAt }`.

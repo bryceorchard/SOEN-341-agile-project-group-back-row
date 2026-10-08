@@ -5,6 +5,8 @@ import { notFound, errorHandler } from './middleware.js';
 import authRoutes from './routes/auth.js';
 import profileRoutes from './routes/profile.js';
 import resumeRoutes from './routes/resumes.js';
+import jobRoutes from './routes/jobs.js';
+import applicationRoutes from './routes/applications.js';
 
 export function createApp(db) {
   const app = express();
@@ -14,6 +16,8 @@ export function createApp(db) {
   app.use('/auth', authRoutes(db));
   app.use('/profile', profileRoutes(db));
   app.use('/resumes', resumeRoutes(db));
+  app.use('/jobs', jobRoutes(db));
+  app.use('/applications', applicationRoutes(db));
   app.use(notFound);
   app.use(errorHandler);
   return app;

@@ -15,6 +15,13 @@ export function requireAuth(req, _res, next) {
   }
 }
 
+export function requireRole(role) {
+  return (req, _res, next) => {
+    if (req.user?.role !== role) return next(new HttpError(403, `Must be a ${role}`));
+    next();
+  };
+}
+
 export function notFound(_req, _res, next) {
   next(new HttpError(404, 'Route not found'));
 }

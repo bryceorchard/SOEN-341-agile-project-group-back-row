@@ -35,3 +35,33 @@ CREATE TABLE IF NOT EXISTS resumes (
 );
 
 CREATE INDEX IF NOT EXISTS idx_resumes_user_id ON resumes(user_id);
+
+CREATE TABLE IF NOT EXISTS jobs (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  recruiter_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title         TEXT    NOT NULL,
+  description   TEXT    NOT NULL,
+  location      TEXT,
+  category      TEXT,
+  deadline      TEXT,
+  created_at    TEXT    NOT NULL DEFAULT (datetime('now')),
+  updated_at    TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_jobs_recruiter_id ON jobs(recruiter_id);
+
+-- Sprint 2 status set; later sprints can extend with Under Review -> interview scheduling etc.
+CREATE TABLE IF NOT EXISTS applications (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  job_id      INTEGER NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
+  resume_id   INTEGER REFERENCES resumes(id) ON DELETE SET NULL,
+  status      TEXT    NOT NULL DEFAULT 'Applied'
+                      CHECK (status IN ('Applied', 'Under Review', 'Interview', 'Offered', 'Rejected')),
+  applied_at  TEXT    NOT NULL DEFAULT (datetime('now')),
+  updated_at  TEXT    NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (user_id, job_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_applications_user_id ON applications(user_id);
+CREATE INDEX IF NOT EXISTS idx_applications_job_id ON applications(job_id);
