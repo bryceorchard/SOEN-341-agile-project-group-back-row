@@ -77,6 +77,7 @@ test('a job seeker applies, cannot double-apply, sees their applications', async
   assert.equal(app.jobTitle, 'Backend Developer');
   assert.equal(app.jobLocation, 'Montreal');
   assert.equal(app.jobCategory, 'Engineering');
+  assert.equal(app.jobStatus, 'open');
   assert.equal(app.resumeFilename, null);
 });
 
@@ -209,4 +210,25 @@ test('applications carry the attached resume filename in POST, GET, and PATCH re
   const afterDelete = (await api.get('/applications').set(seekerAuth).expect(200)).body.applications.find((a) => a.id === created.id);
   assert.equal(afterDelete.resumeId, null);
   assert.equal(afterDelete.resumeFilename, null);
+});
+
+test('applications show jobStatus, so a closed posting is visible to the applicant', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+
+  const job = (await api.post('/jobs').set(recruiterAuth)
+    .send({ title: 'Data Analyst', description: 'Crunch numbers', location: 'Ottawa', category: 'Data' })
+    .expect(201)).body.job;
+
+  const created = (await api.post('/applications').set(seekerAuth).send({ jobId: job.id }).expect(201)).body.application;
+  assert.equal(created.jobStatus, 'open');
+
+  await api.patch(`/jobs/${job.id}/status`).set(recruiterAuth).send({ status: 'closed' }).expect(200);
+
+  const listed = (await api.get('/applications').set(seekerAuth).expect(200)).body.applications.find((a) => a.id === created.id);
+  assert.equal(listed.jobStatus, 'closed');
+  assert.equal(listed.status, 'Applied'); // closing the posting doesn't change the application's own status
+
+  const updated = (await api.patch(`/applications/${created.id}`).set(recruiterAuth).send({ status: 'Rejected' }).expect(200)).body.application;
+  assert.equal(updated.jobStatus, 'closed');
 });

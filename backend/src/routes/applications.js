@@ -11,6 +11,7 @@ const toApi = (a) => ({
   jobLocation: a.job_location,
   jobCategory: a.job_category,
   jobDeadline: a.job_deadline,
+  jobStatus: a.job_status,
   resumeId: a.resume_id,
   resumeFilename: a.resume_filename ?? null,
   status: a.status,
@@ -19,7 +20,7 @@ const toApi = (a) => ({
 });
 
 const SELECT_ONE = `
-  SELECT a.*, j.title AS job_title, j.location AS job_location, j.category AS job_category, j.deadline AS job_deadline,
+  SELECT a.*, j.title AS job_title, j.location AS job_location, j.category AS job_category, j.deadline AS job_deadline, j.status AS job_status,
          r.original_filename AS resume_filename
   FROM applications a
   JOIN jobs j ON j.id = a.job_id
@@ -72,7 +73,7 @@ export default function applicationRoutes(db) {
 
     const rows = db
       .prepare(
-        `SELECT a.*, j.title AS job_title, j.location AS job_location, j.category AS job_category, j.deadline AS job_deadline,
+        `SELECT a.*, j.title AS job_title, j.location AS job_location, j.category AS job_category, j.deadline AS job_deadline, j.status AS job_status,
                 r.original_filename AS resume_filename
          FROM applications a
          JOIN jobs j ON j.id = a.job_id

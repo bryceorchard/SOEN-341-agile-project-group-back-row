@@ -47,5 +47,5 @@ Protected routes need `Authorization: Bearer <token>`.
 
 `user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`;
 `job` = `{ id, recruiterId, title, description, location, category, deadline, status, createdAt }` (`/jobs/mine` adds `applicationCount`);
-`application` = `{ id, jobId, jobTitle, jobLocation, jobCategory, jobDeadline, resumeId, resumeFilename, status, appliedAt, updatedAt }`.
+`application` = `{ id, jobId, jobTitle, jobLocation, jobCategory, jobDeadline, jobStatus, resumeId, resumeFilename, status, appliedAt, updatedAt }`.
 An entry from `/jobs/:id/applications` is shaped `{ id, applicantEmail, applicantName, applicantHeadline, resumeId, resumeFilename, status, appliedAt }`.
