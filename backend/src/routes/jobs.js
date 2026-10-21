@@ -17,11 +17,25 @@ const toApi = (j) => ({
   createdAt: j.created_at,
 });
 
+// Optional text fields: null/undefined stay null, strings are trimmed (blank becomes null),
+// anything else is rejected so it can't reach SQLite as an unbindable value.
+function optionalText(value, field) {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== 'string') throw new HttpError(400, `${field} must be a string`);
+  return value.trim() || null;
+}
+
 function validateJobBody(body) {
-  const { title, description, location = null, category = null, deadline = null } = body ?? {};
+  const { title, description, location, category, deadline } = body ?? {};
   if (typeof title !== 'string' || !title.trim()) throw new HttpError(400, 'Title is required');
   if (typeof description !== 'string' || !description.trim()) throw new HttpError(400, 'Description is required');
-  return { title: title.trim(), description: description.trim(), location, category, deadline };
+  return {
+    title: title.trim(),
+    description: description.trim(),
+    location: optionalText(location, 'location'),
+    category: optionalText(category, 'category'),
+    deadline: optionalText(deadline, 'deadline'),
+  };
 }
 
 export default function jobRoutes(db) {
@@ -51,10 +65,11 @@ export default function jobRoutes(db) {
     res.json({ jobs: rows.map(toApi) });
   });
 
-  // Distinct categories for the search UI's dropdown. Must be registered before '/:id'.
+  // Distinct categories for the search UI's dropdown, from open postings only so every
+  // option returns results in GET /jobs. Must be registered before '/:id'.
   r.get('/categories', (_req, res) => {
     const rows = db
-      .prepare("SELECT DISTINCT category FROM jobs WHERE category IS NOT NULL AND category != '' ORDER BY category")
+      .prepare("SELECT DISTINCT category FROM jobs WHERE status = 'open' AND category IS NOT NULL AND category != '' ORDER BY category")
       .all();
     res.json({ categories: rows.map((r) => r.category) });
   });
