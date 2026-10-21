@@ -36,6 +36,7 @@ Protected routes need `Authorization: Bearer <token>`.
 | DELETE | `/resumes/:id` | –                                                     | 204                                 |
 | GET    | `/jobs`        | query: `keyword?`, `location?`, `category?`           | 200 `{ jobs }` (no auth required)   |
 | GET    | `/jobs/:id`    | –                                                     | 200 `{ job }` (no auth required)    |
+| GET    | `/jobs/:id/applications` | query: `status?`                            | 200 `{ applications }` (owning recruiter only; 404 otherwise) |
 | POST   | `/jobs`        | `{ title, description, location?, category?, deadline? }` (recruiter only) | 201 `{ job }` (403 if not a recruiter) |
 | POST   | `/applications`     | `{ jobId, resumeId? }`                           | 201 `{ application }` (409 if already applied) |
 | GET    | `/applications`     | –                                                 | 200 `{ applications }` (current user's own) |
@@ -44,3 +45,4 @@ Protected routes need `Authorization: Bearer <token>`.
 `user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`;
 `job` = `{ id, recruiterId, title, description, location, category, deadline, createdAt }`;
 `application` = `{ id, jobId, jobTitle, resumeId, status, appliedAt, updatedAt }`.
+An entry from `/jobs/:id/applications` is shaped `{ id, applicantEmail, applicantName, applicantHeadline, resumeId, resumeFilename, status, appliedAt }`.

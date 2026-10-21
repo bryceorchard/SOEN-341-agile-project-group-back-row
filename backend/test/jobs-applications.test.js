@@ -105,3 +105,25 @@ test('resume replace swaps the file and keeps the id', async () => {
   const list = await api.get('/resumes').set(auth).expect(200);
   assert.equal(list.body.resumes.length, 1);
 });
+
+test('GET /jobs/:id/applications: owning recruiter sees applicants, others are refused', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+
+  await api.post('/auth/signup').send({ email: 'other-recruiter@test.com', password: 'Password123!', role: 'recruiter' }).expect(201);
+  const otherRecruiterToken = (await api.post('/auth/login').send({ email: 'other-recruiter@test.com', password: 'Password123!' }).expect(200)).body.token;
+
+  await api.put('/profile').set(seekerAuth).send({ fullName: 'Sam Seeker' }).expect(200);
+
+  await api.get(`/jobs/${jobId}/applications`).set(seekerAuth).expect(403);
+  await api.get(`/jobs/${jobId}/applications`).set({ Authorization: `Bearer ${otherRecruiterToken}` }).expect(404);
+
+  const res = await api.get(`/jobs/${jobId}/applications`).set(recruiterAuth).expect(200);
+  assert.equal(res.body.applications.length, 1);
+  assert.equal(res.body.applications[0].applicantEmail, 'seeker@test.com');
+  assert.equal(res.body.applications[0].applicantName, 'Sam Seeker');
+
+  const filtered = await api.get(`/jobs/${jobId}/applications`).query({ status: 'Offered' }).set(recruiterAuth).expect(200);
+  assert.equal(filtered.body.applications.length, 0);
+  await api.get(`/jobs/${jobId}/applications`).query({ status: 'Not A Status' }).set(recruiterAuth).expect(400);
+});
