@@ -37,7 +37,6 @@ Protected routes need `Authorization: Bearer <token>`.
 | GET    | `/jobs`        | query: `keyword?`, `location?`, `category?`           | 200 `{ jobs }` (no auth required, closed postings excluded) |
 | GET    | `/jobs/mine`   | –                                                     | 200 `{ jobs }` (recruiter's own, any status, with `applicationCount`) |
 | GET    | `/jobs/:id`    | –                                                     | 200 `{ job }` (no auth required)    |
-| GET    | `/jobs/:id/applications` | query: `status?`                            | 200 `{ applications }` (owning recruiter only; 404 otherwise) |
 | POST   | `/jobs`        | `{ title, description, location?, category?, deadline? }` (recruiter only) | 201 `{ job }` (403 if not a recruiter) |
 | PUT    | `/jobs/:id`    | same body as POST (owning recruiter only)             | 200 `{ job }` (404 if not yours)    |
 | PATCH  | `/jobs/:id/status` | `{ status }` one of open/closed (owning recruiter only) | 200 `{ job }` (404 if not yours) |
@@ -48,4 +47,3 @@ Protected routes need `Authorization: Bearer <token>`.
 `user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`;
 `job` = `{ id, recruiterId, title, description, location, category, deadline, status, createdAt }` (`/jobs/mine` adds `applicationCount`);
 `application` = `{ id, jobId, jobTitle, resumeId, status, appliedAt, updatedAt }`.
-An entry from `/jobs/:id/applications` is shaped `{ id, applicantEmail, applicantName, applicantHeadline, resumeId, resumeFilename, status, appliedAt }`.
