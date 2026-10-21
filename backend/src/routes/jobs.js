@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { HttpError } from '../errors.js';
 import { requireAuth, requireRole } from '../middleware.js';
 
+const APPLICATION_STATUSES = ['Applied', 'Under Review', 'Interview', 'Offered', 'Rejected'];
+
 const toApi = (j) => ({
   id: j.id,
   recruiterId: j.recruiter_id,
@@ -44,6 +46,51 @@ export default function jobRoutes(db) {
     const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(req.params.id);
     if (!job) throw new HttpError(404, 'Job not found');
     res.json({ job: toApi(job) });
+  });
+
+  // Owning recruiter only: who applied to this posting. Optional ?status= filter.
+  r.get('/:id/applications', requireAuth, requireRole('recruiter'), (req, res) => {
+    const job = db.prepare('SELECT * FROM jobs WHERE id = ? AND recruiter_id = ?').get(req.params.id, req.user.id);
+    if (!job) throw new HttpError(404, 'Job not found');
+
+    const { status } = req.query;
+    if (status !== undefined && !APPLICATION_STATUSES.includes(status)) {
+      throw new HttpError(400, `status must be one of: ${APPLICATION_STATUSES.join(', ')}`);
+    }
+
+    const clauses = ['a.job_id = @jobId'];
+    const params = { jobId: job.id };
+    if (status !== undefined) {
+      clauses.push('a.status = @status');
+      params.status = status;
+    }
+
+    const rows = db
+      .prepare(
+        `SELECT a.id, a.status, a.applied_at, a.resume_id,
+                u.email AS applicant_email, p.full_name AS applicant_name, p.headline AS applicant_headline,
+                res.original_filename AS resume_filename
+         FROM applications a
+         JOIN users u ON u.id = a.user_id
+         LEFT JOIN profiles p ON p.user_id = a.user_id
+         LEFT JOIN resumes res ON res.id = a.resume_id
+         WHERE ${clauses.join(' AND ')}
+         ORDER BY a.applied_at DESC`
+      )
+      .all(params);
+
+    res.json({
+      applications: rows.map((a) => ({
+        id: a.id,
+        applicantEmail: a.applicant_email,
+        applicantName: a.applicant_name,
+        applicantHeadline: a.applicant_headline,
+        resumeId: a.resume_id,
+        resumeFilename: a.resume_filename,
+        status: a.status,
+        appliedAt: a.applied_at,
+      })),
+    });
   });
 
   r.post('/', requireAuth, requireRole('recruiter'), (req, res) => {
