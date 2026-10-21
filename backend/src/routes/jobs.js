@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { HttpError } from '../errors.js';
 import { requireAuth, requireRole } from '../middleware.js';
 
+const JOB_STATUSES = ['open', 'closed'];
 const APPLICATION_STATUSES = ['Applied', 'Under Review', 'Interview', 'Offered', 'Rejected'];
 
 const toApi = (j) => ({
