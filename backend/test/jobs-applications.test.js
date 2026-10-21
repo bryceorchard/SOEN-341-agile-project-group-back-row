@@ -105,3 +105,39 @@ test('resume replace swaps the file and keeps the id', async () => {
   const list = await api.get('/resumes').set(auth).expect(200);
   assert.equal(list.body.resumes.length, 1);
 });
+
+test('recruiter posting management: mine, edit, close/reopen, and ownership checks', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+
+  await api.post('/auth/signup').send({ email: 'other-recruiter@test.com', password: 'Password123!', role: 'recruiter' }).expect(201);
+  const otherRecruiterToken = (await api.post('/auth/login').send({ email: 'other-recruiter@test.com', password: 'Password123!' }).expect(200)).body.token;
+  const otherRecruiterAuth = { Authorization: `Bearer ${otherRecruiterToken}` };
+
+  await api.get('/jobs/mine').set(seekerAuth).expect(403);
+  const mine = await api.get('/jobs/mine').set(recruiterAuth).expect(200);
+  assert.equal(mine.body.jobs.length, 2);
+  const backendJob = mine.body.jobs.find((j) => j.title === 'Backend Developer');
+  assert.equal(backendJob.status, 'open');
+  assert.equal(backendJob.applicationCount, 1);
+
+  await api.put(`/jobs/${jobId}`).set(otherRecruiterAuth).send({ title: 'Hijack', description: 'x' }).expect(404);
+  await api.put(`/jobs/${jobId}`).set(recruiterAuth).send({ title: '' }).expect(400);
+  const edited = await api.put(`/jobs/${jobId}`).set(recruiterAuth)
+    .send({ title: 'Backend Developer II', description: 'Updated role', location: 'Montreal', category: 'Engineering' })
+    .expect(200);
+  assert.equal(edited.body.job.title, 'Backend Developer II');
+
+  await api.patch(`/jobs/${jobId}/status`).set(otherRecruiterAuth).send({ status: 'closed' }).expect(404);
+  await api.patch(`/jobs/${jobId}/status`).set(recruiterAuth).send({ status: 'not-a-status' }).expect(400);
+  const closed = await api.patch(`/jobs/${jobId}/status`).set(recruiterAuth).send({ status: 'closed' }).expect(200);
+  assert.equal(closed.body.job.status, 'closed');
+
+  const listed = await api.get('/jobs').expect(200);
+  assert.ok(!listed.body.jobs.some((j) => j.id === jobId));
+
+  await api.post('/applications').set(seekerAuth).send({ jobId }).expect(400);
+
+  const reopened = await api.patch(`/jobs/${jobId}/status`).set(recruiterAuth).send({ status: 'open' }).expect(200);
+  assert.equal(reopened.body.job.status, 'open');
+});

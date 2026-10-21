@@ -22,7 +22,9 @@ export default function applicationRoutes(db) {
     const { jobId, resumeId = null } = req.body ?? {};
     if (!Number.isInteger(jobId)) throw new HttpError(400, 'jobId is required');
 
-    if (!db.prepare('SELECT 1 FROM jobs WHERE id = ?').get(jobId)) throw new HttpError(404, 'Job not found');
+    const job = db.prepare('SELECT status FROM jobs WHERE id = ?').get(jobId);
+    if (!job) throw new HttpError(404, 'Job not found');
+    if (job.status === 'closed') throw new HttpError(400, 'This job posting is closed');
 
     if (resumeId !== null) {
       const resume = db.prepare('SELECT 1 FROM resumes WHERE id = ? AND user_id = ?').get(resumeId, req.user.id);
