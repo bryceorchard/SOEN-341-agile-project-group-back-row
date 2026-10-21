@@ -10,7 +10,7 @@
 cd backend
 npm install
 npm run db:migrate   # create tables from db/schema.sql
-npm run db:seed      # demo users (password: Password123!)
+npm run db:seed      # demo users (password: Password123!), 14 jobs across 2 recruiters, and demo applications
 npm run db:reset     # wipe + migrate + seed
 ```
 The database file is created at `backend/data/careerconnect.db` (gitignored). Override with `DB_PATH`.
@@ -35,6 +35,7 @@ Protected routes need `Authorization: Bearer <token>`.
 | PUT    | `/resumes/:id` | multipart field `resume` (replaces the file)          | 200 `{ resume }`                    |
 | DELETE | `/resumes/:id` | –                                                     | 204                                 |
 | GET    | `/jobs`        | query: `keyword?`, `location?`, `category?`           | 200 `{ jobs }` (no auth required)   |
+| GET    | `/jobs/categories` | –                                                  | 200 `{ categories }` (distinct, no auth required) |
 | GET    | `/jobs/:id`    | –                                                     | 200 `{ job }` (no auth required)    |
 | POST   | `/jobs`        | `{ title, description, location?, category?, deadline? }` (recruiter only) | 201 `{ job }` (403 if not a recruiter) |
 | POST   | `/applications`     | `{ jobId, resumeId? }`                           | 201 `{ application }` (409 if already applied) |

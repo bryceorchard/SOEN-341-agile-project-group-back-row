@@ -63,6 +63,11 @@ test('jobs are listed and searched without auth', async () => {
   await api.get('/jobs/99999').expect(404);
 });
 
+test('GET /jobs/categories returns the distinct categories, not a job id lookup', async () => {
+  const res = await api.get('/jobs/categories').expect(200);
+  assert.deepEqual(res.body.categories, ['Engineering', 'QA']);
+});
+
 test('a job seeker applies, cannot double-apply, sees their applications', async () => {
   const auth = { Authorization: `Bearer ${seekerToken}` };
   const applied = await api.post('/applications').set(auth).send({ jobId }).expect(201);

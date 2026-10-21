@@ -40,6 +40,14 @@ export default function jobRoutes(db) {
     res.json({ jobs: rows.map(toApi) });
   });
 
+  // Distinct categories for the search UI's dropdown. Must be registered before '/:id'.
+  r.get('/categories', (_req, res) => {
+    const rows = db
+      .prepare("SELECT DISTINCT category FROM jobs WHERE category IS NOT NULL AND category != '' ORDER BY category")
+      .all();
+    res.json({ categories: rows.map((r) => r.category) });
+  });
+
   r.get('/:id', (req, res) => {
     const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(req.params.id);
     if (!job) throw new HttpError(404, 'Job not found');
