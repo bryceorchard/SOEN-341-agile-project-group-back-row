@@ -44,6 +44,8 @@ CREATE TABLE IF NOT EXISTS jobs (
   location      TEXT,
   category      TEXT,
   deadline      TEXT,
+  status        TEXT    NOT NULL DEFAULT 'open'
+                        CHECK (status IN ('open', 'closed')),
   created_at    TEXT    NOT NULL DEFAULT (datetime('now')),
   updated_at    TEXT    NOT NULL DEFAULT (datetime('now'))
 );
