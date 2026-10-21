@@ -38,9 +38,9 @@ Protected routes need `Authorization: Bearer <token>`.
 | GET    | `/jobs/:id`    | –                                                     | 200 `{ job }` (no auth required)    |
 | POST   | `/jobs`        | `{ title, description, location?, category?, deadline? }` (recruiter only) | 201 `{ job }` (403 if not a recruiter) |
 | POST   | `/applications`     | `{ jobId, resumeId? }`                           | 201 `{ application }` (409 if already applied) |
-| GET    | `/applications`     | –                                                 | 200 `{ applications }` (current user's own) |
+| GET    | `/applications`     | query: `status?`                                 | 200 `{ applications }` (current user's own) |
 | PATCH  | `/applications/:id` | `{ status }` one of Applied/Under Review/Interview/Offered/Rejected (recruiter who owns the job only) | 200 `{ application }` |
 
 `user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`;
 `job` = `{ id, recruiterId, title, description, location, category, deadline, createdAt }`;
-`application` = `{ id, jobId, jobTitle, resumeId, status, appliedAt, updatedAt }`.
+`application` = `{ id, jobId, jobTitle, jobLocation, jobCategory, jobDeadline, resumeId, resumeFilename, status, appliedAt, updatedAt }`.

@@ -73,7 +73,23 @@ test('a job seeker applies, cannot double-apply, sees their applications', async
 
   const mine = await api.get('/applications').set(auth).expect(200);
   assert.equal(mine.body.applications.length, 1);
-  assert.equal(mine.body.applications[0].jobTitle, 'Backend Developer');
+  const app = mine.body.applications[0];
+  assert.equal(app.jobTitle, 'Backend Developer');
+  assert.equal(app.jobLocation, 'Montreal');
+  assert.equal(app.jobCategory, 'Engineering');
+  assert.equal(app.resumeFilename, null);
+});
+
+test('GET /applications?status filters, and rejects an invalid status', async () => {
+  const auth = { Authorization: `Bearer ${seekerToken}` };
+
+  const applied = await api.get('/applications').query({ status: 'Applied' }).set(auth).expect(200);
+  assert.equal(applied.body.applications.length, 1);
+
+  const offered = await api.get('/applications').query({ status: 'Offered' }).set(auth).expect(200);
+  assert.equal(offered.body.applications.length, 0);
+
+  await api.get('/applications').query({ status: 'Not A Status' }).set(auth).expect(400);
 });
 
 test('only the owning recruiter can update an application status', async () => {
