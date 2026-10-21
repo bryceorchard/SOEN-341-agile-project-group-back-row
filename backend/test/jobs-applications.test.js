@@ -179,3 +179,34 @@ test('recruiter posting management: mine, edit, close/reopen, and ownership chec
   const reopened = await api.patch(`/jobs/${jobId}/status`).set(recruiterAuth).send({ status: 'open' }).expect(200);
   assert.equal(reopened.body.job.status, 'open');
 });
+
+test('applications carry the attached resume filename in POST, GET, and PATCH responses', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+
+  const job = (await api.post('/jobs').set(recruiterAuth)
+    .send({ title: 'Frontend Developer', description: 'Build the UI', location: 'Toronto', category: 'Engineering', deadline: '2026-12-01' })
+    .expect(201)).body.job;
+  const resume = (await api.post('/resumes').set(seekerAuth)
+    .attach('resume', Buffer.from('%PDF-1.4 cv'), { filename: 'cv-frontend.pdf', contentType: 'application/pdf' })
+    .expect(201)).body.resume;
+
+  const created = (await api.post('/applications').set(seekerAuth).send({ jobId: job.id, resumeId: resume.id }).expect(201)).body.application;
+  assert.equal(created.resumeId, resume.id);
+  assert.equal(created.resumeFilename, 'cv-frontend.pdf');
+  assert.equal(created.jobLocation, 'Toronto');
+  assert.equal(created.jobDeadline, '2026-12-01');
+
+  const listed = (await api.get('/applications').set(seekerAuth).expect(200)).body.applications.find((a) => a.id === created.id);
+  assert.equal(listed.resumeFilename, 'cv-frontend.pdf');
+
+  const updated = (await api.patch(`/applications/${created.id}`).set(recruiterAuth).send({ status: 'Under Review' }).expect(200)).body.application;
+  assert.equal(updated.resumeFilename, 'cv-frontend.pdf');
+  assert.deepEqual(Object.keys(updated).sort(), Object.keys(created).sort());
+
+  // Deleting the resume keeps the application; the resume fields fall back to null.
+  await api.delete(`/resumes/${resume.id}`).set(seekerAuth).expect(204);
+  const afterDelete = (await api.get('/applications').set(seekerAuth).expect(200)).body.applications.find((a) => a.id === created.id);
+  assert.equal(afterDelete.resumeId, null);
+  assert.equal(afterDelete.resumeFilename, null);
+});
