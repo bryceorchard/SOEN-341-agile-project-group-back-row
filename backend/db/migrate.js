@@ -15,6 +15,13 @@ export function openDb() {
 
 export function migrate(db) {
   db.exec(readFileSync(join(here, 'schema.sql'), 'utf8'));
+
+  // schema.sql only CREATEs tables, so a column added after a table already exists
+  // (e.g. jobs.status) needs an explicit, idempotent ALTER for databases from before it.
+  const jobColumns = db.prepare('PRAGMA table_info(jobs)').all().map((c) => c.name);
+  if (!jobColumns.includes('status')) {
+    db.exec("ALTER TABLE jobs ADD COLUMN status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed'))");
+  }
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
