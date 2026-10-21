@@ -1,5 +1,5 @@
 # CareerConnect
-
+test
 **SOEN 341 - Agile Project (Group: back-row)**
 
 CareerConnect is a web-based platform that streamlines job seeking and recruiting in one place. Job seekers can build a profile, upload and manage resumes, search and filter jobs, and track their applications through each stage. Recruiters can post and manage job listings and review candidates. The goal is to replace the scattered, multi-channel job hunt with a single organized workflow for both sides of the market.
