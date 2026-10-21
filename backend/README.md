@@ -45,8 +45,6 @@ Protected routes need `Authorization: Bearer <token>`.
 | GET    | `/applications`     | query: `status?`                                 | 200 `{ applications }` (current user's own) |
 | PATCH  | `/applications/:id` | `{ status }` one of Applied/Under Review/Interview/Offered/Rejected (recruiter who owns the job only) | 200 `{ application }` |
 
-
-
 `user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`;
 `job` = `{ id, recruiterId, title, description, location, category, deadline, status, createdAt }` (`/jobs/mine` adds `applicationCount`);
 `application` = `{ id, jobId, jobTitle, jobLocation, jobCategory, jobDeadline, resumeId, resumeFilename, status, appliedAt, updatedAt }`.
