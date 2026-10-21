@@ -63,6 +63,11 @@ test('jobs are listed and searched without auth', async () => {
   await api.get('/jobs/99999').expect(404);
 });
 
+test('GET /jobs/categories returns the distinct categories, not a job id lookup', async () => {
+  const res = await api.get('/jobs/categories').expect(200);
+  assert.deepEqual(res.body.categories, ['Engineering', 'QA']);
+});
+
 test('a job seeker applies, cannot double-apply, sees their applications', async () => {
   const auth = { Authorization: `Bearer ${seekerToken}` };
   const applied = await api.post('/applications').set(auth).send({ jobId }).expect(201);
@@ -231,4 +236,39 @@ test('applications show jobStatus, so a closed posting is visible to the applica
 
   const updated = (await api.patch(`/applications/${created.id}`).set(recruiterAuth).send({ status: 'Rejected' }).expect(200)).body.application;
   assert.equal(updated.jobStatus, 'closed');
+});
+
+test('GET /jobs/categories only lists categories that have open postings', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const legal = (await api.post('/jobs').set(recruiterAuth)
+    .send({ title: 'Paralegal', description: 'Review contracts', category: 'Legal' }).expect(201)).body.job;
+
+  let categories = (await api.get('/jobs/categories').expect(200)).body.categories;
+  assert.ok(categories.includes('Legal'));
+
+  await api.patch(`/jobs/${legal.id}/status`).set(recruiterAuth).send({ status: 'closed' }).expect(200);
+  categories = (await api.get('/jobs/categories').expect(200)).body.categories;
+  assert.ok(!categories.includes('Legal'), 'a category whose only posting is closed should disappear');
+
+  await api.patch(`/jobs/${legal.id}/status`).set(recruiterAuth).send({ status: 'open' }).expect(200);
+  categories = (await api.get('/jobs/categories').expect(200)).body.categories;
+  assert.ok(categories.includes('Legal'));
+});
+
+test('optional job fields are trimmed, blanks become null, and non-strings are rejected', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const job = (await api.post('/jobs').set(recruiterAuth)
+    .send({ title: 'Office Manager', description: 'Run the office', location: '  Laval ', category: ' Operations  ', deadline: '' })
+    .expect(201)).body.job;
+  assert.equal(job.location, 'Laval');
+  assert.equal(job.category, 'Operations');
+  assert.equal(job.deadline, null);
+
+  const filtered = (await api.get('/jobs').query({ category: 'Operations' }).expect(200)).body.jobs;
+  assert.ok(filtered.some((j) => j.id === job.id));
+  const categories = (await api.get('/jobs/categories').expect(200)).body.categories;
+  assert.ok(categories.includes('Operations') && !categories.some((c) => c !== c.trim()));
+
+  await api.post('/jobs').set(recruiterAuth).send({ title: 'X', description: 'Y', category: 123 }).expect(400);
+  await api.put(`/jobs/${job.id}`).set(recruiterAuth).send({ title: 'X', description: 'Y', location: { city: 'Laval' } }).expect(400);
 });
