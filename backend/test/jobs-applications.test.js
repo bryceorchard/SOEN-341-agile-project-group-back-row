@@ -300,3 +300,21 @@ test('optional job fields are trimmed, blanks become null, and non-strings are r
   await api.post('/jobs').set(recruiterAuth).send({ title: 'X', description: 'Y', category: 123 }).expect(400);
   await api.put(`/jobs/${job.id}`).set(recruiterAuth).send({ title: 'X', description: 'Y', location: { city: 'Laval' } }).expect(400);
 });
+
+test('resume filenames keep non-ASCII characters through upload, list, and download', async () => {
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+  const name = 'Résumé – Bryce’s CV (2026).pdf';
+
+  const up = await api.post('/resumes').set(seekerAuth)
+    .attach('resume', Buffer.from('%PDF-1.4 utf8'), { filename: name, contentType: 'application/pdf' }).expect(201);
+  assert.equal(up.body.resume.originalFilename, name);
+
+  const listed = (await api.get('/resumes').set(seekerAuth).expect(200)).body.resumes.find((r) => r.id === up.body.resume.id);
+  assert.equal(listed.originalFilename, name);
+
+  const file = await api.get(`/resumes/${up.body.resume.id}/file`).set(seekerAuth).expect(200);
+  const disposition = file.headers['content-disposition'];
+  assert.match(disposition, /^inline; filename="[\x20-\x7e]+"; filename\*=UTF-8''/);
+  assert.equal(decodeURIComponent(disposition.split("filename*=UTF-8''")[1]), name);
+  assert.equal(file.headers['x-content-type-options'], 'nosniff');
+});
