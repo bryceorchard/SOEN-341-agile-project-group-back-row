@@ -33,6 +33,7 @@ Protected routes need `Authorization: Bearer <token>`.
 | POST   | `/resumes`     | multipart field `resume` (PDF/DOC/DOCX, max 5 MB)     | 201 `{ resume }`                    |
 | GET    | `/resumes`     | –                                                     | 200 `{ resumes }`                   |
 | PUT    | `/resumes/:id` | multipart field `resume` (replaces the file)          | 200 `{ resume }`                    |
+| GET    | `/resumes/:id/file` | –                                                | 200 file stream (owner or a recruiter whose job this resume was submitted to; 404 otherwise) |
 | DELETE | `/resumes/:id` | –                                                     | 204                                 |
 | GET    | `/jobs`        | query: `keyword?`, `location?`, `category?`           | 200 `{ jobs }` (no auth required)   |
 | GET    | `/jobs/:id`    | –                                                     | 200 `{ job }` (no auth required)    |
