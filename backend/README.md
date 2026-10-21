@@ -42,10 +42,10 @@ Protected routes need `Authorization: Bearer <token>`.
 | PUT    | `/jobs/:id`    | same body as POST (owning recruiter only)             | 200 `{ job }` (404 if not yours)    |
 | PATCH  | `/jobs/:id/status` | `{ status }` one of open/closed (owning recruiter only) | 200 `{ job }` (404 if not yours) |
 | POST   | `/applications`     | `{ jobId, resumeId? }`                           | 201 `{ application }` (409 if already applied) |
-| GET    | `/applications`     | –                                                 | 200 `{ applications }` (current user's own) |
+| GET    | `/applications`     | query: `status?`                                 | 200 `{ applications }` (current user's own) |
 | PATCH  | `/applications/:id` | `{ status }` one of Applied/Under Review/Interview/Offered/Rejected (recruiter who owns the job only) | 200 `{ application }` |
 
 `user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`;
 `job` = `{ id, recruiterId, title, description, location, category, deadline, status, createdAt }` (`/jobs/mine` adds `applicationCount`);
-`application` = `{ id, jobId, jobTitle, resumeId, status, appliedAt, updatedAt }`.
+`application` = `{ id, jobId, jobTitle, jobLocation, jobCategory, jobDeadline, resumeId, resumeFilename, status, appliedAt, updatedAt }`.
 An entry from `/jobs/:id/applications` is shaped `{ id, applicantEmail, applicantName, applicantHeadline, resumeId, resumeFilename, status, appliedAt }`.
