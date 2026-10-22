@@ -1,5 +1,4 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -12,106 +11,63 @@ interface Resume {
   uploadedAt: string;
 }
 
+interface ProfileData {
+  fullName: string | null;
+  headline: string | null;
+  location: string | null;
+  phone: string | null;
+  bio: string | null;
+}
+
 @Component({
   selector: 'profile',
-  template: `
-  <div class="profile-upload">
-    <h1>Welcome, {{ user() }}!</h1>
-
-    <div>
-      <form class="profile-upload-form "[formGroup]="upload_form" (ngSubmit)="onSubmit()">
-        <div>
-          <input class="profile-button" type="file" name="resume" (change)="onFileSelect($event)" />
-        </div>
-        <div>
-          <button class="profile-button" type="submit">Upload</button>
-        </div>
-      </form>
-    </div>
-
-    <div *ngIf="upload_error()" class="error">{{ upload_error() }}</div>
-  </div>
-
-  <div class="profile-display">
-    <h2>Your resumes</h2>
-    <div class="profile-resume">
-      <ul>
-        <li *ngFor="let r of resumes()">
-          {{ r.originalFilename }}
-          <button class="profile-button" (click)="deleteResume(r.id)">Delete</button>
-        </li>
-      </ul>
-    </div>
-  </div>
-  `,
-  styles: `
-    .profile-upload {
-      justify-items: center;
-      border-radius: 10px;
-      background: white;
-      padding: 15px;
-      margin-bottom: 20px;
-    }
-    .profile-upload-form {
-      display: flex;
-      justify-items: center;
-    }
-    .profile-button {
-      border-radius: 10px;
-      border-color: white;
-      border-width: thin;
-      background: midnightblue;
-      color: white;
-      padding: 5px;
-    }
-    input[type="file"]::file-selector-button {
-      display: none;
-    }
-    .profile-display {
-      justify-items: center;
-      border-radius: 10px;
-      background: white;
-      padding: 15px;
-    }
-    .error {
-      background: red;
-      color: white;
-      margin-top: 20px;
-      border-radius: 10px;
-      padding: 5px;
-    }
-  `,
+  templateUrl: './profile.component.html',
+  styleUrl: './profile.component.css',
   imports: [CommonModule, ReactiveFormsModule],
 })
 export class Profile implements OnInit {
-  private activated_route = inject(ActivatedRoute);
-  private router = inject(Router);
   private form_builder = inject(FormBuilder);
   private http_client = inject(HttpClient);
   private auth = inject(AuthService);
 
-  user = signal('');
+  user = this.auth.currentUser;
   resumes = signal<Resume[]>([]);
   upload_error = signal('');
+  profile_saved = signal(false);
+  replacing_id = signal<number | null>(null);
 
   upload_form: FormGroup;
+  profile_form: FormGroup;
 
   constructor() {
-    this.activated_route.params.subscribe((params) => {
-      this.user.set(params['user']);
-    });
-    this.upload_form = this.form_builder.group({
-      resume: [''],
+    this.upload_form = this.form_builder.group({ resume: [''] });
+    this.profile_form = this.form_builder.group({
+      fullName: [''],
+      headline: [''],
+      location: [''],
+      phone: [''],
+      bio: [''],
     });
   }
 
   ngOnInit() {
-    // The backend reads the user from the JWT, not from the URL, so no token = no access.
-    if (!this.auth.isLoggedIn()) {
-      this.router.navigateByUrl('/login');
-      return;
-    }
     this.refreshResumes();
+    this.http_client.get<{ profile: ProfileData }>(`${API_BASE}/profile`).subscribe((res) => {
+      this.profile_form.patchValue({
+        fullName: res.profile.fullName ?? '',
+        headline: res.profile.headline ?? '',
+        location: res.profile.location ?? '',
+        phone: res.profile.phone ?? '',
+        bio: res.profile.bio ?? '',
+      });
+    });
+  }
+
+  saveProfile() {
+    this.profile_saved.set(false);
+    this.http_client.put(`${API_BASE}/profile`, this.profile_form.getRawValue()).subscribe({
+      next: () => this.profile_saved.set(true),
+    });
   }
 
   onFileSelect(event: Event) {
@@ -130,7 +86,10 @@ export class Profile implements OnInit {
     this.upload_error.set('');
 
     this.http_client.post<{ resume: Resume }>(`${API_BASE}/resumes`, form_data).subscribe({
-      next: () => this.refreshResumes(),
+      next: () => {
+        this.upload_form.reset();
+        this.refreshResumes();
+      },
       error: (err) => this.upload_error.set(err?.error?.error ?? 'Upload failed'),
     });
   }
@@ -138,6 +97,31 @@ export class Profile implements OnInit {
   deleteResume(id: number) {
     this.http_client.delete(`${API_BASE}/resumes/${id}`).subscribe({
       next: () => this.refreshResumes(),
+    });
+  }
+
+  viewResume(id: number) {
+    this.http_client.get(`${API_BASE}/resumes/${id}/file`, { responseType: 'blob' }).subscribe((blob) => {
+      window.open(URL.createObjectURL(blob), '_blank');
+    });
+  }
+
+  startReplace(id: number) {
+    this.replacing_id.set(id);
+  }
+
+  onReplaceSelect(event: Event, id: number) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+
+    const form_data = new FormData();
+    form_data.append('resume', file);
+    this.http_client.put<{ resume: Resume }>(`${API_BASE}/resumes/${id}`, form_data).subscribe({
+      next: () => {
+        this.replacing_id.set(null);
+        this.refreshResumes();
+      },
     });
   }
 

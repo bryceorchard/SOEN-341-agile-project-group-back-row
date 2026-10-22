@@ -1,0 +1,50 @@
+<a class="back-link" routerLink="/recruiter/postings">← Back to my postings</a>
+
+<p class="not-found" *ngIf="forbidden()">You don't have access to this posting's applicants.</p>
+
+<div *ngIf="!forbidden()">
+  <div class="page-header">
+    <h1>Applicants</h1>
+  </div>
+
+  <div class="status-filter">
+    <button
+      class="btn btn-sm"
+      [class.btn-primary]="active_status() === ''"
+      [class.btn-secondary]="active_status() !== ''"
+      (click)="filterBy('')"
+    >
+      All
+    </button>
+    <button
+      class="btn btn-sm"
+      *ngFor="let s of statuses"
+      [class.btn-primary]="active_status() === s"
+      [class.btn-secondary]="active_status() !== s"
+      (click)="filterBy(s)"
+    >
+      {{ s }}
+    </button>
+  </div>
+
+  <div class="applicant-list" *ngIf="applicants().length; else noApplicants">
+    <div class="card applicant-row" *ngFor="let a of applicants()">
+      <div class="applicant-info">
+        <h2>{{ a.applicantName || a.applicantEmail }}</h2>
+        <p class="applicant-meta">{{ a.applicantEmail }}<span *ngIf="a.applicantHeadline"> · {{ a.applicantHeadline }}</span></p>
+        <p class="applicant-meta">Applied {{ a.appliedAt | slice: 0:10 }}</p>
+        <button class="btn btn-secondary btn-sm" *ngIf="a.resumeId" (click)="viewResume(a.resumeId)">View resume</button>
+        <span class="no-resume" *ngIf="!a.resumeId">No resume attached</span>
+      </div>
+
+      <div class="applicant-status">
+        <select [ngModel]="a.status" (ngModelChange)="setStatus(a, $event)" name="status-{{ a.id }}">
+          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <ng-template #noApplicants>
+    <p class="empty-state">No applicants yet.</p>
+  </ng-template>
+</div>

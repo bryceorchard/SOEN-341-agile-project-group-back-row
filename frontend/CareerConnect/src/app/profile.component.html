@@ -1,0 +1,65 @@
+<div class="page-header">
+  <div>
+    <h1>Your profile</h1>
+    <p>{{ user()?.email }} · {{ user()?.role === 'recruiter' ? 'Recruiter' : 'Job seeker' }}</p>
+  </div>
+</div>
+
+<div class="card profile-card">
+  <h2>Details</h2>
+  <form [formGroup]="profile_form" (ngSubmit)="saveProfile()">
+    <div class="field">
+      <label>Full name</label>
+      <input formControlName="fullName" placeholder="Your name" />
+    </div>
+    <div class="field">
+      <label>Headline</label>
+      <input formControlName="headline" placeholder="e.g. Junior backend developer" />
+    </div>
+    <div class="field">
+      <label>Location</label>
+      <input formControlName="location" placeholder="City, Province" />
+    </div>
+    <div class="field">
+      <label>Phone</label>
+      <input formControlName="phone" placeholder="Optional" />
+    </div>
+    <div class="field">
+      <label>Bio</label>
+      <textarea formControlName="bio" rows="3" placeholder="A short summary"></textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">Save profile</button>
+    <div *ngIf="profile_saved()" class="alert alert-success">Saved.</div>
+  </form>
+</div>
+
+<div class="card resumes-card">
+  <h2>Resumes</h2>
+
+  <form class="upload-row" [formGroup]="upload_form" (ngSubmit)="onSubmit()">
+    <input type="file" (change)="onFileSelect($event)" accept=".pdf,.doc,.docx" />
+    <button class="btn btn-primary btn-sm" type="submit">Upload</button>
+  </form>
+  <div *ngIf="upload_error()" class="alert alert-error">{{ upload_error() }}</div>
+
+  <ul class="resume-list" *ngIf="resumes().length; else noResumes">
+    <li *ngFor="let r of resumes()" class="resume-row">
+      <span class="resume-name">{{ r.originalFilename }}</span>
+      <div class="resume-actions">
+        <button class="btn btn-secondary btn-sm" (click)="viewResume(r.id)">View</button>
+
+        <ng-container *ngIf="replacing_id() === r.id; else replaceButton">
+          <input type="file" accept=".pdf,.doc,.docx" (change)="onReplaceSelect($event, r.id)" />
+        </ng-container>
+        <ng-template #replaceButton>
+          <button class="btn btn-secondary btn-sm" (click)="startReplace(r.id)">Replace</button>
+        </ng-template>
+
+        <button class="btn btn-danger btn-sm" (click)="deleteResume(r.id)">Delete</button>
+      </div>
+    </li>
+  </ul>
+  <ng-template #noResumes>
+    <p class="empty-state">No resumes uploaded yet.</p>
+  </ng-template>
+</div>

@@ -1,0 +1,58 @@
+.back-link {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-size: 0.88rem;
+  text-decoration: none;
+  color: var(--text-muted);
+}
+
+.back-link:hover {
+  color: var(--primary);
+}
+
+.status-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.applicant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.applicant-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.applicant-info h2 {
+  font-size: 1rem;
+}
+
+.applicant-meta {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin: 2px 0 8px;
+}
+
+.no-resume {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.applicant-status select {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.not-found {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--text-muted);
+}

@@ -1,0 +1,39 @@
+.profile-card {
+  margin-bottom: 20px;
+}
+
+.upload-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.resume-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.resume-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.resume-name {
+  font-weight: 500;
+}
+
+.resume-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.resume-actions input[type='file'] {
+  font-size: 0.78rem;
+}
