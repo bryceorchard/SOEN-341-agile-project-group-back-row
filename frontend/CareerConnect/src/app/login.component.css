@@ -1,18 +1,45 @@
 .auth-shell {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  overflow: hidden;
+}
+
+.auth-bubble-1 {
+  width: 260px;
+  height: 260px;
+  top: -80px;
+  left: 8%;
+}
+
+.auth-bubble-2 {
+  width: 200px;
+  height: 200px;
+  bottom: -60px;
+  right: 10%;
+}
+
+.auth-bubble-3 {
+  width: 120px;
+  height: 120px;
+  top: 18%;
+  right: 20%;
 }
 
 .auth-card {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 360px;
   background: var(--surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 32px 28px;
+  border-top: 4px solid transparent;
+  border-image: linear-gradient(90deg, var(--primary-light), var(--accent), var(--accent-2)) 1;
 }
 
 .auth-card h1 {

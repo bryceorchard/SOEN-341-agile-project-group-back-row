@@ -23,12 +23,14 @@
   display: block;
   text-decoration: none;
   color: inherit;
-  transition: transform 0.12s, box-shadow 0.12s;
+  border-left: 4px solid transparent;
+  transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
 }
 
 .job-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(28, 31, 51, 0.08), 0 12px 28px rgba(28, 31, 51, 0.1);
+  box-shadow: 0 2px 4px rgba(16, 59, 51, 0.08), 0 12px 28px rgba(15, 118, 110, 0.14);
+  border-left-color: var(--primary-light);
 }
 
 .job-card-header {

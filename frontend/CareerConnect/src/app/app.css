@@ -3,12 +3,25 @@
   align-items: center;
   gap: 24px;
   padding: 14px 28px;
-  background: var(--primary);
+  background: linear-gradient(120deg, var(--primary-dark), var(--primary) 55%, var(--primary-light));
   color: white;
   box-shadow: var(--shadow);
   position: sticky;
   top: 0;
   z-index: 10;
+  overflow: hidden;
+}
+
+.nav::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: 12%;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(251, 191, 36, 0.35), transparent 70%);
+  pointer-events: none;
 }
 
 .nav-brand {
@@ -71,7 +84,26 @@
 }
 
 .page {
+  position: relative;
   max-width: 980px;
   margin: 0 auto;
   padding: 28px 20px 60px;
+}
+
+.page::before {
+  content: '';
+  position: fixed;
+  top: 100px;
+  right: 4%;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(20, 184, 166, 0.1), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page > * {
+  position: relative;
+  z-index: 1;
 }

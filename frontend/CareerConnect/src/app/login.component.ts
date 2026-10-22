@@ -22,11 +22,21 @@ export class Login {
   USERNAME_TAKEN = 1;
   WRONG_PASSWORD = 2;
   OTHER_ERROR = 3;
+  INVALID_EMAIL = 4;
   display_error = 0;
+
+  private isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
 
   login() {
     const email = this.user.getRawValue() ?? '';
     const password = this.pass.getRawValue() ?? '';
+
+    if (!this.isValidEmail(email)) {
+      this.display_error = this.INVALID_EMAIL;
+      return;
+    }
     this.display_error = 0;
 
     this.auth.login(email, password).subscribe({
@@ -40,6 +50,11 @@ export class Login {
     const email = this.user.getRawValue() ?? '';
     const password = this.pass.getRawValue() ?? '';
     const role = this.role.getRawValue() ?? 'job_seeker';
+
+    if (!this.isValidEmail(email)) {
+      this.display_error = this.INVALID_EMAIL;
+      return;
+    }
     this.display_error = 0;
 
     this.auth.register(email, password, role).subscribe({

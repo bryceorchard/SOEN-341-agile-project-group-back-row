@@ -1,4 +1,8 @@
 <div class="auth-shell">
+  <span class="bubble bubble-teal auth-bubble-1"></span>
+  <span class="bubble bubble-coral auth-bubble-2"></span>
+  <span class="bubble bubble-gold auth-bubble-3"></span>
+
   <div class="auth-card">
     <h1>CareerConnect</h1>
     <p class="auth-subtitle">Sign in, or create an account below</p>
@@ -44,5 +48,6 @@
     <div *ngIf="WRONG_PASSWORD === display_error" class="alert alert-error">Wrong email or password</div>
     <div *ngIf="USERNAME_TAKEN === display_error" class="alert alert-error">Email already registered</div>
     <div *ngIf="OTHER_ERROR === display_error" class="alert alert-error">Something went wrong, try again</div>
+    <div *ngIf="INVALID_EMAIL === display_error" class="alert alert-error">Enter a valid email address</div>
   </div>
 </div>

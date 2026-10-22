@@ -2,22 +2,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Lora:wght@600;700&display=swap');
 
 :root {
-  --bg: #f4f5fb;
+  --bg: #f3fbfa;
   --surface: #ffffff;
-  --surface-muted: #eef0fa;
-  --border: #dde1f0;
-  --text: #1c1f33;
-  --text-muted: #5b6072;
-  --primary: #2c2f8c;
-  --primary-dark: #1c1f5e;
-  --accent: #ff7a59;
-  --success: #1c8a5e;
-  --success-bg: #e4f6ee;
+  --surface-muted: #e6f7f4;
+  --border: #d3ece7;
+  --text: #103b33;
+  --text-muted: #5c7a73;
+  --primary: #0f766e;
+  --primary-light: #14b8a6;
+  --primary-dark: #0b544e;
+  --accent: #f97362;
+  --accent-bg: #fef0ed;
+  --accent-2: #fbbf24;
+  --accent-2-bg: #fef8e7;
+  --success: #15803d;
+  --success-bg: #e4f7e9;
   --error: #c0293a;
   --error-bg: #fbe7e9;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 1px 2px rgba(28, 31, 51, 0.06), 0 8px 24px rgba(28, 31, 51, 0.08);
+  --radius: 14px;
+  --radius-sm: 9px;
+  --shadow: 0 1px 2px rgba(16, 59, 51, 0.06), 0 10px 28px rgba(15, 118, 110, 0.1);
 }
 
 * {
@@ -30,7 +34,12 @@ html, body {
 
 body {
   margin: 0;
-  background: var(--bg);
+  background:
+    radial-gradient(640px 420px at 88% -8%, rgba(20, 184, 166, 0.16), transparent 62%),
+    radial-gradient(520px 360px at -8% 12%, rgba(249, 115, 98, 0.14), transparent 60%),
+    radial-gradient(480px 420px at 50% 115%, rgba(251, 191, 36, 0.12), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--text);
   font-family: 'Manrope', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -95,8 +104,8 @@ a {
 .field select:focus,
 .field textarea:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(44, 47, 140, 0.12);
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.16);
 }
 
 .field .hint {
@@ -124,18 +133,19 @@ a {
 }
 
 .btn-primary {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
   color: white;
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.25);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--primary-dark);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
 }
 
 .btn-secondary {
   background: var(--surface);
   color: var(--primary);
-  border-color: var(--primary);
+  border-color: var(--primary-light);
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -186,23 +196,31 @@ a {
 }
 
 .badge-open,
-.badge-applied {
+.badge-offered {
   background: var(--success-bg);
   color: var(--success);
 }
 
-.badge-closed,
 .badge-rejected {
   background: var(--error-bg);
   color: var(--error);
 }
 
+.badge-closed,
 .badge-neutral,
-.badge-under-review,
-.badge-interview,
-.badge-offered {
+.badge-under-review {
   background: var(--surface-muted);
   color: var(--primary);
+}
+
+.badge-applied {
+  background: var(--accent-2-bg);
+  color: #92650a;
+}
+
+.badge-interview {
+  background: var(--accent-bg);
+  color: #c2441f;
 }
 
 .empty-state {
@@ -223,4 +241,27 @@ a {
 .page-header p {
   color: var(--text-muted);
   margin: 4px 0 0;
+}
+
+/* Decorative floating bubbles — drop a few <span class="bubble bubble-*"> into a
+   position:relative container, sized/positioned with inline style per instance. */
+
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(1px);
+}
+
+.bubble-teal {
+  background: radial-gradient(circle at 32% 28%, rgba(20, 184, 166, 0.45), rgba(20, 184, 166, 0.04) 72%);
+}
+
+.bubble-coral {
+  background: radial-gradient(circle at 32% 28%, rgba(249, 115, 98, 0.4), rgba(249, 115, 98, 0.04) 72%);
+}
+
+.bubble-gold {
+  background: radial-gradient(circle at 32% 28%, rgba(251, 191, 36, 0.4), rgba(251, 191, 36, 0.04) 72%);
 }
