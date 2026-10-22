@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
@@ -28,6 +28,9 @@ const USER_KEY = 'cc_user';
 export class AuthService {
   private http = inject(HttpClient);
 
+  // Signal so the nav bar (and anything else) reacts to login/logout without polling.
+  currentUser = signal<AuthUser | null>(this.getUser());
+
   login(email: string, password: string): Observable<LoginResponse> {
     return this.http
       .post<LoginResponse>(`${API_BASE}/auth/login`, { email, password })
@@ -47,6 +50,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    this.currentUser.set(null);
   }
 
   getToken(): string | null {
@@ -77,5 +81,6 @@ export class AuthService {
     } catch {
       // localStorage unavailable (e.g. private mode) — session just won't persist across reloads.
     }
+    this.currentUser.set(res.user);
   }
 }

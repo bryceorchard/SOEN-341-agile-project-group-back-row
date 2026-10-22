@@ -1,0 +1,42 @@
+<div class="page-header">
+  <div>
+    <h1>My applications</h1>
+    <p>Everything you've applied to, and where it stands</p>
+  </div>
+</div>
+
+<div class="status-filter">
+  <button
+    class="btn btn-sm"
+    [class.btn-primary]="active_status() === ''"
+    [class.btn-secondary]="active_status() !== ''"
+    (click)="filterBy('')"
+  >
+    All
+  </button>
+  <button
+    class="btn btn-sm"
+    *ngFor="let s of statuses"
+    [class.btn-primary]="active_status() === s"
+    [class.btn-secondary]="active_status() !== s"
+    (click)="filterBy(s)"
+  >
+    {{ s }}
+  </button>
+</div>
+
+<div class="application-list" *ngIf="applications().length; else noApplications">
+  <a class="card application-row" *ngFor="let a of applications()" [routerLink]="['/jobs', a.jobId]">
+    <div>
+      <h2>{{ a.jobTitle }}</h2>
+      <p class="app-meta" *ngIf="a.jobLocation || a.jobCategory">
+        {{ a.jobLocation }}<span *ngIf="a.jobLocation && a.jobCategory"> · </span>{{ a.jobCategory }}
+      </p>
+      <p class="app-meta">Applied {{ a.appliedAt | slice: 0:10 }}</p>
+    </div>
+    <span class="badge" [ngClass]="badgeClass(a.status)">{{ a.status }}</span>
+  </a>
+</div>
+<ng-template #noApplications>
+  <p class="empty-state">No applications yet — <a routerLink="/jobs">browse open postings</a>.</p>
+</ng-template>

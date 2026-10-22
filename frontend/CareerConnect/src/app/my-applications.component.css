@@ -1,0 +1,31 @@
+.status-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.application-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.application-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.application-row h2 {
+  font-size: 1rem;
+}
+
+.app-meta {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin: 2px 0 0;
+}
