@@ -45,9 +45,10 @@
       <button class="btn btn-secondary" (click)="register()">Register</button>
     </div>
 
-    <div *ngIf="WRONG_PASSWORD === display_error" class="alert alert-error">Wrong email or password</div>
-    <div *ngIf="USERNAME_TAKEN === display_error" class="alert alert-error">Email already registered</div>
-    <div *ngIf="OTHER_ERROR === display_error" class="alert alert-error">Something went wrong, try again</div>
-    <div *ngIf="INVALID_EMAIL === display_error" class="alert alert-error">Enter a valid email address</div>
+    <div *ngIf="WRONG_PASSWORD === display_error()" class="alert alert-error">Wrong email or password</div>
+    <div *ngIf="USERNAME_TAKEN === display_error()" class="alert alert-error">Email already registered</div>
+    <div *ngIf="INVALID_EMAIL === display_error()" class="alert alert-error">Enter a valid email address</div>
+    <div *ngIf="backend_error()" class="alert alert-error">{{ backend_error() }}</div>
+    <div *ngIf="OTHER_ERROR === display_error() && !backend_error()" class="alert alert-error">Something went wrong, try again</div>
   </div>
 </div>
