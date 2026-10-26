@@ -128,6 +128,7 @@ my-project/
 │   │   ├── routes/                 # Route JS files
 │   ├── test/                       # Backend Tests 
 |   └── README.md                   # Backend ReadME
+├── docs/
 |   ├── minutes/                    # Meeting Minutes (attendance, decisions, action items) (#27)
 |   │   ├── minutes-template.md     # Template for New Meetings
 |   │   └── YYYY-MM-DD_Meeting_Minutes  # Various Weekly Minute Logs
