@@ -23,11 +23,12 @@ export class Login {
   WRONG_PASSWORD = 2;
   OTHER_ERROR = 3;
   INVALID_EMAIL = 4;
+  INVALID_PASSWORD = 5;
   
   display_error = signal(0);
   backend_error = signal('');
 
-  private isValidEmail(email: string): boolean {
+  isValidEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
@@ -66,6 +67,11 @@ export class Login {
 
     if (!this.isValidEmail(email)) {
       this.display_error.set(this.INVALID_EMAIL);
+      return;
+    }
+
+    if (password.length < 8) {
+      this.display_error.set(this.INVALID_PASSWORD);
       return;
     }
     this.display_error.set(0);

@@ -10,11 +10,14 @@
     <div class="field">
       <label>Email</label>
       <input placeholder="you@example.com" type="text" [formControl]="user" />
+      <p *ngIf="user.value && !isValidEmail(user.value)" class="alert alert-error">Enter a valid email address</p>
     </div>
 
     <div class="field">
       <label>Password</label>
       <input placeholder="••••••••" type="password" [formControl]="pass" />
+      <p class="hint">Password must be at least 8 characters.</p>  
+      <p *ngIf="pass.value && pass.value.length < 8" class="alert alert-error">Password must be at least 8 characters</p>
     </div>
 
     <div class="field">
@@ -42,12 +45,13 @@
 
     <div class="auth-actions">
       <button class="btn btn-primary" (click)="login()">Login</button>
-      <button class="btn btn-secondary" (click)="register()">Register</button>
+      <button class="btn btn-secondary" [disabled]="!isValidEmail(user.value ?? '') || (pass.value ?? '').length < 8" (click)="register()">Register</button>
     </div>
 
     <div *ngIf="WRONG_PASSWORD === display_error()" class="alert alert-error">Wrong email or password</div>
     <div *ngIf="USERNAME_TAKEN === display_error()" class="alert alert-error">Email already registered</div>
-    <div *ngIf="INVALID_EMAIL === display_error()" class="alert alert-error">Enter a valid email address</div>
+    <div *ngIf="INVALID_EMAIL === display_error() && !(user.value && !isValidEmail(user.value))" class="alert alert-error">Enter a valid email address</div>
+    <div *ngIf="INVALID_PASSWORD === display_error() && !(pass.value && pass.value.length < 8)" class="alert alert-error">Password must be at least 8 characters</div>
     <div *ngIf="backend_error()" class="alert alert-error">{{ backend_error() }}</div>
     <div *ngIf="OTHER_ERROR === display_error() && !backend_error()" class="alert alert-error">Something went wrong, try again</div>
   </div>
