@@ -34,6 +34,7 @@ export class Profile implements OnInit {
   resumes = signal<Resume[]>([]);
   upload_error = signal('');
   profile_saved = signal(false);
+  profile_error = signal('');
   replacing_id = signal<number | null>(null);
 
   upload_form: FormGroup;
@@ -65,8 +66,10 @@ export class Profile implements OnInit {
 
   saveProfile() {
     this.profile_saved.set(false);
+    this.profile_error.set('');
     this.http_client.put(`${API_BASE}/profile`, this.profile_form.getRawValue()).subscribe({
       next: () => this.profile_saved.set(true),
+      error: (err) => this.profile_error.set(err?.error?.error ?? 'Could notsave profile'),
     });
   }
 

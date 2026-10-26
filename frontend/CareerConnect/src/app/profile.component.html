@@ -30,6 +30,7 @@
     </div>
     <button class="btn btn-primary" type="submit">Save profile</button>
     <div *ngIf="profile_saved()" class="alert alert-success">Saved.</div>
+    <div *ngIf="profile_error()" class="alert alert-error">{{ profile_error() }}</div>
   </form>
 </div>
 
