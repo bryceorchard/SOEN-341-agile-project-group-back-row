@@ -34,7 +34,7 @@
   </form>
 </div>
 
-<div class="card resumes-card">
+<div class="card resumes-card" *ngIf="user()?.role !== 'recruiter'">
   <h2>Resumes</h2>
 
   <form class="upload-row" [formGroup]="upload_form" (ngSubmit)="onSubmit()">

@@ -52,7 +52,9 @@ export class Profile implements OnInit {
   }
 
   ngOnInit() {
-    this.refreshResumes();
+    if (this.user()?.role !== 'recruiter') {
+      this.refreshResumes();
+    }
     this.http_client.get<{ profile: ProfileData }>(`${API_BASE}/profile`).subscribe((res) => {
       this.profile_form.patchValue({
         fullName: res.profile.fullName ?? '',
@@ -69,7 +71,7 @@ export class Profile implements OnInit {
     this.profile_error.set('');
     this.http_client.put(`${API_BASE}/profile`, this.profile_form.getRawValue()).subscribe({
       next: () => this.profile_saved.set(true),
-      error: (err) => this.profile_error.set(err?.error?.error ?? 'Could notsave profile'),
+      error: (err) => this.profile_error.set(err?.error?.error ?? 'Could not save profile'),
     });
   }
 
