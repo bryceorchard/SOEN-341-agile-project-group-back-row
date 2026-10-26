@@ -13,8 +13,9 @@ const { migrate } = await import('../db/migrate.js');
 const { createApp } = await import('../src/app.js');
 
 let api;
+let db;
 before(() => {
-  const db = new Database(':memory:');
+  db = new Database(':memory:');
   db.pragma('foreign_keys = ON');
   migrate(db);
   api = request(createApp(db));
@@ -63,6 +64,11 @@ test('jobs are listed and searched without auth', async () => {
   await api.get('/jobs/99999').expect(404);
 });
 
+test('GET /jobs/categories returns the distinct categories, not a job id lookup', async () => {
+  const res = await api.get('/jobs/categories').expect(200);
+  assert.deepEqual(res.body.categories, ['Engineering', 'QA']);
+});
+
 test('a job seeker applies, cannot double-apply, sees their applications', async () => {
   const auth = { Authorization: `Bearer ${seekerToken}` };
   const applied = await api.post('/applications').set(auth).send({ jobId }).expect(201);
@@ -73,7 +79,24 @@ test('a job seeker applies, cannot double-apply, sees their applications', async
 
   const mine = await api.get('/applications').set(auth).expect(200);
   assert.equal(mine.body.applications.length, 1);
-  assert.equal(mine.body.applications[0].jobTitle, 'Backend Developer');
+  const app = mine.body.applications[0];
+  assert.equal(app.jobTitle, 'Backend Developer');
+  assert.equal(app.jobLocation, 'Montreal');
+  assert.equal(app.jobCategory, 'Engineering');
+  assert.equal(app.jobStatus, 'open');
+  assert.equal(app.resumeFilename, null);
+});
+
+test('GET /applications?status filters, and rejects an invalid status', async () => {
+  const auth = { Authorization: `Bearer ${seekerToken}` };
+
+  const applied = await api.get('/applications').query({ status: 'Applied' }).set(auth).expect(200);
+  assert.equal(applied.body.applications.length, 1);
+
+  const offered = await api.get('/applications').query({ status: 'Offered' }).set(auth).expect(200);
+  assert.equal(offered.body.applications.length, 0);
+
+  await api.get('/applications').query({ status: 'Not A Status' }).set(auth).expect(400);
 });
 
 test('only the owning recruiter can update an application status', async () => {
@@ -104,4 +127,194 @@ test('resume replace swaps the file and keeps the id', async () => {
 
   const list = await api.get('/resumes').set(auth).expect(200);
   assert.equal(list.body.resumes.length, 1);
+});
+
+test('resume file: owner, applied-to recruiter, others, and missing file', async () => {
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+
+  await api.post('/auth/signup').send({ email: 'other-seeker@test.com', password: 'Password123!', role: 'job_seeker' }).expect(201);
+  const otherSeekerToken = (await api.post('/auth/login').send({ email: 'other-seeker@test.com', password: 'Password123!' }).expect(200)).body.token;
+  const otherSeekerAuth = { Authorization: `Bearer ${otherSeekerToken}` };
+
+  const up = await api.post('/resumes').set(seekerAuth)
+    .attach('resume', Buffer.from('%PDF-1.4 file test'), { filename: 'file-test.pdf', contentType: 'application/pdf' }).expect(201);
+  const resumeId = up.body.resume.id;
+
+  // seekerToken already applied to `jobId` in an earlier test; apply to the other
+  // recruiter-owned job instead so the resume can be attached to a fresh application.
+  const qaJob = db.prepare("SELECT id FROM jobs WHERE title = 'QA Analyst'").get();
+  await api.post('/applications').set(seekerAuth).send({ jobId: qaJob.id, resumeId }).expect(201);
+
+  const asOwner = await api.get(`/resumes/${resumeId}/file`).set(seekerAuth).expect(200);
+  assert.equal(asOwner.headers['content-type'], 'application/pdf');
+
+  await api.get(`/resumes/${resumeId}/file`).set(recruiterAuth).expect(200);
+  await api.get(`/resumes/${resumeId}/file`).set(otherSeekerAuth).expect(404);
+
+  db.prepare('UPDATE resumes SET file_path = ? WHERE id = ?').run('/nonexistent/path.pdf', resumeId);
+  await api.get(`/resumes/${resumeId}/file`).set(seekerAuth).expect(404);
+});
+
+test('GET /jobs/:id/applications: owning recruiter sees applicants, others are refused', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+
+  await api.post('/auth/signup').send({ email: 'other-recruiter@test.com', password: 'Password123!', role: 'recruiter' }).expect(201);
+  const otherRecruiterToken = (await api.post('/auth/login').send({ email: 'other-recruiter@test.com', password: 'Password123!' }).expect(200)).body.token;
+
+  await api.put('/profile').set(seekerAuth).send({ fullName: 'Sam Seeker' }).expect(200);
+
+  await api.get(`/jobs/${jobId}/applications`).set(seekerAuth).expect(403);
+  await api.get(`/jobs/${jobId}/applications`).set({ Authorization: `Bearer ${otherRecruiterToken}` }).expect(404);
+
+  const res = await api.get(`/jobs/${jobId}/applications`).set(recruiterAuth).expect(200);
+  assert.equal(res.body.applications.length, 1);
+  assert.equal(res.body.applications[0].applicantEmail, 'seeker@test.com');
+  assert.equal(res.body.applications[0].applicantName, 'Sam Seeker');
+
+  const filtered = await api.get(`/jobs/${jobId}/applications`).query({ status: 'Offered' }).set(recruiterAuth).expect(200);
+  assert.equal(filtered.body.applications.length, 0);
+  await api.get(`/jobs/${jobId}/applications`).query({ status: 'Not A Status' }).set(recruiterAuth).expect(400);
+});
+
+test('recruiter posting management: mine, edit, close/reopen, and ownership checks', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+
+  await api.post('/auth/signup').send({ email: 'other-recruiter-2@test.com', password: 'Password123!', role: 'recruiter' }).expect(201);
+  const otherRecruiterToken = (await api.post('/auth/login').send({ email: 'other-recruiter-2@test.com', password: 'Password123!' }).expect(200)).body.token;
+  const otherRecruiterAuth = { Authorization: `Bearer ${otherRecruiterToken}` };
+
+  await api.get('/jobs/mine').set(seekerAuth).expect(403);
+  const mine = await api.get('/jobs/mine').set(recruiterAuth).expect(200);
+  assert.equal(mine.body.jobs.length, 2);
+  const backendJob = mine.body.jobs.find((j) => j.title === 'Backend Developer');
+  assert.equal(backendJob.status, 'open');
+  assert.equal(backendJob.applicationCount, 1);
+
+  await api.put(`/jobs/${jobId}`).set(otherRecruiterAuth).send({ title: 'Hijack', description: 'x' }).expect(404);
+  await api.put(`/jobs/${jobId}`).set(recruiterAuth).send({ title: '' }).expect(400);
+  const edited = await api.put(`/jobs/${jobId}`).set(recruiterAuth)
+    .send({ title: 'Backend Developer II', description: 'Updated role', location: 'Montreal', category: 'Engineering' })
+    .expect(200);
+  assert.equal(edited.body.job.title, 'Backend Developer II');
+
+  await api.patch(`/jobs/${jobId}/status`).set(otherRecruiterAuth).send({ status: 'closed' }).expect(404);
+  await api.patch(`/jobs/${jobId}/status`).set(recruiterAuth).send({ status: 'not-a-status' }).expect(400);
+  const closed = await api.patch(`/jobs/${jobId}/status`).set(recruiterAuth).send({ status: 'closed' }).expect(200);
+  assert.equal(closed.body.job.status, 'closed');
+
+  const listed = await api.get('/jobs').expect(200);
+  assert.ok(!listed.body.jobs.some((j) => j.id === jobId));
+
+  await api.post('/applications').set(seekerAuth).send({ jobId }).expect(400);
+
+  const reopened = await api.patch(`/jobs/${jobId}/status`).set(recruiterAuth).send({ status: 'open' }).expect(200);
+  assert.equal(reopened.body.job.status, 'open');
+});
+
+test('applications carry the attached resume filename in POST, GET, and PATCH responses', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+
+  const job = (await api.post('/jobs').set(recruiterAuth)
+    .send({ title: 'Frontend Developer', description: 'Build the UI', location: 'Toronto', category: 'Engineering', deadline: '2026-12-01' })
+    .expect(201)).body.job;
+  const resume = (await api.post('/resumes').set(seekerAuth)
+    .attach('resume', Buffer.from('%PDF-1.4 cv'), { filename: 'cv-frontend.pdf', contentType: 'application/pdf' })
+    .expect(201)).body.resume;
+
+  const created = (await api.post('/applications').set(seekerAuth).send({ jobId: job.id, resumeId: resume.id }).expect(201)).body.application;
+  assert.equal(created.resumeId, resume.id);
+  assert.equal(created.resumeFilename, 'cv-frontend.pdf');
+  assert.equal(created.jobLocation, 'Toronto');
+  assert.equal(created.jobDeadline, '2026-12-01');
+
+  const listed = (await api.get('/applications').set(seekerAuth).expect(200)).body.applications.find((a) => a.id === created.id);
+  assert.equal(listed.resumeFilename, 'cv-frontend.pdf');
+
+  const updated = (await api.patch(`/applications/${created.id}`).set(recruiterAuth).send({ status: 'Under Review' }).expect(200)).body.application;
+  assert.equal(updated.resumeFilename, 'cv-frontend.pdf');
+  assert.deepEqual(Object.keys(updated).sort(), Object.keys(created).sort());
+
+  // Deleting the resume keeps the application; the resume fields fall back to null.
+  await api.delete(`/resumes/${resume.id}`).set(seekerAuth).expect(204);
+  const afterDelete = (await api.get('/applications').set(seekerAuth).expect(200)).body.applications.find((a) => a.id === created.id);
+  assert.equal(afterDelete.resumeId, null);
+  assert.equal(afterDelete.resumeFilename, null);
+});
+
+test('applications show jobStatus, so a closed posting is visible to the applicant', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+
+  const job = (await api.post('/jobs').set(recruiterAuth)
+    .send({ title: 'Data Analyst', description: 'Crunch numbers', location: 'Ottawa', category: 'Data' })
+    .expect(201)).body.job;
+
+  const created = (await api.post('/applications').set(seekerAuth).send({ jobId: job.id }).expect(201)).body.application;
+  assert.equal(created.jobStatus, 'open');
+
+  await api.patch(`/jobs/${job.id}/status`).set(recruiterAuth).send({ status: 'closed' }).expect(200);
+
+  const listed = (await api.get('/applications').set(seekerAuth).expect(200)).body.applications.find((a) => a.id === created.id);
+  assert.equal(listed.jobStatus, 'closed');
+  assert.equal(listed.status, 'Applied'); // closing the posting doesn't change the application's own status
+
+  const updated = (await api.patch(`/applications/${created.id}`).set(recruiterAuth).send({ status: 'Rejected' }).expect(200)).body.application;
+  assert.equal(updated.jobStatus, 'closed');
+});
+
+test('GET /jobs/categories only lists categories that have open postings', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const legal = (await api.post('/jobs').set(recruiterAuth)
+    .send({ title: 'Paralegal', description: 'Review contracts', category: 'Legal' }).expect(201)).body.job;
+
+  let categories = (await api.get('/jobs/categories').expect(200)).body.categories;
+  assert.ok(categories.includes('Legal'));
+
+  await api.patch(`/jobs/${legal.id}/status`).set(recruiterAuth).send({ status: 'closed' }).expect(200);
+  categories = (await api.get('/jobs/categories').expect(200)).body.categories;
+  assert.ok(!categories.includes('Legal'), 'a category whose only posting is closed should disappear');
+
+  await api.patch(`/jobs/${legal.id}/status`).set(recruiterAuth).send({ status: 'open' }).expect(200);
+  categories = (await api.get('/jobs/categories').expect(200)).body.categories;
+  assert.ok(categories.includes('Legal'));
+});
+
+test('optional job fields are trimmed, blanks become null, and non-strings are rejected', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const job = (await api.post('/jobs').set(recruiterAuth)
+    .send({ title: 'Office Manager', description: 'Run the office', location: '  Laval ', category: ' Operations  ', deadline: '' })
+    .expect(201)).body.job;
+  assert.equal(job.location, 'Laval');
+  assert.equal(job.category, 'Operations');
+  assert.equal(job.deadline, null);
+
+  const filtered = (await api.get('/jobs').query({ category: 'Operations' }).expect(200)).body.jobs;
+  assert.ok(filtered.some((j) => j.id === job.id));
+  const categories = (await api.get('/jobs/categories').expect(200)).body.categories;
+  assert.ok(categories.includes('Operations') && !categories.some((c) => c !== c.trim()));
+
+  await api.post('/jobs').set(recruiterAuth).send({ title: 'X', description: 'Y', category: 123 }).expect(400);
+  await api.put(`/jobs/${job.id}`).set(recruiterAuth).send({ title: 'X', description: 'Y', location: { city: 'Laval' } }).expect(400);
+});
+
+test('resume filenames keep non-ASCII characters through upload, list, and download', async () => {
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+  const name = 'Résumé – Bryce’s CV (2026).pdf';
+
+  const up = await api.post('/resumes').set(seekerAuth)
+    .attach('resume', Buffer.from('%PDF-1.4 utf8'), { filename: name, contentType: 'application/pdf' }).expect(201);
+  assert.equal(up.body.resume.originalFilename, name);
+
+  const listed = (await api.get('/resumes').set(seekerAuth).expect(200)).body.resumes.find((r) => r.id === up.body.resume.id);
+  assert.equal(listed.originalFilename, name);
+
+  const file = await api.get(`/resumes/${up.body.resume.id}/file`).set(seekerAuth).expect(200);
+  const disposition = file.headers['content-disposition'];
+  assert.match(disposition, /^inline; filename="[\x20-\x7e]+"; filename\*=UTF-8''/);
+  assert.equal(decodeURIComponent(disposition.split("filename*=UTF-8''")[1]), name);
+  assert.equal(file.headers['x-content-type-options'], 'nosniff');
 });
