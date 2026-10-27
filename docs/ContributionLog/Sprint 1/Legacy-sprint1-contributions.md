@@ -1,4 +1,6 @@
-# Sprint 1 - Team Contributions
+# Sprint 1 - Team Contributions - TO BE UPDATED TO PROPER TEMPLATE
+
+Will likely still be 1 document, not split in separate Contribution logs like future Sprint Contribution Logs
 
 | Member | Role | Main Contributions |
 |---|---|---|
