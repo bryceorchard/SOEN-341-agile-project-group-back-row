@@ -1,7 +1,7 @@
 # Contribution Log — Sprint # (Associated Sprint)  — (Member)
 
 ## Task Summary
-
+**Of the following information in this section, only the table should be in your individual Submission**
 Quick Summary Of Tasks done
 
 Task done - Keep Name as Brief Description, Try and Keep to 3-5 Words
@@ -13,11 +13,10 @@ Task Jump - Provide an associated anchor link for easy access to the full descri
 ```markdown
 [Jump to Task](#Task-1-Title)
 ```
-Syntax uses no spaces, all lowercase, ignores hashtags, semicolons and dashes or hyphens, 
-
-[Clickable Text](#lowercase-section-title-with-dashes)
+Anchor Link Syntax uses no spaces, all lowercase, ignores hashtags, semicolons and dashes or hyphens, 
 
 | Task Done | Issue #   | Hrs Spent | Date Started  |   Task Jump       |
+| ;-------; | ;-------; | ;-------; | ;----------- ;| ;---------------; |
 | --------- | # or(N/A) | # of Hrs  | YYYY-MM-DD    |      (Link)       |
 |           |           |           |               |                   |
 |           |           |           |               |                   |
