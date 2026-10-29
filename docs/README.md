@@ -12,10 +12,12 @@ docs/
 ├── ERD.md                   # database entity-relationship diagram
 ├── minutes/                 # meeting minutes (attendance, decisions, action items) (#27)
 │   ├── minutes-template.md  # blank template for new meetings
-│   └── WeeklyMinutes.md     # running weekly minutes log
+│   └── YYYY_MM_DD_Meeting_Minutes.md  # one file per meeting
 ├── sprint-1/                # Sprint 1 deliverables (#24)
 │   ├── sprint-1-plan.md     # backlog, priorities, risks, effort, capacity
 │   └── appendix-a.md        # Sprint 1 work-plan table
+├── sprint-2/                # Sprint 2 deliverables (#98)
+│   └── sprint-2-plan.md     # goal, ranked backlog / work plan, capacity, estimates, risks
 └── user-stories/            # requirements — AI- and team-sourced kept separate (#28, #29)
     ├── AI Generated User Stories/
     │   └── Zohair AI LOG.pdf
