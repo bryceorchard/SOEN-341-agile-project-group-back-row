@@ -39,6 +39,8 @@ export class JobDetail implements OnInit {
 
   job = signal<JobSummary | null>(null);
   not_found = signal(false);
+  // Any other failure loading the job (server down, 500…): different message, so it isn't mistaken for a missing job.
+  load_error = signal('');
   resumes = signal<Resume[]>([]);
   apply_form: FormGroup;
   apply_error = signal('');
@@ -59,7 +61,10 @@ export class JobDetail implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     this.http_client.get<{ job: JobSummary }>(`${API_BASE}/jobs/${id}`).subscribe({
       next: (res) => this.job.set(res.job),
-      error: () => this.not_found.set(true),
+      error: (err: HttpErrorResponse) => {
+        if (err.status === 404) this.not_found.set(true);
+        else this.load_error.set('Could not load this job. Please try again.');
+      },
     });
 
     if (this.auth.currentUser()?.role === 'job_seeker') {

@@ -12,6 +12,8 @@ export interface JobSummary {
   location: string | null;
   category: string | null;
   deadline: string | null;
+  // Closed postings are hidden from search but can still be opened by id (e.g. from My applications).
+  status: 'open' | 'closed';
   createdAt: string;
 }
 

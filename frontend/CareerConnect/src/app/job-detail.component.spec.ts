@@ -14,6 +14,7 @@ const JOB = {
   location: 'Montreal',
   category: 'Engineering',
   deadline: '2026-12-31',
+  status: 'open',
   createdAt: '2026-10-01T12:00:00Z',
 };
 
@@ -23,12 +24,12 @@ describe('JobDetail', () => {
   let harness: RouterTestingHarness;
   let http: HttpTestingController;
 
-  async function openPage(applications: Array<{ jobId: number; status: string }> = []) {
+  async function openPage(applications: Array<{ jobId: number; status: string }> = [], job: object = JOB) {
     harness = await RouterTestingHarness.create();
     await harness.navigateByUrl(`/jobs/${JOB_ID}`, JobDetail);
     http = TestBed.inject(HttpTestingController);
 
-    http.expectOne(`${API_BASE}/jobs/${JOB_ID}`).flush({ job: JOB });
+    http.expectOne(`${API_BASE}/jobs/${JOB_ID}`).flush({ job });
     http.expectOne(`${API_BASE}/resumes`).flush({ resumes: [] });
     http.expectOne(`${API_BASE}/applications`).flush({ applications });
     await render();
@@ -107,6 +108,46 @@ describe('JobDetail', () => {
     expect(text).toContain("You've already applied to this job");
     expect(text).not.toContain('Application submitted');
     expect(page().querySelector('form')).not.toBeNull();
+  });
+
+  it('shows a closed banner and no apply form on a closed posting', async () => {
+    await openPage([], { ...JOB, status: 'closed' });
+
+    expect(page().querySelector('.closed-banner')?.textContent).toContain('This posting is closed');
+    expect(page().querySelector('form')).toBeNull();
+    expect(page().querySelector('.apply-confirmation')).toBeNull();
+  });
+
+  it('still shows the application status on a closed posting the seeker applied to', async () => {
+    await openPage([{ jobId: JOB_ID, status: 'Rejected' }], { ...JOB, status: 'closed' });
+
+    expect(page().querySelector('.closed-banner')).not.toBeNull();
+    expect(page().querySelector('form')).toBeNull();
+    expect(page().querySelector('.apply-confirmation')?.textContent).toContain('Rejected');
+  });
+
+  async function openFailingPage(status: number) {
+    harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl(`/jobs/${JOB_ID}`, JobDetail);
+    http = TestBed.inject(HttpTestingController);
+    http.expectOne(`${API_BASE}/jobs/${JOB_ID}`).flush({ error: 'x' }, { status, statusText: 'Error' });
+    http.expectOne(`${API_BASE}/resumes`).flush({ resumes: [] });
+    http.expectOne(`${API_BASE}/applications`).flush({ applications: [] });
+    await render();
+  }
+
+  it('says the job no longer exists on a 404', async () => {
+    await openFailingPage(404);
+
+    expect(page().textContent).toContain('This job no longer exists');
+    expect(page().querySelector('a[href="/jobs"]')).not.toBeNull();
+  });
+
+  it('shows a load error, not "no longer exists", for other failures', async () => {
+    await openFailingPage(500);
+
+    expect(page().textContent).toContain('Could not load this job');
+    expect(page().textContent).not.toContain('no longer exists');
   });
 
   it('ignores applications to other jobs', async () => {

@@ -1,5 +1,9 @@
 <p class="not-found" *ngIf="not_found()">
-  Job not found. <a routerLink="/jobs" [queryParams]="backQueryParams">Back to search</a>
+  This job no longer exists. <a routerLink="/jobs" [queryParams]="backQueryParams">Back to the job listings</a>
+</p>
+
+<p class="not-found load-error" *ngIf="load_error()">
+  {{ load_error() }} <a routerLink="/jobs" [queryParams]="backQueryParams">Back to the job listings</a>
 </p>
 
 <div *ngIf="job() as j">
@@ -14,13 +18,16 @@
       <span class="badge badge-neutral" *ngIf="j.category">{{ j.category }}</span>
     </div>
 
+    <div class="closed-banner" *ngIf="j.status === 'closed'">This posting is closed and no longer accepts applications.</div>
+
     <p class="job-deadline" *ngIf="j.deadline">Apply by {{ j.deadline }}</p>
     <p class="job-posted">Posted {{ j.createdAt | date: 'mediumDate' }}</p>
 
     <p class="job-description">{{ j.description }}</p>
   </div>
 
-  <div class="card apply-card" *ngIf="auth.currentUser()?.role === 'job_seeker'">
+  <!-- On a closed posting, only someone who already applied sees this card (with their status). -->
+  <div class="card apply-card" *ngIf="auth.currentUser()?.role === 'job_seeker' && (applied_status() || j.status !== 'closed')">
     <h2>Apply to this job</h2>
 
     <div *ngIf="!applied_status(); else appliedMsg">
@@ -46,7 +53,7 @@
     </ng-template>
   </div>
 
-  <div class="card apply-card" *ngIf="!auth.currentUser()">
+  <div class="card apply-card" *ngIf="!auth.currentUser() && j.status !== 'closed'">
     <p>
       <a routerLink="/login">Log in</a> as a job seeker to apply to this posting.
     </p>
