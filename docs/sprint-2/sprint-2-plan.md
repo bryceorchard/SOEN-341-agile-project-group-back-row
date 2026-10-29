@@ -1,6 +1,6 @@
 # Sprint 2 Plan — CareerConnect
 
-**Sprint window:** 2026-09-29 → 2026-10-26 (team deadline from the 2026-10-24 minutes) · **Evaluation:** in the lab, directly from the GitHub repository · **Prepared by:** Bryce (Scrum lead) · **As of:** 2026-10-28
+**Sprint window:** 2026-09-29 → 2026-10-26 (team deadline from the 2026-10-24 minutes) · **Evaluation:** in the lab, directly from the GitHub repository · **Prepared by:** Bryce (Scrum lead) · **As of:** 2026-10-29
 
 The per-issue work plan (Issue #, Title, Type, Responsible, Target, Priority, Status) is the
 [ranked backlog](#ranked-backlog-work-plan) below. The same order and fields are on the
@@ -22,14 +22,18 @@ Deliver the three required Sprint 2 features end to end and start the fourth:
 Alongside: at least two acceptance tests per Sprint 1 and Sprint 2 story, a CI pipeline that is set
 up and demonstrated, an up-to-date board, meeting minutes, a contribution log per member, and the AI log.
 
-## Where we are (2026-10-28)
+## Where we are (2026-10-29)
 
 - **Backend: done and on `main`.** All endpoints for Features 1–4 are merged (#66, #67, #76, #78, #82,
   #84, #86); 28 backend tests pass in CI.
-- **Frontend: done in an open PR.** PR #112 implements the UI for Features 1–4 (#73–#87), plus
-  Zohair's follow-up fixes. It is not on `main` yet, so it does not count for a repository evaluation.
+- **Frontend: done in an open PR.** PR #112 implements the UI for Features 1–4 (#73–#87), with
+  follow-ups from Zohair (#74, #75), Luca (#87) and Mahmoud (#73, #77, #79, #80); 34 frontend tests
+  pass. It is not on `main` yet, so it does not count for a repository evaluation. #112 fully finishes
+  #77, #79, #80 and #85 (linked, so they close on merge); the other tasks list what's left in a
+  "Progress in #112" note.
 - **CI:** the backend job is green and required on `main`. PR #117 adds the frontend job; that job
-  fails until #112 merges (the old `app.spec.ts` test is fixed in #112).
+  fails until #112 merges (the old `app.spec.ts` test is fixed in #112). A follow-up branch
+  (`chore/111-ci-actions`, #111) moves the actions to Node 24 and pins the runner image.
 - **Acceptance tests:** written for every story (#68, #69, #88–#95, closed out in #105); the Sprint 2
   UI tests have not been verified in the running app yet (#103).
 - **Process docs:** meeting minutes are up (#100); the contribution logs are on the unmerged
@@ -62,15 +66,17 @@ Priority follows the points at stake and what blocks them.
 ## Critical path
 
 1. **Merge #112 into `main`** (after updating it with `main`; it is currently behind). This one merge
-   moves ten frontend tasks to done and unblocks the UI acceptance tests and the demo.
-2. **Merge #117** once its frontend job is green on top of #112. Don't merge the
+   closes #77, #79, #80 and #85, puts every Sprint 2 screen on `main`, and unblocks the UI
+   acceptance tests and the demo. Then merge `feature/81-apply-confirmation` (#81), which is built on it.
+2. **Merge #117** once its frontend job is green on top of #112, then `chore/111-ci-actions` (#111). Don't merge the
    `lucamancini2005-design-frontend-failed-test-fix` branch: it adds a `Hello, CareerConnect` heading
    to `app.html` to satisfy the stale test, and it conflicts with #112's `app.html`.
 3. **Make `frontend` a required check** on `main` next to `backend` (#96, #97).
 4. **Verify the acceptance tests on `main`** (#103), tick them in #88–#93 (and #94–#95 where done),
    and close the AT issues and their tasks.
-5. **Documentation before the lab:** merge the contribution logs (#101), fill the AI-log gaps (#99),
-   write the one-page summary (#102), run the demo once (#104).
+5. **Documentation before the lab:** merge the contribution logs (#101), the AI-log fixes
+   (`docs/99-ai-log-fixes`, #99) and the README cleanup (`chore/97-readme-cleanup`, #97); write the
+   one-page summary (#102); run the demo once (#104).
 
 ## Ranked backlog (work plan)
 
@@ -96,7 +102,7 @@ Open issues in priority order. Target is relative because the evaluation date is
 | 16 | #92 | Acceptance tests: US-05 Submit applications through the platform | Acceptance Test | Zohair + Luca | Before evaluation | P0 | Todo |
 | 17 | #93 | Acceptance tests: US-06 Application dashboard with status | Acceptance Test | Zohair + Luca | Before evaluation | P0 | Todo |
 | 18 | #101 | [Task] Detailed contribution log (Sprint 2) | Task | Gene | Before evaluation | P0 | In Progress |
-| 19 | #99 | [Task] AI Usage Log — Sprint 2 + Sprint 1 fixes | Task | Bryce | Before evaluation | P0 | Todo |
+| 19 | #99 | [Task] AI Usage Log — Sprint 2 + Sprint 1 fixes | Task | Bryce | Before evaluation | P0 | In Progress |
 | 20 | #102 | [Task] Sprint 2 summary report (one page) | Task | Gene | Before evaluation | P0 | Todo |
 | 21 | #104 | [Task] Sprint 2 demo preparation | Task | Luca | Before evaluation | P0 | Todo |
 | 22 | #38 | US-01 [AI-Generated]: Register and manage profile | User Story | Gabriel + Mahmoud + Zohair | Before evaluation | P0 | In Progress |
