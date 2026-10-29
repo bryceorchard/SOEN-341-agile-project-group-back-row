@@ -110,43 +110,82 @@ See [`backend/README.md`](backend/README.md) for the full API reference and data
 
 ## File Structure
 
-General File Structure of Major Folders and Salient Files 
+General file structure of the major folders and salient files. Folders marked _git-ignored_ are
+created locally and aren't in the repository.
 
-```CareerConnect
-my-project/
-├── .github/                         #Github Actions & Pull Request Template
-|   ├── workflows/
-│   │   └── ci.yml
-|   └── PULL_REQUEST_TEMPLATE.md
-├── AI-log/                          # Individual AI usage logs, one folder per member (#99)
-|   ├── Bryce/
-|   ├── Gabriel/
+```text
+SOEN-341-agile-project-group-back-row/
+├── .github/
+│   ├── workflows/
+│   │   └── ci.yml                     # GitHub Actions: backend and frontend jobs (install, test, build)
+│   └── PULL_REQUEST_TEMPLATE.md       # PR checklist (Definition of Done)
+├── AI-log/                            # Individual AI usage logs, one folder per member (#99)
+│   ├── Bryce/
+│   ├── Gabriel/
 │   ├── Gene/
-|   ├── Luca/
-|   ├── Mahmoud/
-|   └── Zohair/
-├── backend/                          #SQLite Database
+│   ├── Luca/
+│   ├── Mahmoud/
+│   └── Zohair/
+├── backend/                           # Express 5 API with a SQLite database
 │   ├── db/
+│   │   ├── schema.sql                 # Table definitions
+│   │   ├── migrate.js                 # npm run db:migrate
+│   │   └── seed.js                    # npm run db:seed (demo users, profiles, jobs, applications)
 │   ├── src/
-│   │   ├── routes/                 # Route JS files
-│   ├── test/                       # Backend Tests 
-|   └── README.md                   # Backend ReadME
+│   │   ├── routes/                    # auth, profile, resumes, jobs, applications
+│   │   ├── app.js                     # Express app: middleware and routes
+│   │   ├── server.js                  # Entry point (npm start)
+│   │   ├── config.js                  # Environment variables and defaults
+│   │   ├── middleware.js              # JWT authentication and role checks
+│   │   └── errors.js                  # HTTP error type
+│   ├── test/                          # Backend tests (npm test)
+│   ├── data/                          # SQLite database file (git-ignored)
+│   ├── uploads/                       # Uploaded resumes (git-ignored)
+│   ├── .nvmrc                         # Backend Node version
+│   └── README.md                      # API reference and database notes
 ├── docs/
-|   ├── minutes/                    # Meeting Minutes (attendance, decisions, action items) (#27)
-|   │   ├── minutes-template.md     # Template for New Meetings
-|   │   └── YYYY-MM-DD_Meeting_Minutes  # Various Weekly Minute Logs
-|   ├── sprint-1/                   # Sprint 1 deliverables (#24), including work-plan table, backlog & priorities
-|   ├── user-stories/               # Requirements, Split into AI Generated & Team Generated Directories
-|   |   ├── AI Generated User Stories/ 
-|   |   └── Team Generated User Stories/
-│   ├── Contributing.md             #Team process: Workflow, Branching, PRs, Review, Definition of Ready/Definition of done(DoR/DoD)
-│   ├── ERD.md                      #Database Entity-Relation Diagram of Current and Projected features.
-│   └── README.md                   #File Structure of Docs Directory
-├── frontend/CareerConnect
+│   ├── ContributionLog/               # Contribution logs (#101)
+│   │   ├── Sprint 1/
+│   │   ├── Sprint2/                   # One file per member
+│   │   └── contribution-template.md
+│   ├── minutes/                       # Meeting minutes: attendance, decisions, action items (#27)
+│   │   ├── minutes-template.md        # Template for new meetings
+│   │   └── YYYY_MM_DD_Meeting_Minutes.md
+│   ├── sprint-1/                      # Sprint 1 plan (backlog, priorities, work-plan table) and Appendix A
+│   ├── sprint-2/                      # Sprint 2 plan (goal, ranked backlog, work plan, risks) (#98)
+│   ├── user-stories/                  # Requirements, kept separate by source
+│   │   ├── AI Generated User Stories/
+│   │   └── Team Generated User Stories/
+│   ├── CONTRIBUTING.md                # Team process: workflow, branching, PRs, review, DoR/DoD
+│   ├── ERD.md                         # Entity-relationship diagram (current and planned features)
+│   └── README.md                      # Layout of the docs folder
+├── frontend/CareerConnect/            # Angular 22 app
+│   ├── public/                        # Static assets (favicon)
 │   ├── src/
-│   │   ├── app/                    # Website UI (HTML & CSS) & Front-Backend (TypeScript) files
-|   ├── Config Files                # Various Angular, Json, Tsconfig files
-|   └── README.md
-├── LICENSE                         #GNU General Public License
-└── README.md                       #This File, the Primary ReadME
+│   │   ├── app/                       # Each component has .ts, .html, .css and a .spec.ts unit test
+│   │   │   ├── app.ts / .html / .css      # App shell: nav bar and page outlet
+│   │   │   ├── app.routes.ts              # Page routes and their guards
+│   │   │   ├── app.config.ts              # Router, HTTP client and interceptor setup
+│   │   │   ├── auth.service.ts            # Login state and token storage
+│   │   │   ├── auth.interceptor.ts        # Adds the token to API calls; logs out on a 401
+│   │   │   ├── guards.ts                  # Logged-in and role guards
+│   │   │   ├── open-blob.ts               # Opens a downloaded resume in a new tab
+│   │   │   ├── login.component.*          # Login and registration
+│   │   │   ├── profile.component.*        # Profile and resumes
+│   │   │   ├── jobs.component.*           # Job search and filters
+│   │   │   ├── job-detail.component.*     # Job details and applying
+│   │   │   ├── my-applications.component.*     # Job seeker's applications dashboard
+│   │   │   ├── recruiter-postings.component.*  # Recruiter's postings: create, edit, close/reopen
+│   │   │   └── posting-applicants.component.*  # Applicants for a posting and status updates
+│   │   ├── index.html
+│   │   ├── main.ts
+│   │   └── styles.css                 # Global styles
+│   ├── .tool-versions                 # Frontend Node version (asdf)
+│   ├── angular.json                   # Angular build and test configuration
+│   ├── package.json
+│   ├── tsconfig*.json                 # TypeScript configuration
+│   └── README.md
+├── .gitignore
+├── LICENSE                            # GNU General Public License v3
+└── README.md                          # This file, the primary README
 ```
