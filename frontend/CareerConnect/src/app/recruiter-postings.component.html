@@ -1,0 +1,96 @@
+<div class="page-header">
+  <div>
+    <h1>My postings</h1>
+    <p>Create, edit, and manage your job postings</p>
+  </div>
+  <button class="btn btn-primary" (click)="show_create.set(!show_create())">
+    {{ show_create() ? 'Cancel' : 'New posting' }}
+  </button>
+</div>
+
+<div class="card create-card" *ngIf="show_create()">
+  <h2>New posting</h2>
+  <form [formGroup]="create_form" (ngSubmit)="onCreate()">
+    <div class="field">
+      <label>Title</label>
+      <input formControlName="title" placeholder="e.g. Backend Developer" />
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea formControlName="description" rows="3" placeholder="What the role involves"></textarea>
+    </div>
+    <div class="filters-row">
+      <div class="field">
+        <label>Location (optional)</label>
+        <input formControlName="location" placeholder="Montreal, QC" />
+      </div>
+      <div class="field">
+        <label>Category (optional)</label>
+        <input formControlName="category" placeholder="Engineering" />
+      </div>
+      <div class="field">
+        <label>Deadline (optional)</label>
+        <input formControlName="deadline" type="date" />
+      </div>
+    </div>
+    <button class="btn btn-primary" type="submit" [disabled]="create_form.invalid">Create posting</button>
+    <div *ngIf="create_error()" class="alert alert-error">{{ create_error() }}</div>
+  </form>
+</div>
+
+<div class="posting-list" *ngIf="postings().length; else noPostings">
+  <div class="card posting-card" *ngFor="let p of postings()">
+    <ng-container *ngIf="editing_id() === p.id; else viewRow">
+      <form [formGroup]="edit_form" (ngSubmit)="onSaveEdit(p.id)">
+        <div class="field">
+          <label>Title</label>
+          <input formControlName="title" />
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea formControlName="description" rows="3"></textarea>
+        </div>
+        <div class="filters-row">
+          <div class="field">
+            <label>Location</label>
+            <input formControlName="location" />
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <input formControlName="category" />
+          </div>
+          <div class="field">
+            <label>Deadline</label>
+            <input formControlName="deadline" type="date" />
+          </div>
+        </div>
+        <div class="posting-actions">
+          <button class="btn btn-primary btn-sm" type="submit" [disabled]="edit_form.invalid">Save</button>
+          <button class="btn btn-secondary btn-sm" type="button" (click)="cancelEdit()">Cancel</button>
+        </div>
+        <div *ngIf="edit_error()" class="alert alert-error">{{ edit_error() }}</div>
+      </form>
+    </ng-container>
+
+    <ng-template #viewRow>
+      <div class="posting-row-header">
+        <h2>{{ p.title }}</h2>
+        <span class="badge" [ngClass]="p.status === 'open' ? 'badge-open' : 'badge-closed'">{{ p.status }}</span>
+      </div>
+      <p class="posting-meta" *ngIf="p.location || p.category">
+        {{ p.location }}<span *ngIf="p.location && p.category"> · </span>{{ p.category }}
+      </p>
+      <p class="posting-applicants">{{ p.applicationCount }} application(s)</p>
+      <div class="posting-actions">
+        <a class="btn btn-secondary btn-sm" [routerLink]="['/recruiter/postings', p.id, 'applicants']">View applicants</a>
+        <button class="btn btn-secondary btn-sm" (click)="startEdit(p)">Edit</button>
+        <button class="btn btn-secondary btn-sm" (click)="toggleStatus(p)">
+          {{ p.status === 'open' ? 'Close' : 'Reopen' }}
+        </button>
+      </div>
+    </ng-template>
+  </div>
+</div>
+<ng-template #noPostings>
+  <p class="empty-state">You haven't posted any jobs yet.</p>
+</ng-template>

@@ -1,1 +1,34 @@
-<router-outlet />
+<nav class="nav" *ngIf="router.url !== '/login'">
+  <a class="nav-brand" routerLink="/jobs">CareerConnect</a>
+
+  <ng-container *ngIf="auth.currentUser() as user; else guestLinks">
+    <div class="nav-links" *ngIf="user.role === 'job_seeker'">
+      <a routerLink="/jobs" routerLinkActive="active">Jobs</a>
+      <a routerLink="/applications" routerLinkActive="active">My applications</a>
+      <a routerLink="/profile" routerLinkActive="active">Profile</a>
+    </div>
+
+    <div class="nav-links" *ngIf="user.role === 'recruiter'">
+      <a routerLink="/recruiter/postings" routerLinkActive="active">My postings</a>
+      <a routerLink="/profile" routerLinkActive="active">Profile</a>
+    </div>
+
+    <div class="nav-user">
+      <span class="nav-email">{{ user.email }}</span>
+      <button class="nav-logout" (click)="logout()">Logout</button>
+    </div>
+  </ng-container>
+
+  <ng-template #guestLinks>
+    <div class="nav-links">
+      <a routerLink="/jobs" routerLinkActive="active">Jobs</a>
+    </div>
+    <div class="nav-user">
+      <a class="nav-logout" routerLink="/login">Login</a>
+    </div>
+  </ng-template>
+</nav>
+
+<main class="page">
+  <router-outlet />
+</main>

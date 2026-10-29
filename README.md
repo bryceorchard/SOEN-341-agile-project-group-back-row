@@ -19,6 +19,7 @@ CareerConnect is a web-based platform that streamlines job seeking and recruitin
     - [Frontend setup and start](#frontend-setup-and-start)
     - [Configuration](#configuration)
   - [Features](#features)
+  - [File Structure](#file-structure)
 
 ## Team
 
@@ -58,7 +59,7 @@ CareerConnect brings both sides into one platform. Job seekers create a profile,
 - **git**
 - **Node.js** — the backend and frontend pin their own versions:
   - Backend: Node 22 (see `backend/.nvmrc`; requires `>=22 <25`)
-  - Frontend: recent Node (see `frontend/.tool-versions`)
+  - Frontend: Node `^22.22.3`, `^24.15` or `>=26` (Angular 22's requirement; CI uses Node 24). `frontend/CareerConnect/.tool-versions` pins one for asdf users.
 - A Node version manager (**nvm** recommended) so you can switch between them.
 
 ### Backend setup and start
@@ -71,7 +72,7 @@ npm install
 npm run db:migrate  # create tables
 npm run db:seed     # add demo users (password: Password123!)
 npm test            # optional: run the test suite
-npm starm
+npm start
 ```
 
 ### Frontend setup and start
@@ -106,3 +107,46 @@ See [`backend/README.md`](backend/README.md) for the full API reference and data
 - Application history dashboard
 - Notifications and reminders for application deadlines
 - Saved jobs and favourites
+
+## File Structure
+
+General File Structure of Major Folders and Salient Files 
+
+```CareerConnect
+my-project/
+├── .github/                         #Github Actions & Pull Request Template
+|   ├── workflows/
+│   │   └── ci.yml
+|   └── PULL_REQUEST_TEMPLATE.md
+├── AI-log/                          # Individual AI usage logs, one folder per member (#99)
+|   ├── Bryce/
+|   ├── Gabriel/
+│   ├── Gene/
+|   ├── Luca/
+|   ├── Mahmoud/
+|   └── Zohair/
+├── backend/                          #SQLite Database
+│   ├── db/
+│   ├── src/
+│   │   ├── routes/                 # Route JS files
+│   ├── test/                       # Backend Tests 
+|   └── README.md                   # Backend ReadME
+├── docs/
+|   ├── minutes/                    # Meeting Minutes (attendance, decisions, action items) (#27)
+|   │   ├── minutes-template.md     # Template for New Meetings
+|   │   └── YYYY-MM-DD_Meeting_Minutes  # Various Weekly Minute Logs
+|   ├── sprint-1/                   # Sprint 1 deliverables (#24), including work-plan table, backlog & priorities
+|   ├── user-stories/               # Requirements, Split into AI Generated & Team Generated Directories
+|   |   ├── AI Generated User Stories/ 
+|   |   └── Team Generated User Stories/
+│   ├── Contributing.md             #Team process: Workflow, Branching, PRs, Review, Definition of Ready/Definition of done(DoR/DoD)
+│   ├── ERD.md                      #Database Entity-Relation Diagram of Current and Projected features.
+│   └── README.md                   #File Structure of Docs Directory
+├── frontend/CareerConnect
+│   ├── src/
+│   │   ├── app/                    # Website UI (HTML & CSS) & Front-Backend (TypeScript) files
+|   ├── Config Files                # Various Angular, Json, Tsconfig files
+|   └── README.md
+├── LICENSE                         #GNU General Public License
+└── README.md                       #This File, the Primary ReadME
+```
