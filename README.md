@@ -98,15 +98,22 @@ See [`backend/README.md`](backend/README.md) for the full API reference and data
 
 ## Features
 
-- User registration, authentication, and profile management
-- Resume upload and management
-- Job posting management for recruiters
-- Job search and filtering
-- Job application submission
-- Application status tracking (Applied, Interview, Offered, Rejected)
-- Application history dashboard
-- Notifications and reminders for application deadlines
-- Saved jobs and favourites
+Implemented (Sprints 1–2):
+
+- Registration and login as a job seeker or a recruiter, and profile management
+- Resume upload, replace, view, and delete
+- Job search with keyword, location, and category filters, and a details page for each job
+- Applying to a job, optionally attaching one of your resumes
+- Application dashboard with each application's status (Applied, Under Review, Interview, Offered, Rejected) and a status filter
+- Job postings for recruiters: create, edit, close, and reopen
+- Applicants for each posting, with a status filter and status updates by the recruiter
+
+Planned for later sprints:
+
+- AI-assisted resume feedback (US-10)
+- Saved and favourite jobs (US-04)
+- Notifications and reminders for application deadlines (US-07)
+- More stories in the backlog (US-11 to US-19); see the GitHub issues
 
 ## File Structure
 
