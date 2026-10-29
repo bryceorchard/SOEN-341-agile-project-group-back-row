@@ -59,7 +59,7 @@ CareerConnect brings both sides into one platform. Job seekers create a profile,
 - **git**
 - **Node.js** — the backend and frontend pin their own versions:
   - Backend: Node 22 (see `backend/.nvmrc`; requires `>=22 <25`)
-  - Frontend: recent Node (see `frontend/.tool-versions`)
+  - Frontend: Node `^22.22.3`, `^24.15` or `>=26` (Angular 22's requirement; CI uses Node 24). `frontend/CareerConnect/.tool-versions` pins one for asdf users.
 - A Node version manager (**nvm** recommended) so you can switch between them.
 
 ### Backend setup and start
@@ -72,7 +72,7 @@ npm install
 npm run db:migrate  # create tables
 npm run db:seed     # add demo users (password: Password123!)
 npm test            # optional: run the test suite
-npm starm
+npm start
 ```
 
 ### Frontend setup and start
