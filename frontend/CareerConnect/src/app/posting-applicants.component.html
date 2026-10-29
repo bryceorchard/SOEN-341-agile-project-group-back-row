@@ -3,8 +3,20 @@
 <p class="not-found" *ngIf="forbidden()">You don't have access to this posting's applicants.</p>
 
 <div *ngIf="!forbidden()">
+  <div class="card posting-summary" *ngIf="job() as j">
+    <div class="page-header">
+      <div>
+        <h1>{{ j.title }}</h1>
+        <p class="applicant-meta">
+          {{ j.location }}<span *ngIf="j.location && j.category"> · </span>{{ j.category }}<span *ngIf="j.deadline"> · Deadline {{ j.deadline }}</span>
+        </p>
+      </div>
+      <span class="badge" [ngClass]="j.status === 'closed' ? 'badge-closed' : 'badge-open'">{{ j.status }}</span>
+    </div>
+  </div>
+
   <div class="page-header">
-    <h1>Applicants</h1>
+    <h2 class="applicants-heading">Applicants</h2>
   </div>
 
   <div class="alert alert-error" *ngIf="error()">{{ error() }}</div>
@@ -35,6 +47,7 @@
         <h2>{{ a.applicantName || a.applicantEmail }}</h2>
         <p class="applicant-meta">{{ a.applicantEmail }}<span *ngIf="a.applicantHeadline"> · {{ a.applicantHeadline }}</span></p>
         <p class="applicant-meta">Applied {{ a.appliedAt | slice: 0:10 }}</p>
+        <p class="applicant-meta" *ngIf="a.resumeId">Resume: {{ a.resumeFilename || 'attached' }}</p>
         <button class="btn btn-secondary btn-sm" *ngIf="a.resumeId" (click)="viewResume(a.resumeId)">View resume</button>
         <span class="no-resume" *ngIf="!a.resumeId">No resume attached</span>
       </div>

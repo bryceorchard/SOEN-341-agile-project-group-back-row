@@ -40,3 +40,21 @@
   text-align: center;
   color: var(--text-muted);
 }
+
+.apply-confirmation p {
+  margin: 0 0 4px;
+}
+
+.apply-confirmation a {
+  font-weight: 600;
+}
+
+.closed-banner {
+  margin: 12px 0 4px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--error-bg);
+  color: var(--error);
+  font-weight: 600;
+  font-size: 0.88rem;
+}

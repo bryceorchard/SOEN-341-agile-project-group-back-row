@@ -5,38 +5,60 @@
   </div>
 </div>
 
-<div class="status-filter">
-  <button
-    class="btn btn-sm"
-    [class.btn-primary]="active_status() === ''"
-    [class.btn-secondary]="active_status() !== ''"
-    (click)="filterBy('')"
-  >
-    All
-  </button>
-  <button
-    class="btn btn-sm"
-    *ngFor="let s of statuses"
-    [class.btn-primary]="active_status() === s"
-    [class.btn-secondary]="active_status() !== s"
-    (click)="filterBy(s)"
-  >
-    {{ s }}
-  </button>
-</div>
+<div class="alert alert-error" *ngIf="error()">{{ error() }}</div>
 
-<div class="application-list" *ngIf="applications().length; else noApplications">
-  <a class="card application-row" *ngFor="let a of applications()" [routerLink]="['/jobs', a.jobId]">
-    <div>
-      <h2>{{ a.jobTitle }}</h2>
-      <p class="app-meta" *ngIf="a.jobLocation || a.jobCategory">
-        {{ a.jobLocation }}<span *ngIf="a.jobLocation && a.jobCategory"> · </span>{{ a.jobCategory }}
-      </p>
-      <p class="app-meta">Applied {{ a.appliedAt | slice: 0:10 }}</p>
-    </div>
-    <span class="badge" [ngClass]="badgeClass(a.status)">{{ a.status }}</span>
-  </a>
-</div>
+<ng-container *ngIf="!error()">
+  <div class="status-filter">
+    <button
+      class="btn btn-sm"
+      [class.btn-primary]="active_status() === ''"
+      [class.btn-secondary]="active_status() !== ''"
+      (click)="filterBy('')"
+    >
+      All ({{ counts()[''] }})
+    </button>
+    <button
+      class="btn btn-sm"
+      *ngFor="let s of statuses"
+      [class.btn-primary]="active_status() === s"
+      [class.btn-secondary]="active_status() !== s"
+      (click)="filterBy(s)"
+    >
+      {{ s }} ({{ counts()[s] }})
+    </button>
+  </div>
+
+  <p class="filter-summary" *ngIf="active_status() && !loading()">
+    {{ counts()[active_status()] }} {{ active_status() }} application{{ counts()[active_status()] === 1 ? '' : 's' }}
+  </p>
+
+  <p class="empty-state" *ngIf="loading()">Loading your applications…</p>
+
+  <div class="application-list" *ngIf="!loading() && applications().length">
+    <a class="card application-row" *ngFor="let a of applications()" [routerLink]="['/jobs', a.jobId]">
+      <div>
+        <h2>{{ a.jobTitle }}</h2>
+        <p class="app-meta" *ngIf="a.jobLocation || a.jobCategory">
+          {{ a.jobLocation }}<span *ngIf="a.jobLocation && a.jobCategory"> · </span>{{ a.jobCategory }}
+        </p>
+        <p class="app-meta" *ngIf="a.jobDeadline">Deadline {{ a.jobDeadline }}</p>
+        <p class="app-meta">
+          Applied {{ a.appliedAt | slice: 0:10 }}<span *ngIf="a.updatedAt"> · Last updated {{ a.updatedAt | slice: 0:10 }}</span>
+        </p>
+        <p class="app-meta">Resume: {{ a.resumeFilename || 'none attached' }}</p>
+      </div>
+      <div class="app-badges">
+        <span class="badge badge-closed" *ngIf="a.jobStatus === 'closed'">Posting closed</span>
+        <span class="badge" [ngClass]="badgeClass(a.status)">{{ a.status }}</span>
+      </div>
+    </a>
+  </div>
+
+  <ng-container *ngIf="!loading() && !applications().length">
+    <p class="empty-state" *ngIf="active_status(); else noApplications">No {{ active_status() }} applications.</p>
+  </ng-container>
+</ng-container>
+
 <ng-template #noApplications>
   <p class="empty-state">No applications yet — <a routerLink="/jobs">browse open postings</a>.</p>
 </ng-template>

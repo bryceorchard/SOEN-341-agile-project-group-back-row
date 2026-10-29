@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService, API_BASE } from './auth.service';
 import { openBlobInNewTab } from './open-blob';
 
@@ -20,6 +20,16 @@ const ALLOWED_RESUME_TYPES: Record<string, string> = {
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
 };
 const MAX_RESUME_BYTES = 5 * 1024 * 1024;
+
+// Mirrors backend/src/routes/profile.js, which rejects any profile field over 2000 characters.
+export const PROFILE_FIELD_MAX = 2000;
+const PROFILE_FIELD_LABELS: Record<string, string> = {
+  fullName: 'Full name',
+  headline: 'Headline',
+  location: 'Location',
+  phone: 'Phone',
+  bio: 'Bio',
+};
 
 // Exported so it can be unit-tested without standing up the whole component.
 export function validateResumeFile(file: File): string | null {
@@ -68,12 +78,13 @@ export class Profile implements OnInit {
 
   constructor() {
     this.upload_form = this.form_builder.group({ resume: [''] });
+    const field = () => ['', Validators.maxLength(PROFILE_FIELD_MAX)];
     this.profile_form = this.form_builder.group({
-      fullName: [''],
-      headline: [''],
-      location: [''],
-      phone: [''],
-      bio: [''],
+      fullName: field(),
+      headline: field(),
+      location: field(),
+      phone: field(),
+      bio: field(),
     });
   }
 
@@ -92,9 +103,21 @@ export class Profile implements OnInit {
     });
   }
 
+  // Labels of the fields that are over the length limit, for the inline message.
+  tooLongFields(): string[] {
+    return Object.keys(PROFILE_FIELD_LABELS)
+      .filter((name) => this.profile_form.get(name)?.hasError('maxlength'))
+      .map((name) => PROFILE_FIELD_LABELS[name]);
+  }
+
   saveProfile() {
     this.profile_saved.set(false);
     this.profile_error.set('');
+    const tooLong = this.tooLongFields();
+    if (tooLong.length) {
+      this.profile_error.set(`${tooLong.join(', ')}: ${PROFILE_FIELD_MAX} characters max.`);
+      return;
+    }
     this.http_client.put(`${API_BASE}/profile`, this.profile_form.getRawValue()).subscribe({
       next: () => this.profile_saved.set(true),
       error: (err) => this.profile_error.set(err?.error?.error ?? 'Could not save profile'),

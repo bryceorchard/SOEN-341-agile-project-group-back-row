@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { API_BASE } from './auth.service';
+import { JobSummary } from './jobs.component';
 import { openBlobInNewTab } from './open-blob';
 
 interface Applicant {
@@ -30,6 +31,8 @@ export class PostingApplicants implements OnInit {
   private http_client = inject(HttpClient);
 
   jobId!: number;
+  // The posting itself, shown above the applicants (title, location, category, deadline, status).
+  job = signal<JobSummary | null>(null);
   applicants = signal<Applicant[]>([]);
   statuses = STATUSES;
   active_status = signal('');
@@ -38,6 +41,11 @@ export class PostingApplicants implements OnInit {
 
   ngOnInit() {
     this.jobId = Number(this.route.snapshot.paramMap.get('id'));
+    this.http_client.get<{ job: JobSummary }>(`${API_BASE}/jobs/${this.jobId}`).subscribe({
+      next: (res) => this.job.set(res.job),
+      // The applicants request decides access; a missing posting just leaves the header generic.
+      error: () => this.job.set(null),
+    });
     this.load();
   }
 

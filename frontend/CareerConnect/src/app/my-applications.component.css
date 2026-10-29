@@ -29,3 +29,16 @@
   font-size: 0.82rem;
   margin: 2px 0 0;
 }
+
+.app-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.filter-summary {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin: -8px 0 16px;
+}
