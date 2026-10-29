@@ -31,8 +31,11 @@
   </form>
 </div>
 
-<div class="job-list" *ngIf="jobs().length; else noJobs">
-  <a class="card job-card" *ngFor="let j of jobs()" [routerLink]="['/jobs', j.id]">
+<p class="empty-state" *ngIf="loading()">Loading postings…</p>
+<div class="alert alert-error" *ngIf="error()">{{ error() }}</div>
+
+<div class="job-list" *ngIf="!loading() && !error() && jobs().length; else noJobs">
+  <a class="card job-card" *ngFor="let j of jobs()" [routerLink]="['/jobs', j.id]" queryParamsHandling="preserve">
     <div class="job-card-header">
       <h2>{{ j.title }}</h2>
       <span class="badge badge-neutral" *ngIf="j.category">{{ j.category }}</span>
@@ -43,5 +46,5 @@
   </a>
 </div>
 <ng-template #noJobs>
-  <p class="empty-state">No postings match those filters.</p>
+  <p class="empty-state" *ngIf="!loading() && !error()">No postings match those filters.</p>
 </ng-template>

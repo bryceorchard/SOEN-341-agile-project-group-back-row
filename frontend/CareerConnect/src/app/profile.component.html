@@ -46,7 +46,10 @@
 
   <ul class="resume-list" *ngIf="resumes().length; else noResumes">
     <li *ngFor="let r of resumes()" class="resume-row">
-      <span class="resume-name">{{ r.originalFilename }}</span>
+      <div class="resume-info">
+        <span class="resume-name">{{ r.originalFilename }}</span>
+        <span class="resume-meta">{{ typeLabel(r.fileType) }} · Uploaded {{ r.uploadedAt | date: 'mediumDate' }}</span>
+      </div>
       <div class="resume-actions">
         <button class="btn btn-secondary btn-sm" (click)="viewResume(r.id)">View</button>
 

@@ -12,6 +12,12 @@ interface Resume {
   originalFilename: string;
 }
 
+interface Application {
+  id: number;
+  jobId: number;
+  status: string;
+}
+
 @Component({
   selector: 'job-detail',
   templateUrl: './job-detail.component.html',
@@ -29,7 +35,11 @@ export class JobDetail implements OnInit {
   resumes = signal<Resume[]>([]);
   apply_form: FormGroup;
   apply_error = signal('');
-  applied = signal(false);
+  // null = haven't applied; otherwise the application's current status (Applied, Interview, …).
+  applied_status = signal<string | null>(null);
+
+  // The search filters the user came from, so "Back to results" lands them where they were.
+  backQueryParams = this.route.snapshot.queryParams;
 
   constructor() {
     this.apply_form = this.form_builder.group({ resumeId: [''] });
@@ -46,6 +56,11 @@ export class JobDetail implements OnInit {
       this.http_client
         .get<{ resumes: Resume[] }>(`${API_BASE}/resumes`)
         .subscribe((res) => this.resumes.set(res.resumes));
+
+      this.http_client.get<{ applications: Application[] }>(`${API_BASE}/applications`).subscribe((res) => {
+        const existing = res.applications.find((a) => a.jobId === Number(id));
+        if (existing) this.applied_status.set(existing.status);
+      });
     }
   }
 
@@ -56,7 +71,7 @@ export class JobDetail implements OnInit {
 
     const resumeId = this.apply_form.getRawValue().resumeId || undefined;
     this.http_client.post(`${API_BASE}/applications`, { jobId: job.id, resumeId }).subscribe({
-      next: () => this.applied.set(true),
+      next: () => this.applied_status.set('Applied'),
       error: (err: HttpErrorResponse) =>
         this.apply_error.set(err.status === 409 ? "You've already applied to this job" : err.error?.error ?? 'Could not apply'),
     });

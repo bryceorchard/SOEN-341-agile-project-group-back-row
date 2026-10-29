@@ -24,8 +24,19 @@
   border-top: 1px solid var(--border);
 }
 
+.resume-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .resume-name {
   font-weight: 500;
+}
+
+.resume-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
 }
 
 .resume-actions {

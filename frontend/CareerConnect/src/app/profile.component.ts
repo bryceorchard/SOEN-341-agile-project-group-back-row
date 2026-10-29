@@ -12,6 +12,30 @@ interface Resume {
   uploadedAt: string;
 }
 
+// Mirrors backend/src/config.js's ALLOWED_RESUME_TYPES / MAX_RESUME_BYTES so bad files
+// are rejected before we even open a connection, with a friendlier message than the API gives.
+const ALLOWED_RESUME_TYPES: Record<string, string> = {
+  'application/pdf': 'PDF',
+  'application/msword': 'DOC',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
+};
+const MAX_RESUME_BYTES = 5 * 1024 * 1024;
+
+// Exported so it can be unit-tested without standing up the whole component.
+export function validateResumeFile(file: File): string | null {
+  if (!ALLOWED_RESUME_TYPES[file.type]) {
+    return 'Resume must be a PDF, DOC or DOCX file.';
+  }
+  if (file.size > MAX_RESUME_BYTES) {
+    return 'Resume must be 5 MB or smaller.';
+  }
+  return null;
+}
+
+export function fileTypeLabel(mimeType: string): string {
+  return ALLOWED_RESUME_TYPES[mimeType] ?? mimeType;
+}
+
 interface ProfileData {
   fullName: string | null;
   headline: string | null;
@@ -80,7 +104,16 @@ export class Profile implements OnInit {
   onFileSelect(event: Event) {
     const target = event.target as HTMLInputElement;
     if (target && target.files && target.files.length > 0) {
-      this.upload_form.get('resume')?.setValue(target.files[0]);
+      const file = target.files[0];
+      const error = validateResumeFile(file);
+      if (error) {
+        this.upload_error.set(error);
+        target.value = '';
+        this.upload_form.get('resume')?.setValue('');
+        return;
+      }
+      this.upload_error.set('');
+      this.upload_form.get('resume')?.setValue(file);
     }
   }
 
@@ -102,6 +135,8 @@ export class Profile implements OnInit {
   }
 
   deleteResume(id: number) {
+    if (!confirm('Delete this resume? This cannot be undone.')) return;
+
     this.resume_error.set('');
     this.http_client.delete(`${API_BASE}/resumes/${id}`).subscribe({
       next: () => this.refreshResumes(),
@@ -121,10 +156,21 @@ export class Profile implements OnInit {
     this.replacing_id.set(id);
   }
 
+  typeLabel(mimeType: string): string {
+    return fileTypeLabel(mimeType);
+  }
+
   onReplaceSelect(event: Event, id: number) {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
     if (!file) return;
+
+    const error = validateResumeFile(file);
+    if (error) {
+      this.resume_error.set(error);
+      this.replacing_id.set(null);
+      return;
+    }
 
     const form_data = new FormData();
     form_data.append('resume', file);

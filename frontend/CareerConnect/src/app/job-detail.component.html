@@ -1,9 +1,9 @@
 <p class="not-found" *ngIf="not_found()">
-  Job not found. <a routerLink="/jobs">Back to search</a>
+  Job not found. <a routerLink="/jobs" [queryParams]="backQueryParams">Back to search</a>
 </p>
 
 <div *ngIf="job() as j">
-  <a class="back-link" routerLink="/jobs">← Back to search</a>
+  <a class="back-link" routerLink="/jobs" [queryParams]="backQueryParams">← Back to search</a>
 
   <div class="card job-detail-card">
     <div class="page-header">
@@ -15,6 +15,7 @@
     </div>
 
     <p class="job-deadline" *ngIf="j.deadline">Apply by {{ j.deadline }}</p>
+    <p class="job-posted">Posted {{ j.createdAt | date: 'mediumDate' }}</p>
 
     <p class="job-description">{{ j.description }}</p>
   </div>
@@ -22,7 +23,7 @@
   <div class="card apply-card" *ngIf="auth.currentUser()?.role === 'job_seeker'">
     <h2>Apply to this job</h2>
 
-    <div *ngIf="!applied(); else appliedMsg">
+    <div *ngIf="!applied_status(); else appliedMsg">
       <form [formGroup]="apply_form" (ngSubmit)="apply()">
         <div class="field">
           <label>Resume (optional)</label>
@@ -36,7 +37,9 @@
       <div *ngIf="apply_error()" class="alert alert-error">{{ apply_error() }}</div>
     </div>
     <ng-template #appliedMsg>
-      <div class="alert alert-success">Application submitted — track it on your applications page.</div>
+      <div class="alert alert-success">
+        Application status: <strong>{{ applied_status() }}</strong> — track it on your applications page.
+      </div>
     </ng-template>
   </div>
 
