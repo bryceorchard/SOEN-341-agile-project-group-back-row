@@ -37,8 +37,11 @@
       <div *ngIf="apply_error()" class="alert alert-error">{{ apply_error() }}</div>
     </div>
     <ng-template #appliedMsg>
-      <div class="alert alert-success">
-        Application status: <strong>{{ applied_status() }}</strong> — track it on your applications page.
+      <div class="alert alert-success apply-confirmation">
+        <p *ngIf="just_applied()"><strong>Application submitted</strong></p>
+        <p>{{ j.title }}<span *ngIf="applied_at()"> · Applied {{ applied_at() }}</span></p>
+        <p>Application status: <strong>{{ applied_status() }}</strong></p>
+        <a routerLink="/applications">View My applications</a>
       </div>
     </ng-template>
   </div>

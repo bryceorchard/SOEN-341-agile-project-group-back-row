@@ -71,6 +71,44 @@ describe('JobDetail', () => {
     expect(page().textContent).toContain('Interview');
   });
 
+  it('shows a confirmation with the job title, date, status and a link after applying', async () => {
+    await openPage([]);
+
+    page().querySelector('form')!.dispatchEvent(new Event('submit'));
+    const req = http.expectOne(`${API_BASE}/applications`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ jobId: JOB_ID, resumeId: undefined });
+    req.flush(
+      { application: { id: 3, jobId: JOB_ID, status: 'Applied', appliedAt: '2026-10-29 18:30:00' } },
+      { status: 201, statusText: 'Created' },
+    );
+    await render();
+
+    const text = page().textContent ?? '';
+    expect(page().querySelector('form')).toBeNull();
+    expect(text).toContain('Application submitted');
+    expect(text).toContain('Backend Developer');
+    expect(text).toContain('Applied 2026-10-29');
+    expect(text).toContain('Application status');
+    const link = page().querySelector('.apply-confirmation a');
+    expect(link?.getAttribute('href')).toBe('/applications');
+  });
+
+  it('shows an "already applied" message on a 409 and no confirmation', async () => {
+    await openPage([]);
+
+    page().querySelector('form')!.dispatchEvent(new Event('submit'));
+    http
+      .expectOne(`${API_BASE}/applications`)
+      .flush({ error: 'You already applied to this job' }, { status: 409, statusText: 'Conflict' });
+    await render();
+
+    const text = page().textContent ?? '';
+    expect(text).toContain("You've already applied to this job");
+    expect(text).not.toContain('Application submitted');
+    expect(page().querySelector('form')).not.toBeNull();
+  });
+
   it('ignores applications to other jobs', async () => {
     await openPage([{ jobId: JOB_ID + 1, status: 'Interview' }]);
 
