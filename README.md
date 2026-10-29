@@ -118,10 +118,13 @@ my-project/
 |   ├── workflows/
 │   │   └── ci.yml
 |   └── PULL_REQUEST_TEMPLATE.md
-├── AI-Log/                          #Individual AI usage Logs, (Luca, Zohair & Gabriel have none as of this moment)
+├── AI-log/                          # Individual AI usage logs, one folder per member (#99)
 |   ├── Bryce/
-│   ├── Gene/ 
-|   └── Mahmoud/
+|   ├── Gabriel/
+│   ├── Gene/
+|   ├── Luca/
+|   ├── Mahmoud/
+|   └── Zohair/
 ├── backend/                          #SQLite Database
 │   ├── db/
 │   ├── src/
