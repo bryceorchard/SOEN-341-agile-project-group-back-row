@@ -8,14 +8,24 @@ import { API_BASE } from './auth.service';
 
 const JOB_ID = 7;
 const LIST_URL = `${API_BASE}/jobs/${JOB_ID}/applications`;
+const JOB = {
+  id: JOB_ID,
+  title: 'Backend Developer',
+  description: 'Work on the API',
+  location: 'Montreal, QC',
+  category: 'Engineering',
+  deadline: '2026-12-31',
+  status: 'open',
+  createdAt: '2026-10-01T12:00:00Z',
+};
 
 const ADA = {
   id: 1,
   applicantEmail: 'ada@test.com',
   applicantName: 'Ada Lovelace',
   applicantHeadline: 'Backend dev',
-  resumeId: null,
-  resumeFilename: null,
+  resumeId: null as number | null,
+  resumeFilename: null as string | null,
   status: 'Applied',
   appliedAt: '2026-10-01T12:00:00Z',
 };
@@ -38,6 +48,7 @@ describe('PostingApplicants', () => {
     await harness.navigateByUrl(`/recruiter/postings/${JOB_ID}/applicants`, PostingApplicants);
     http = TestBed.inject(HttpTestingController);
 
+    http.expectOne(`${API_BASE}/jobs/${JOB_ID}`).flush({ job: JOB });
     const req = http.expectOne((r) => r.url === LIST_URL);
     expect(req.request.method).toBe('GET');
     req.flush({ applications: applicants });
@@ -86,6 +97,26 @@ describe('PostingApplicants', () => {
     await openPage();
 
     expect(names()).toEqual(['Ada Lovelace', 'Grace Hopper']);
+  });
+
+  it("shows the posting's details above the applicants", async () => {
+    await openPage();
+
+    const summary = page().querySelector('.posting-summary')!.textContent!.replace(/\s+/g, ' ');
+    expect(summary).toContain('Backend Developer');
+    expect(summary).toContain('Montreal, QC · Engineering');
+    expect(summary).toContain('Deadline 2026-12-31');
+    expect(summary).toContain('open');
+  });
+
+  it("shows each applicant's email, name, headline, applied date and resume filename", async () => {
+    await openPage([{ ...ADA, resumeId: 5, resumeFilename: 'ada-cv.pdf' }]);
+
+    const row = page().querySelector('.applicant-row')!.textContent!.replace(/\s+/g, ' ');
+    expect(row).toContain('Ada Lovelace');
+    expect(row).toContain('ada@test.com · Backend dev');
+    expect(row).toContain('Applied 2026-10-01');
+    expect(row).toContain('Resume: ada-cv.pdf');
   });
 
   it('shows an empty state when there are no applicants', async () => {
