@@ -42,6 +42,7 @@
     <button class="btn btn-primary btn-sm" type="submit">Upload</button>
   </form>
   <div *ngIf="upload_error()" class="alert alert-error">{{ upload_error() }}</div>
+  <div *ngIf="resume_error()" class="alert alert-error">{{ resume_error() }}</div>
 
   <ul class="resume-list" *ngIf="resumes().length; else noResumes">
     <li *ngFor="let r of resumes()" class="resume-row">

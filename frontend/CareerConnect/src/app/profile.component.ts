@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { AuthService, API_BASE } from './auth.service';
+import { openBlobInNewTab } from './open-blob';
 
 interface Resume {
   id: number;
@@ -33,6 +34,7 @@ export class Profile implements OnInit {
   user = this.auth.currentUser;
   resumes = signal<Resume[]>([]);
   upload_error = signal('');
+  resume_error = signal('');
   profile_saved = signal(false);
   profile_error = signal('');
   replacing_id = signal<number | null>(null);
@@ -100,15 +102,19 @@ export class Profile implements OnInit {
   }
 
   deleteResume(id: number) {
+    this.resume_error.set('');
     this.http_client.delete(`${API_BASE}/resumes/${id}`).subscribe({
       next: () => this.refreshResumes(),
+      error: (err) => this.resume_error.set(err?.error?.error ?? 'Could not delete the resume.'),
     });
   }
 
   viewResume(id: number) {
-    this.http_client.get(`${API_BASE}/resumes/${id}/file`, { responseType: 'blob' }).subscribe((blob) => {
-      window.open(URL.createObjectURL(blob), '_blank');
-    });
+    this.resume_error.set('');
+    openBlobInNewTab(
+      this.http_client.get(`${API_BASE}/resumes/${id}/file`, { responseType: 'blob' }),
+      (message) => this.resume_error.set(message),
+    );
   }
 
   startReplace(id: number) {
@@ -122,10 +128,16 @@ export class Profile implements OnInit {
 
     const form_data = new FormData();
     form_data.append('resume', file);
+    this.resume_error.set('');
     this.http_client.put<{ resume: Resume }>(`${API_BASE}/resumes/${id}`, form_data).subscribe({
       next: () => {
         this.replacing_id.set(null);
         this.refreshResumes();
+      },
+      error: (err) => {
+        // Close the file picker so the user can click Replace again to retry.
+        this.replacing_id.set(null);
+        this.resume_error.set(err?.error?.error ?? 'Could not replace the resume.');
       },
     });
   }

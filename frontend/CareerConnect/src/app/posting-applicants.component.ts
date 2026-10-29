@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { API_BASE } from './auth.service';
+import { openBlobInNewTab } from './open-blob';
 
 interface Applicant {
   id: number;
@@ -33,6 +34,7 @@ export class PostingApplicants implements OnInit {
   statuses = STATUSES;
   active_status = signal('');
   forbidden = signal(false);
+  error = signal('');
 
   ngOnInit() {
     this.jobId = Number(this.route.snapshot.paramMap.get('id'));
@@ -45,15 +47,33 @@ export class PostingApplicants implements OnInit {
   }
 
   setStatus(applicant: Applicant, status: string) {
+    const previous = applicant.status;
+    this.error.set('');
+    // Show the new status right away, and remember the old one in case the save fails.
+    this.replaceStatus(applicant.id, status);
+
     this.http_client.patch(`${API_BASE}/applications/${applicant.id}`, { status }).subscribe({
       next: () => this.load(),
+      error: (err) => {
+        // The save failed, so put the dropdown back to what is actually stored.
+        this.replaceStatus(applicant.id, previous);
+        this.error.set(err?.error?.error ?? 'Could not update the status. Please try again.');
+      },
     });
   }
 
   viewResume(resumeId: number) {
-    this.http_client.get(`${API_BASE}/resumes/${resumeId}/file`, { responseType: 'blob' }).subscribe((blob) => {
-      window.open(URL.createObjectURL(blob), '_blank');
-    });
+    this.error.set('');
+    openBlobInNewTab(
+      this.http_client.get(`${API_BASE}/resumes/${resumeId}/file`, { responseType: 'blob' }),
+      (message) => this.error.set(message),
+    );
+  }
+
+  // Swaps in a new object (instead of editing the old one) so Angular re-renders the row
+  // and the <select> shows the right value.
+  private replaceStatus(id: number, status: string) {
+    this.applicants.update((list) => list.map((a) => (a.id === id ? { ...a, status } : a)));
   }
 
   private load() {
