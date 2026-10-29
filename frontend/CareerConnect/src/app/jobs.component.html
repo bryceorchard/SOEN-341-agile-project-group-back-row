@@ -1,0 +1,50 @@
+<div class="page-header">
+  <div>
+    <h1>Find your next role</h1>
+    <p>Browse open postings from recruiters on CareerConnect</p>
+  </div>
+</div>
+
+<div class="card filters-card">
+  <form [formGroup]="filter_form" (ngSubmit)="search()">
+    <div class="filters-row">
+      <div class="field">
+        <label>Keyword</label>
+        <input formControlName="keyword" placeholder="Title or description" />
+      </div>
+      <div class="field">
+        <label>Location</label>
+        <input formControlName="location" placeholder="City" />
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select formControlName="category">
+          <option value="">All categories</option>
+          <option *ngFor="let c of categories()" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="filters-actions">
+      <button class="btn btn-primary" type="submit">Search</button>
+      <button class="btn btn-secondary" type="button" (click)="resetFilters()">Clear</button>
+    </div>
+  </form>
+</div>
+
+<p class="empty-state" *ngIf="loading()">Loading postings…</p>
+<div class="alert alert-error" *ngIf="error()">{{ error() }}</div>
+
+<div class="job-list" *ngIf="!loading() && !error() && jobs().length; else noJobs">
+  <a class="card job-card" *ngFor="let j of jobs()" [routerLink]="['/jobs', j.id]" queryParamsHandling="preserve">
+    <div class="job-card-header">
+      <h2>{{ j.title }}</h2>
+      <span class="badge badge-neutral" *ngIf="j.category">{{ j.category }}</span>
+    </div>
+    <p class="job-meta" *ngIf="j.location">{{ j.location }}</p>
+    <p class="job-excerpt">{{ excerpt(j.description) }}</p>
+    <p class="job-deadline" *ngIf="j.deadline">Apply by {{ j.deadline }}</p>
+  </a>
+</div>
+<ng-template #noJobs>
+  <p class="empty-state" *ngIf="!loading() && !error()">No jobs match your search.</p>
+</ng-template>

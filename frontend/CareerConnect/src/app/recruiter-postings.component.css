@@ -1,0 +1,49 @@
+.create-card {
+  margin-bottom: 20px;
+}
+
+.filters-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.posting-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.posting-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.posting-row-header h2 {
+  font-size: 1.05rem;
+}
+
+.posting-meta {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 4px 0;
+}
+
+.posting-applicants {
+  font-size: 0.85rem;
+  margin: 2px 0 10px;
+}
+
+.posting-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .filters-row {
+    grid-template-columns: 1fr;
+  }
+}

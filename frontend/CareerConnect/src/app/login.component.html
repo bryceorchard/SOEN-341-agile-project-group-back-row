@@ -1,0 +1,58 @@
+<div class="auth-shell">
+  <span class="bubble bubble-teal auth-bubble-1"></span>
+  <span class="bubble bubble-coral auth-bubble-2"></span>
+  <span class="bubble bubble-gold auth-bubble-3"></span>
+
+  <div class="auth-card">
+    <h1>CareerConnect</h1>
+    <p class="auth-subtitle">Sign in, or create an account below</p>
+
+    <div class="field">
+      <label>Email</label>
+      <input placeholder="you@example.com" type="text" [formControl]="user" />
+      <p *ngIf="user.value && !isValidEmail(user.value)" class="alert alert-error">Enter a valid email address</p>
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <input placeholder="••••••••" type="password" [formControl]="pass" />
+      <p class="hint">Password must be at least 8 characters.</p>  
+      <p *ngIf="pass.value && pass.value.length < 8" class="alert alert-error">Password must be at least 8 characters</p>
+    </div>
+
+    <div class="field">
+      <label>Signing up as</label>
+      <div class="role-toggle">
+        <button
+          type="button"
+          class="role-option"
+          [class.selected]="role.value === 'job_seeker'"
+          (click)="role.setValue('job_seeker')"
+        >
+          Job seeker
+        </button>
+        <button
+          type="button"
+          class="role-option"
+          [class.selected]="role.value === 'recruiter'"
+          (click)="role.setValue('recruiter')"
+        >
+          Recruiter
+        </button>
+      </div>
+      <p class="hint">Only used when registering a new account.</p>
+    </div>
+
+    <div class="auth-actions">
+      <button class="btn btn-primary" (click)="login()">Login</button>
+      <button class="btn btn-secondary" [disabled]="!isValidEmail(user.value ?? '') || (pass.value ?? '').length < 8" (click)="register()">Register</button>
+    </div>
+
+    <div *ngIf="WRONG_PASSWORD === display_error()" class="alert alert-error">Wrong email or password</div>
+    <div *ngIf="USERNAME_TAKEN === display_error()" class="alert alert-error">Email already registered</div>
+    <div *ngIf="INVALID_EMAIL === display_error() && !(user.value && !isValidEmail(user.value))" class="alert alert-error">Enter a valid email address</div>
+    <div *ngIf="INVALID_PASSWORD === display_error() && !(pass.value && pass.value.length < 8)" class="alert alert-error">Password must be at least 8 characters</div>
+    <div *ngIf="backend_error()" class="alert alert-error">{{ backend_error() }}</div>
+    <div *ngIf="OTHER_ERROR === display_error() && !backend_error()" class="alert alert-error">Something went wrong, try again</div>
+  </div>
+</div>

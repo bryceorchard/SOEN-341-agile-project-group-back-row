@@ -1,4 +1,267 @@
 /* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Lora:wght@600;700&display=swap');
+
+:root {
+  --bg: #f3fbfa;
+  --surface: #ffffff;
+  --surface-muted: #e6f7f4;
+  --border: #d3ece7;
+  --text: #103b33;
+  --text-muted: #5c7a73;
+  --primary: #0f766e;
+  --primary-light: #14b8a6;
+  --primary-dark: #0b544e;
+  --accent: #f97362;
+  --accent-bg: #fef0ed;
+  --accent-2: #fbbf24;
+  --accent-2-bg: #fef8e7;
+  --success: #15803d;
+  --success-bg: #e4f7e9;
+  --error: #c0293a;
+  --error-bg: #fbe7e9;
+  --radius: 14px;
+  --radius-sm: 9px;
+  --shadow: 0 1px 2px rgba(16, 59, 51, 0.06), 0 10px 28px rgba(15, 118, 110, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
 body {
-  background: midnightblue;
+  margin: 0;
+  background:
+    radial-gradient(640px 420px at 88% -8%, rgba(20, 184, 166, 0.16), transparent 62%),
+    radial-gradient(520px 360px at -8% 12%, rgba(249, 115, 98, 0.14), transparent 60%),
+    radial-gradient(480px 420px at 50% 115%, rgba(251, 191, 36, 0.12), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: 'Lora', Georgia, serif;
+  margin: 0 0 8px;
+  color: var(--text);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+a {
+  color: var(--primary);
+}
+
+/* Shared components, used across pages so the app reads as one product. */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.field input,
+.field select,
+.field textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.16);
+}
+
+.field .hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: white;
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.25);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--surface-muted);
+}
+
+.btn-danger {
+  background: var(--surface);
+  color: var(--error);
+  border-color: var(--error);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--error-bg);
+}
+
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 0.78rem;
+}
+
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  margin-top: 12px;
+}
+
+.alert-error {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.alert-success {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.badge-open,
+.badge-offered {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.badge-rejected {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.badge-closed,
+.badge-neutral,
+.badge-under-review {
+  background: var(--surface-muted);
+  color: var(--primary);
+}
+
+.badge-applied {
+  background: var(--accent-2-bg);
+  color: #92650a;
+}
+
+.badge-interview {
+  background: var(--accent-bg);
+  color: #c2441f;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 32px 16px;
+}
+
+.page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.page-header p {
+  color: var(--text-muted);
+  margin: 4px 0 0;
+}
+
+/* Decorative floating bubbles — drop a few <span class="bubble bubble-*"> into a
+   position:relative container, sized/positioned with inline style per instance. */
+
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(1px);
+}
+
+.bubble-teal {
+  background: radial-gradient(circle at 32% 28%, rgba(20, 184, 166, 0.45), rgba(20, 184, 166, 0.04) 72%);
+}
+
+.bubble-coral {
+  background: radial-gradient(circle at 32% 28%, rgba(249, 115, 98, 0.4), rgba(249, 115, 98, 0.04) 72%);
+}
+
+.bubble-gold {
+  background: radial-gradient(circle at 32% 28%, rgba(251, 191, 36, 0.4), rgba(251, 191, 36, 0.04) 72%);
 }
