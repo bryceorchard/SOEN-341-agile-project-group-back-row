@@ -46,8 +46,15 @@ Protected routes need `Authorization: Bearer <token>`.
 | POST   | `/applications`     | `{ jobId, resumeId? }`                           | 201 `{ application }` (409 if already applied) |
 | GET    | `/applications`     | query: `status?`                                 | 200 `{ applications }` (current user's own) |
 | PATCH  | `/applications/:id` | `{ status }` one of Applied/Under Review/Interview/Offered/Rejected (recruiter who owns the job only) | 200 `{ application }` |
+| GET    | `/notifications`      | query: `unread?` (`true` to only show unread)   | 200 `{ notifications }` (current user's own, newest first) |
+| GET    | `/notifications/unread-count` | –                                        | 200 `{ count }` (current user's own) |
+| PATCH  | `/notifications/read-all` | –                                          | 200 `{ count: 0 }` (marks all of the current user's notifications read) |
+| PATCH  | `/notifications/:id/read` | –                                          | 200 `{ notification }` (recipient only; 404 otherwise) |
 
 `user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`;
 `job` = `{ id, recruiterId, title, description, location, category, deadline, status, createdAt }` (`/jobs/mine` adds `applicationCount`);
 `application` = `{ id, jobId, jobTitle, jobLocation, jobCategory, jobDeadline, jobStatus, resumeId, resumeFilename, status, appliedAt, updatedAt }`.
 An entry from `/jobs/:id/applications` is shaped `{ id, applicantEmail, applicantName, applicantHeadline, resumeId, resumeFilename, status, appliedAt }`.
+`notification` = `{ id, type, title, message, link, jobId, applicationId, read, readAt, createdAt }`, where `type` is one of
+`status_update`, `interview_invite`, `new_application`, `deadline_reminder`. Created by `notify(db, {...})` in `src/notify.js`, the
+one place every trigger (a status change, a new application, and eventually deadline reminders in #137) goes through.
