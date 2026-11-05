@@ -7,6 +7,7 @@ import profileRoutes from './routes/profile.js';
 import resumeRoutes from './routes/resumes.js';
 import jobRoutes from './routes/jobs.js';
 import applicationRoutes from './routes/applications.js';
+import notificationRoutes from './routes/notifications.js';
 
 export function createApp(db) {
   const app = express();
@@ -18,6 +19,7 @@ export function createApp(db) {
   app.use('/resumes', resumeRoutes(db));
   app.use('/jobs', jobRoutes(db));
   app.use('/applications', applicationRoutes(db));
+  app.use('/notifications', notificationRoutes(db));
   app.use(notFound);
   app.use(errorHandler);
   return app;

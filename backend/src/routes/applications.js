@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { HttpError } from '../errors.js';
 import { requireAuth, requireRole } from '../middleware.js';
+import { notify } from '../notify.js';
 
 const STATUSES = ['Applied', 'Under Review', 'Interview', 'Offered', 'Rejected'];
 
@@ -36,7 +37,7 @@ export default function applicationRoutes(db) {
     const { jobId, resumeId = null } = req.body ?? {};
     if (!Number.isInteger(jobId)) throw new HttpError(400, 'jobId is required');
 
-    const job = db.prepare('SELECT status FROM jobs WHERE id = ?').get(jobId);
+    const job = db.prepare('SELECT title, recruiter_id, status FROM jobs WHERE id = ?').get(jobId);
     if (!job) throw new HttpError(404, 'Job not found');
     if (job.status === 'closed') throw new HttpError(400, 'This job posting is closed');
 
@@ -52,6 +53,19 @@ export default function applicationRoutes(db) {
     const { lastInsertRowid } = db
       .prepare('INSERT INTO applications (user_id, job_id, resume_id) VALUES (?, ?, ?)')
       .run(req.user.id, jobId, resumeId);
+
+    const applicant = db
+      .prepare('SELECT u.email, p.full_name FROM users u LEFT JOIN profiles p ON p.user_id = u.id WHERE u.id = ?')
+      .get(req.user.id);
+    notify(db, {
+      userId: job.recruiter_id,
+      type: 'new_application',
+      title: `New application for ${job.title}`,
+      message: `${applicant.full_name || applicant.email} applied to ${job.title}.`,
+      link: `/recruiter/postings/${jobId}/applicants`,
+      jobId,
+      applicationId: lastInsertRowid,
+    });
 
     const row = db.prepare(SELECT_ONE).get(lastInsertRowid);
     res.status(201).json({ application: toApi(row) });
@@ -100,6 +114,20 @@ export default function applicationRoutes(db) {
 
     db.prepare("UPDATE applications SET status = ?, updated_at = datetime('now') WHERE id = ?").run(status, row.id);
     const updated = db.prepare(SELECT_ONE).get(row.id);
+
+    notify(db, {
+      userId: updated.user_id,
+      type: status === 'Interview' ? 'interview_invite' : 'status_update',
+      title: status === 'Interview' ? `Interview invite: ${updated.job_title}` : `Application update: ${updated.job_title}`,
+      message:
+        status === 'Interview'
+          ? `You've been invited to interview for ${updated.job_title}.`
+          : `Your application for ${updated.job_title} is now "${status}".`,
+      link: '/applications',
+      jobId: updated.job_id,
+      applicationId: updated.id,
+    });
+
     res.json({ application: toApi(updated) });
   });
 

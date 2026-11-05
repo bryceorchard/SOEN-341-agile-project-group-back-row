@@ -67,3 +67,21 @@ CREATE TABLE IF NOT EXISTS applications (
 
 CREATE INDEX IF NOT EXISTS idx_applications_user_id ON applications(user_id);
 CREATE INDEX IF NOT EXISTS idx_applications_job_id ON applications(job_id);
+
+-- In-app notifications. job_id/application_id are kept for building links; both are
+-- nullable since a future notification type (e.g. a general announcement) might need neither.
+CREATE TABLE IF NOT EXISTS notifications (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id        INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  type           TEXT    NOT NULL
+                         CHECK (type IN ('status_update', 'interview_invite', 'new_application', 'deadline_reminder')),
+  title          TEXT    NOT NULL,
+  message        TEXT    NOT NULL,
+  link           TEXT,
+  job_id         INTEGER REFERENCES jobs(id) ON DELETE CASCADE,
+  application_id INTEGER REFERENCES applications(id) ON DELETE CASCADE,
+  read_at        TEXT,
+  created_at     TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
