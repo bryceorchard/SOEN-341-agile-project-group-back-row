@@ -22,6 +22,9 @@ export function migrate(db) {
   if (!jobColumns.includes('status')) {
     db.exec("ALTER TABLE jobs ADD COLUMN status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed'))");
   }
+  if (!jobColumns.includes('archived_at')) {
+    db.exec('ALTER TABLE jobs ADD COLUMN archived_at TEXT');
+  }
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
