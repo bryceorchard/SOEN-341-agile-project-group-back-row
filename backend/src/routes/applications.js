@@ -116,18 +116,21 @@ export default function applicationRoutes(db) {
     db.prepare("UPDATE applications SET status = ?, updated_at = datetime('now') WHERE id = ?").run(status, row.id);
     const updated = db.prepare(SELECT_ONE).get(row.id);
 
-    notify(db, {
-      userId: updated.user_id,
-      type: status === 'Interview' ? 'interview_invite' : 'status_update',
-      title: status === 'Interview' ? `Interview invite: ${updated.job_title}` : `Application update: ${updated.job_title}`,
-      message:
-        status === 'Interview'
-          ? `You've been invited to interview for ${updated.job_title}.`
-          : `Your application for ${updated.job_title} is now "${status}".`,
-      link: '/applications',
-      jobId: updated.job_id,
-      applicationId: updated.id,
-    });
+    // Only a real change is worth telling the applicant about; re-saving the same status stays quiet.
+    if (row.status !== status) {
+      notify(db, {
+        userId: updated.user_id,
+        type: status === 'Interview' ? 'interview_invite' : 'status_update',
+        title: status === 'Interview' ? `Interview invite: ${updated.job_title}` : `Application update: ${updated.job_title}`,
+        message:
+          status === 'Interview'
+            ? `You've been invited to interview for ${updated.job_title}.`
+            : `Your application for ${updated.job_title} is now "${status}".`,
+        link: '/applications',
+        jobId: updated.job_id,
+        applicationId: updated.id,
+      });
+    }
 
     res.json({ application: toApi(updated) });
   });
