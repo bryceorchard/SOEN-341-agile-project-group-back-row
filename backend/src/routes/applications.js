@@ -36,8 +36,9 @@ export default function applicationRoutes(db) {
     const { jobId, resumeId = null } = req.body ?? {};
     if (!Number.isInteger(jobId)) throw new HttpError(400, 'jobId is required');
 
-    const job = db.prepare('SELECT status FROM jobs WHERE id = ?').get(jobId);
+    const job = db.prepare('SELECT status, archived_at FROM jobs WHERE id = ?').get(jobId);
     if (!job) throw new HttpError(404, 'Job not found');
+    if (job.archived_at) throw new HttpError(400, 'This job posting is no longer accepting applications');
     if (job.status === 'closed') throw new HttpError(400, 'This job posting is closed');
 
     if (resumeId !== null) {

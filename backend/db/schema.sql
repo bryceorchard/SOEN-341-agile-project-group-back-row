@@ -46,6 +46,9 @@ CREATE TABLE IF NOT EXISTS jobs (
   deadline      TEXT,
   status        TEXT    NOT NULL DEFAULT 'open'
                         CHECK (status IN ('open', 'closed')),
+  -- Archiving is independent of open/closed: an archived posting is retired from the
+  -- recruiter's active list regardless of status, and is hidden from search like a closed one.
+  archived_at   TEXT,
   created_at    TEXT    NOT NULL DEFAULT (datetime('now')),
   updated_at    TEXT    NOT NULL DEFAULT (datetime('now'))
 );
