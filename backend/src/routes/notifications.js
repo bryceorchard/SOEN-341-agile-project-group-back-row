@@ -20,13 +20,14 @@ export default function notificationRoutes(db) {
   r.use(requireAuth);
 
   // The current user's own notifications, newest first. ?unread=true shows only unread ones.
+  // created_at only has one-second precision, so id breaks ties between same-second rows.
   r.get('/', (req, res) => {
     const clauses = ['user_id = @userId'];
     const params = { userId: req.user.id };
     if (req.query.unread === 'true') clauses.push('read_at IS NULL');
 
     const rows = db
-      .prepare(`SELECT * FROM notifications WHERE ${clauses.join(' AND ')} ORDER BY created_at DESC`)
+      .prepare(`SELECT * FROM notifications WHERE ${clauses.join(' AND ')} ORDER BY created_at DESC, id DESC`)
       .all(params);
     res.json({ notifications: rows.map(toApi) });
   });
