@@ -71,9 +71,14 @@ test('a status change notifies the applicant: interview_invite for Interview, st
   await api.patch(`/applications/${applicationId}`).set(recruiterAuth).send({ status: 'Interview' }).expect(200);
   seekerNotifs = (await api.get('/notifications').set(seekerAuth).expect(200)).body.notifications;
   assert.equal(seekerNotifs.length, 2);
-  const invite = seekerNotifs.find((n) => n.type === 'interview_invite');
-  assert.ok(invite, 'expected an interview_invite notification');
-  assert.match(invite.message, /invited to interview for Backend Developer/);
+  // Newest first, even though both were created within the same second.
+  assert.deepEqual(seekerNotifs.map((n) => n.type), ['interview_invite', 'status_update']);
+  assert.match(seekerNotifs[0].message, /invited to interview for Backend Developer/);
+
+  // Re-saving the status it already has doesn't notify again.
+  await api.patch(`/applications/${applicationId}`).set(recruiterAuth).send({ status: 'Interview' }).expect(200);
+  seekerNotifs = (await api.get('/notifications').set(seekerAuth).expect(200)).body.notifications;
+  assert.equal(seekerNotifs.length, 2);
 });
 
 test('notifications are only visible and markable by their recipient', async () => {
