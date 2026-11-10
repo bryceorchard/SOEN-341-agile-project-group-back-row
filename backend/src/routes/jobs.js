@@ -14,6 +14,7 @@ const toApi = (j) => ({
   category: j.category,
   deadline: j.deadline,
   status: j.status,
+  archivedAt: j.archived_at,
   createdAt: j.created_at,
 });
 
@@ -41,11 +42,11 @@ function validateJobBody(body) {
 export default function jobRoutes(db) {
   const r = Router();
 
-  // Public: job seekers browse without an account. Closed postings never show up here.
+  // Public: job seekers browse without an account. Closed and archived postings never show up here.
   // Filters are all optional and AND together.
   r.get('/', (req, res) => {
     const { keyword, location, category } = req.query;
-    const clauses = ["status = 'open'"];
+    const clauses = ["status = 'open'", 'archived_at IS NULL'];
     const params = {};
 
     if (typeof keyword === 'string' && keyword.trim()) {
@@ -69,25 +70,59 @@ export default function jobRoutes(db) {
   // option returns results in GET /jobs. Must be registered before '/:id'.
   r.get('/categories', (_req, res) => {
     const rows = db
-      .prepare("SELECT DISTINCT category FROM jobs WHERE status = 'open' AND category IS NOT NULL AND category != '' ORDER BY category")
+      .prepare(
+        "SELECT DISTINCT category FROM jobs WHERE status = 'open' AND archived_at IS NULL AND category IS NOT NULL AND category != '' ORDER BY category"
+      )
       .all();
     res.json({ categories: rows.map((r) => r.category) });
   });
 
-  // Recruiter only: their own postings (any status), with how many applications each has.
+  // Recruiter only: their own postings (any status), with how many applications each has
+  // and a breakdown of those applications by status. ?view=active (default) excludes
+  // archived postings; ?view=archived shows only archived ones.
   // Registered before '/:id' so 'mine' isn't parsed as a job id.
   r.get('/mine', requireAuth, requireRole('recruiter'), (req, res) => {
+    const view = req.query.view ?? 'active';
+    if (!['active', 'archived'].includes(view)) {
+      throw new HttpError(400, "view must be 'active' or 'archived'");
+    }
+    const archivedClause = view === 'archived' ? 'j.archived_at IS NOT NULL' : 'j.archived_at IS NULL';
+
     const rows = db
       .prepare(
         `SELECT j.*, COUNT(a.id) AS application_count
          FROM jobs j
          LEFT JOIN applications a ON a.job_id = j.id
-         WHERE j.recruiter_id = ?
+         WHERE j.recruiter_id = ? AND ${archivedClause}
          GROUP BY j.id
          ORDER BY j.created_at DESC`
       )
       .all(req.user.id);
-    res.json({ jobs: rows.map((j) => ({ ...toApi(j), applicationCount: j.application_count })) });
+
+    const statusCounts = new Map();
+    for (const { job_id, status, count } of db
+      .prepare(
+        `SELECT a.job_id AS job_id, a.status AS status, COUNT(*) AS count
+         FROM applications a
+         JOIN jobs j ON j.id = a.job_id
+         WHERE j.recruiter_id = ?
+         GROUP BY a.job_id, a.status`
+      )
+      .all(req.user.id)) {
+      if (!statusCounts.has(job_id)) statusCounts.set(job_id, {});
+      statusCounts.get(job_id)[status] = count;
+    }
+
+    res.json({
+      jobs: rows.map((j) => {
+        const counts = statusCounts.get(j.id) ?? {};
+        return {
+          ...toApi(j),
+          applicationCount: j.application_count,
+          statusCounts: Object.fromEntries(APPLICATION_STATUSES.map((s) => [s, counts[s] ?? 0])),
+        };
+      }),
+    });
   });
 
   r.get('/:id', (req, res) => {
@@ -170,6 +205,23 @@ export default function jobRoutes(db) {
     if (!job) throw new HttpError(404, 'Job not found');
 
     db.prepare("UPDATE jobs SET status = ?, updated_at = datetime('now') WHERE id = ?").run(status, job.id);
+    res.json({ job: toApi(db.prepare('SELECT * FROM jobs WHERE id = ?').get(job.id)) });
+  });
+
+  // Owning recruiter only: archive/unarchive, independent of open/closed status.
+  r.patch('/:id/archive', requireAuth, requireRole('recruiter'), (req, res) => {
+    const job = db.prepare('SELECT * FROM jobs WHERE id = ? AND recruiter_id = ?').get(req.params.id, req.user.id);
+    if (!job) throw new HttpError(404, 'Job not found');
+
+    db.prepare("UPDATE jobs SET archived_at = datetime('now'), updated_at = datetime('now') WHERE id = ?").run(job.id);
+    res.json({ job: toApi(db.prepare('SELECT * FROM jobs WHERE id = ?').get(job.id)) });
+  });
+
+  r.patch('/:id/unarchive', requireAuth, requireRole('recruiter'), (req, res) => {
+    const job = db.prepare('SELECT * FROM jobs WHERE id = ? AND recruiter_id = ?').get(req.params.id, req.user.id);
+    if (!job) throw new HttpError(404, 'Job not found');
+
+    db.prepare("UPDATE jobs SET archived_at = NULL, updated_at = datetime('now') WHERE id = ?").run(job.id);
     res.json({ job: toApi(db.prepare('SELECT * FROM jobs WHERE id = ?').get(job.id)) });
   });
 

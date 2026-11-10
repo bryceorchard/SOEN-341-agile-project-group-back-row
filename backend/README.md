@@ -35,15 +35,17 @@ Protected routes need `Authorization: Bearer <token>`.
 | PUT    | `/resumes/:id` | multipart field `resume` (replaces the file)          | 200 `{ resume }`                    |
 | GET    | `/resumes/:id/file` | –                                                | 200 file stream, `inline` with the original filename (owner or a recruiter whose job this resume was submitted to; 404 otherwise) |
 | DELETE | `/resumes/:id` | –                                                     | 204                                 |
-| GET    | `/jobs`        | query: `keyword?`, `location?`, `category?`           | 200 `{ jobs }` (no auth required, closed postings excluded) |
-| GET    | `/jobs/categories` | –                                                  | 200 `{ categories }` (distinct, open postings only; no auth required) |
-| GET    | `/jobs/mine`   | –                                                     | 200 `{ jobs }` (recruiter's own, any status, with `applicationCount`) |
+| GET    | `/jobs`        | query: `keyword?`, `location?`, `category?`           | 200 `{ jobs }` (no auth required, closed and archived postings excluded) |
+| GET    | `/jobs/categories` | –                                                  | 200 `{ categories }` (distinct, open + non-archived postings only; no auth required) |
+| GET    | `/jobs/mine`   | query: `view?` (`active` default, or `archived`)      | 200 `{ jobs }` (recruiter's own, with `applicationCount` and `statusCounts`) |
 | GET    | `/jobs/:id`    | –                                                     | 200 `{ job }` (no auth required)    |
 | GET    | `/jobs/:id/applications` | query: `status?`                            | 200 `{ applications }` (owning recruiter only; 404 otherwise) |
 | POST   | `/jobs`        | `{ title, description, location?, category?, deadline? }` (recruiter only; optional fields are trimmed strings) | 201 `{ job }` (403 if not a recruiter) |
 | PUT    | `/jobs/:id`    | same body as POST (owning recruiter only)             | 200 `{ job }` (404 if not yours)    |
 | PATCH  | `/jobs/:id/status` | `{ status }` one of open/closed (owning recruiter only) | 200 `{ job }` (404 if not yours) |
-| POST   | `/applications`     | `{ jobId, resumeId? }`                           | 201 `{ application }` (409 if already applied) |
+| PATCH  | `/jobs/:id/archive` | –                                                | 200 `{ job }` (owning recruiter only; 404 if not yours, 403 if not a recruiter) |
+| PATCH  | `/jobs/:id/unarchive` | –                                              | 200 `{ job }` (owning recruiter only; 404 if not yours, 403 if not a recruiter) |
+| POST   | `/applications`     | `{ jobId, resumeId? }`                           | 201 `{ application }` (409 if already applied, 400 if the posting is closed or archived) |
 | GET    | `/applications`     | query: `status?`                                 | 200 `{ applications }` (current user's own) |
 | PATCH  | `/applications/:id` | `{ status }` one of Applied/Under Review/Interview/Offered/Rejected (recruiter who owns the job only) | 200 `{ application }` |
 | GET    | `/notifications`      | query: `unread?` (`true` to only show unread)   | 200 `{ notifications }` (current user's own, newest first) |
@@ -52,7 +54,8 @@ Protected routes need `Authorization: Bearer <token>`.
 | PATCH  | `/notifications/:id/read` | –                                          | 200 `{ notification }` (recipient only; 404 otherwise) |
 
 `user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`;
-`job` = `{ id, recruiterId, title, description, location, category, deadline, status, createdAt }` (`/jobs/mine` adds `applicationCount`);
+`job` = `{ id, recruiterId, title, description, location, category, deadline, status, archivedAt, createdAt }` (`/jobs/mine` adds `applicationCount` and
+`statusCounts`, an object with every application status mapped to its count for that posting, e.g. `{ "Applied": 2, "Under Review": 0, ... }`);
 `application` = `{ id, jobId, jobTitle, jobLocation, jobCategory, jobDeadline, jobStatus, resumeId, resumeFilename, status, appliedAt, updatedAt }`.
 An entry from `/jobs/:id/applications` is shaped `{ id, applicantEmail, applicantName, applicantHeadline, resumeId, resumeFilename, status, appliedAt }`.
 `notification` = `{ id, type, title, message, link, jobId, applicationId, read, readAt, createdAt }`, where `type` is one of
