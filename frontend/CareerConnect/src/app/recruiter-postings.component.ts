@@ -14,6 +14,8 @@ export interface Posting {
   deadline: string | null;
   status: 'open' | 'closed';
   applicationCount: number;
+  statusCounts?: Record<string, number>;
+  archivedAt?: string | null;
 }
 
 @Component({
@@ -32,6 +34,10 @@ export class RecruiterPostings implements OnInit {
   create_error = signal('');
   edit_error = signal('');
 
+  current_view = signal<'active' | 'archived'>('active');
+
+  statusKeys = ['Applied', 'Under Review', 'Interview', 'Offered', 'Rejected'];
+
   create_form: FormGroup;
   edit_form: FormGroup;
 
@@ -42,6 +48,27 @@ export class RecruiterPostings implements OnInit {
 
   ngOnInit() {
     this.refreshPostings();
+  }
+
+  toggleView(view: 'active' | 'archived') {
+    this.current_view.set(view);
+    this.refreshPostings();
+  }
+
+  archivePosting(p: Posting) {
+    if (confirm(`Are you sure you want to archive "${p.title}"?`)) {
+      this.http_client.patch<{ job: Posting }>(`${API_BASE}/jobs/${p.id}/archive`, {}).subscribe({
+        next: () => this.refreshPostings(),
+      });
+    }
+  }
+
+  restorePosting(p: Posting) {
+    if (confirm(`Are you sure you want to restore "${p.title}"?`)) {
+      this.http_client.patch<{ job: Posting }>(`${API_BASE}/jobs/${p.id}/unarchive`, {}).subscribe({
+        next: () => this.refreshPostings(),
+      });
+    }
   }
 
   onCreate() {
@@ -117,7 +144,7 @@ export class RecruiterPostings implements OnInit {
 
   private refreshPostings() {
     this.http_client
-      .get<{ jobs: Posting[] }>(`${API_BASE}/jobs/mine`)
+      .get<{ jobs: Posting[] }>(`${API_BASE}/jobs/mine?view=${this.current_view()}`)
       .subscribe((res) => this.postings.set(res.jobs));
   }
 }

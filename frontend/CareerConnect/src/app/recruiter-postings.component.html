@@ -8,6 +8,17 @@
   </button>
 </div>
 
+<div class="view-toggles" style="margin-bottom: 1rem;">
+  <button 
+    class="btn btn-sm" 
+    [ngClass]="current_view() === 'active' ? 'btn-primary' : 'btn-secondary'" 
+    (click)="toggleView('active')">Active</button>
+  <button 
+    class="btn btn-sm" 
+    [ngClass]="current_view() === 'archived' ? 'btn-primary' : 'btn-secondary'" 
+    (click)="toggleView('archived')">Archived</button>
+</div>
+
 <div class="card create-card" *ngIf="show_create()">
   <h2>New posting</h2>
   <form [formGroup]="create_form" (ngSubmit)="onCreate()">
@@ -80,13 +91,35 @@
       <p class="posting-meta" *ngIf="p.location || p.category">
         {{ p.location }}<span *ngIf="p.location && p.category"> · </span>{{ p.category }}
       </p>
-      <p class="posting-applicants">{{ p.applicationCount }} application(s)</p>
+      <p class="posting-meta" *ngIf="p.deadline">
+        Deadline: {{ p.deadline | date }}
+      </p>
+      <div class="posting-applicants">
+        <strong>Total Applications: {{ p.applicationCount }}</strong>
+        <div class="status-counts" *ngIf="p.statusCounts" style="display: flex; gap: 10px; margin-top: 5px;">
+          <ng-container *ngFor="let status of statusKeys">
+            <a 
+              *ngIf="p.statusCounts[status]" 
+              [routerLink]="['/recruiter/postings', p.id, 'applicants']" 
+              [queryParams]="{ status: status }" 
+              style="cursor: pointer; text-decoration: underline; color: blue;">
+              {{ status }}: {{ p.statusCounts[status] }}
+            </a>
+          </ng-container>
+        </div>
+      </div>
       <div class="posting-actions">
-        <a class="btn btn-secondary btn-sm" [routerLink]="['/recruiter/postings', p.id, 'applicants']">View applicants</a>
-        <button class="btn btn-secondary btn-sm" (click)="startEdit(p)">Edit</button>
-        <button class="btn btn-secondary btn-sm" (click)="toggleStatus(p)">
-          {{ p.status === 'open' ? 'Close' : 'Reopen' }}
-        </button>
+        <a class="btn btn-secondary btn-sm" [routerLink]="['/recruiter/postings', p.id, 'applicants']">View all applicants</a>
+        <ng-container *ngIf="current_view() === 'active'">
+          <button class="btn btn-secondary btn-sm" (click)="startEdit(p)">Edit</button>
+          <button class="btn btn-secondary btn-sm" (click)="toggleStatus(p)">
+            {{ p.status === 'open' ? 'Close' : 'Reopen' }}
+          </button>
+          <button class="btn btn-danger btn-sm" (click)="archivePosting(p)">Archive</button>
+        </ng-container>
+        <ng-container *ngIf="current_view() === 'archived'">
+          <button class="btn btn-primary btn-sm" (click)="restorePosting(p)">Restore</button>
+        </ng-container>
       </div>
     </ng-template>
   </div>
