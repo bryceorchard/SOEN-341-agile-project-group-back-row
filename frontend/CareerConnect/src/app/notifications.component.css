@@ -1,0 +1,30 @@
+.notifications-page {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  margin: 12px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.notification.unread {
+  background: #eef6ff;
+  border-color: #2563eb;
+}
+
+.notification.interview {
+  border-left: 5px solid #16a34a;
+}

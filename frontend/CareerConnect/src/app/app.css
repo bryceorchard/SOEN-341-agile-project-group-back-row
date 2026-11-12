@@ -83,6 +83,26 @@
   background: rgba(255, 255, 255, 0.22);
 }
 
+.notification-bell {
+  position: relative;
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+
+.notification-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  min-width: 18px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: white;
+  font-size: 0.7rem;
+  text-align: center;
+}
+
 .page {
   position: relative;
   max-width: 980px;
