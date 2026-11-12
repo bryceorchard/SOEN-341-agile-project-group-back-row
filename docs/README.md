@@ -10,6 +10,8 @@ docs/
 ├── README.md                # this index
 ├── CONTRIBUTING.md          # team process: workflow, branching, PRs, review, DoR/DoD (#23)
 ├── ERD.md                   # database entity-relationship diagram
+├── ai/
+│   └── us10-resume-feedback.md  # AI resume feedback: schema, prompt, provider, evaluation, privacy notice (#141)
 ├── ContributionLog/         # per-member contribution logs (#101)
 │   ├── contribution-template.md  # template for each member's log
 │   ├── Sprint 1/

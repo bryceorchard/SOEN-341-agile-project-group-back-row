@@ -1,0 +1,34 @@
+AMIRA HADDAD (she/her)
+Montréal, QC · amira.haddad@example.com · 514-555-0142 · github.com/amira-haddad-dev
+
+PROFILE
+Computer engineering student (graduating May 2027) with two co-op terms in backend development. Built and shipped REST APIs used by 40,000+ monthly users, and enjoys making slow systems fast.
+
+EXPERIENCE
+Backend Developer Intern — Maplecrest Software, Montréal, QC          Jan 2026 – Apr 2026
+• Cut the p95 latency of the order-search endpoint from 1.8 s to 350 ms by adding composite indexes and rewriting two N+1 queries in PostgreSQL.
+• Built a webhook retry service in Node.js (TypeScript) with exponential backoff; failed deliveries dropped from 4.1% to 0.3%.
+• Wrote 120+ Jest integration tests and added them to the GitHub Actions pipeline, raising line coverage of the billing module from 52% to 81%.
+• Presented the indexing changes to a team of 12 engineers and wrote the runbook now used for on-call.
+
+Software Developer Co-op — Bluepine Analytics, Laval, QC          May 2025 – Aug 2025
+• Migrated 14 nightly cron jobs to a queue-based worker (BullMQ + Redis), removing a 3-hour batch window.
+• Added role-based access control to an internal Express dashboard used by 60 analysts.
+• Fixed 35 bugs from the backlog, prioritised with the product owner during weekly triage.
+
+PROJECTS
+CareerBoard (team of 6, course project) — Angular, Express, SQLite
+• Designed the database schema and job-search API; led code reviews on 40+ pull requests.
+TransitPing — Python, FastAPI
+• Bus-arrival notifier built on the STM open-data feed; 300+ users in the first month.
+
+EDUCATION
+BEng, Computer Engineering (Co-op) — Lachine Institute of Technology          Expected May 2027
+GPA 3.7/4.3 · Dean's list 2024, 2025
+DEC, Computer Science and Mathematics — Cégep du Vieux-Port          2022
+
+SKILLS
+Languages: TypeScript, JavaScript, Python, Java, SQL
+Backend: Node.js, Express, FastAPI, PostgreSQL, Redis, REST
+Tools: Git, Docker, GitHub Actions, Jest, Linux
+Spoken: English, French (fluent)
