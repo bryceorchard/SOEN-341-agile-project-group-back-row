@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { HttpError } from '../errors.js';
 import { requireAuth } from '../middleware.js';
+import { generateDeadlineReminders } from '../deadline-reminders.js';
 
 const toApi = (n) => ({
   id: n.id,
@@ -22,6 +23,8 @@ export default function notificationRoutes(db) {
   // The current user's own notifications, newest first. ?unread=true shows only unread ones.
   // created_at only has one-second precision, so id breaks ties between same-second rows.
   r.get('/', (req, res) => {
+    generateDeadlineReminders(db); // Ensure deadline reminders are generated before fetching notifications
+    
     const clauses = ['user_id = @userId'];
     const params = { userId: req.user.id };
     if (req.query.unread === 'true') clauses.push('read_at IS NULL');
@@ -33,6 +36,8 @@ export default function notificationRoutes(db) {
   });
 
   r.get('/unread-count', (req, res) => {
+    generateDeadlineReminders(db); // Ensure deadline reminders are generated before fetching unread count
+
     const { count } = db
       .prepare('SELECT COUNT(*) AS count FROM notifications WHERE user_id = ? AND read_at IS NULL')
       .get(req.user.id);
