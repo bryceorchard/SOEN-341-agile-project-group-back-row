@@ -36,6 +36,17 @@ CREATE TABLE IF NOT EXISTS resumes (
 
 CREATE INDEX IF NOT EXISTS idx_resumes_user_id ON resumes(user_id);
 
+-- One row per resume (#139): POST /resumes/:id/feedback replaces it rather than
+-- accumulating history. `feedback` is the normalized JSON object from parseFeedback().
+CREATE TABLE IF NOT EXISTS resume_feedback (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  resume_id      INTEGER NOT NULL UNIQUE REFERENCES resumes(id) ON DELETE CASCADE,
+  feedback       TEXT    NOT NULL,
+  model          TEXT    NOT NULL,
+  prompt_version TEXT    NOT NULL,
+  created_at     TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS jobs (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   recruiter_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,

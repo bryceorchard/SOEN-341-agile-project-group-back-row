@@ -18,6 +18,7 @@ The database file is created at `backend/data/careerconnect.db` (gitignored). Ov
 ## API
 Run: `npm start` (http://localhost:3000, override with `PORT`). Tests: `npm test`.
 Env: `JWT_SECRET` (set in production), `CORS_ORIGIN` (default `http://localhost:4200`), `DB_PATH`, `UPLOAD_DIR`.
+AI resume feedback (#139): `AI_API_KEY` (never committed; unset in dev and CI, which uses a deterministic mock reply instead of calling out), `AI_MODEL` (default `openai/gpt-oss-120b`), `AI_BASE_URL` (default Groq's OpenAI-compatible endpoint, `https://api.groq.com/openai/v1`). See `.env.example`.
 
 Errors are always `{ "error": "message" }` with status 400 / 401 / 404 / 409.
 Protected routes need `Authorization: Bearer <token>`.
@@ -52,6 +53,8 @@ Protected routes need `Authorization: Bearer <token>`.
 | GET    | `/notifications/unread-count` | –                                        | 200 `{ count }` (current user's own) |
 | PATCH  | `/notifications/read-all` | –                                          | 200 `{ count: 0 }` (marks all of the current user's notifications read) |
 | PATCH  | `/notifications/:id/read` | –                                          | 200 `{ notification }` (recipient only; 404 otherwise) |
+| POST   | `/resumes/:id/feedback` | –                                             | 201 `{ feedback }`, replacing any earlier feedback for that resume (owner only; 404 otherwise; 422 no readable text or not a resume; 429 too many requests; 502 the AI reply failed validation; 503 the AI service is unavailable or timed out) |
+| GET    | `/resumes/:id/feedback` | –                                             | 200 `{ feedback }`, or `{ feedback: null }` if none has been generated yet (owner only; 404 otherwise) |
 
 `user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`;
 `job` = `{ id, recruiterId, title, description, location, category, deadline, status, archivedAt, createdAt }` (`/jobs/mine` adds `applicationCount` and
@@ -61,3 +64,8 @@ An entry from `/jobs/:id/applications` is shaped `{ id, applicantEmail, applican
 `notification` = `{ id, type, title, message, link, jobId, applicationId, read, readAt, createdAt }`, where `type` is one of
 `status_update`, `interview_invite`, `new_application`, `deadline_reminder`. Created by `notify(db, {...})` in `src/notify.js`, the
 one place every trigger (a status change, a new application, and eventually deadline reminders in #137) goes through.
+`feedback` (resume feedback) = `{ resumeId, createdAt, model, promptVersion, isResume, summary, strengths, improvements, rewordings }`.
+See [`docs/ai/us10-resume-feedback.md`](../docs/ai/us10-resume-feedback.md) for what each field means and the full design. Text is
+extracted from the stored PDF/DOC/DOCX in `src/ai/extract-text.js`; the prompt and schema (#141) live in `src/ai/prompt.js` and
+`src/ai/feedback-schema.js`; the provider call is `src/ai/provider.js` (mock unless `AI_API_KEY` is set); each user is limited to a
+few requests per minute (`src/ai/rate-limit.js`).

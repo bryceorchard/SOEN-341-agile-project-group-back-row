@@ -18,7 +18,10 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "multer": "^2.4.0"
+    "mammoth": "^1.13.0",
+    "multer": "^2.4.0",
+    "pdf-parse": "^2.4.5",
+    "word-extractor": "^1.0.4"
   },
   "devDependencies": {
     "supertest": "^7.3.0"
