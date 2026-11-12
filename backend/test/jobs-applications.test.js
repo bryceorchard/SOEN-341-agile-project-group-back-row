@@ -301,6 +301,79 @@ test('optional job fields are trimmed, blanks become null, and non-strings are r
   await api.put(`/jobs/${job.id}`).set(recruiterAuth).send({ title: 'X', description: 'Y', location: { city: 'Laval' } }).expect(400);
 });
 
+test('archiving a posting: ownership, role checks, hides it from search, and blocks new applications', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+
+  await api.post('/auth/signup').send({ email: 'other-recruiter-3@test.com', password: 'Password123!', role: 'recruiter' }).expect(201);
+  const otherRecruiterToken = (await api.post('/auth/login').send({ email: 'other-recruiter-3@test.com', password: 'Password123!' }).expect(200)).body.token;
+  const otherRecruiterAuth = { Authorization: `Bearer ${otherRecruiterToken}` };
+
+  const job = (await api.post('/jobs').set(recruiterAuth)
+    .send({ title: 'Technical Writer', description: 'Document the API', category: 'Writing' }).expect(201)).body.job;
+  assert.equal(job.archivedAt, null);
+
+  await api.patch(`/jobs/${job.id}/archive`).set(seekerAuth).expect(403);
+  await api.patch(`/jobs/${job.id}/archive`).set(otherRecruiterAuth).expect(404);
+
+  const archived = await api.patch(`/jobs/${job.id}/archive`).set(recruiterAuth).expect(200);
+  assert.ok(archived.body.job.archivedAt);
+
+  const listed = await api.get('/jobs').expect(200);
+  assert.ok(!listed.body.jobs.some((j) => j.id === job.id));
+  const categories = (await api.get('/jobs/categories').expect(200)).body.categories;
+  assert.ok(!categories.includes('Writing'));
+
+  await api.post('/applications').set(seekerAuth).send({ jobId: job.id }).expect(400);
+
+  await api.patch(`/jobs/${job.id}/unarchive`).set(otherRecruiterAuth).expect(404);
+  const unarchived = await api.patch(`/jobs/${job.id}/unarchive`).set(recruiterAuth).expect(200);
+  assert.equal(unarchived.body.job.archivedAt, null);
+
+  const listedAgain = await api.get('/jobs').expect(200);
+  assert.ok(listedAgain.body.jobs.some((j) => j.id === job.id));
+});
+
+test('GET /jobs/mine?view= filters by archived state and reports applicationCount + statusCounts', async () => {
+  const recruiterAuth = { Authorization: `Bearer ${recruiterToken}` };
+  const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
+
+  const job = (await api.post('/jobs').set(recruiterAuth)
+    .send({ title: 'Support Specialist', description: 'Help customers', category: 'Support' }).expect(201)).body.job;
+
+  await api.post('/auth/signup').send({ email: 'seeker-counts@test.com', password: 'Password123!', role: 'job_seeker' }).expect(201);
+  const seeker2Token = (await api.post('/auth/login').send({ email: 'seeker-counts@test.com', password: 'Password123!' }).expect(200)).body.token;
+  const seeker2Auth = { Authorization: `Bearer ${seeker2Token}` };
+
+  await api.post('/applications').set(seekerAuth).send({ jobId: job.id }).expect(201);
+  const app2 = (await api.post('/applications').set(seeker2Auth).send({ jobId: job.id }).expect(201)).body.application;
+  await api.patch(`/applications/${app2.id}`).set(recruiterAuth).send({ status: 'Interview' }).expect(200);
+
+  await api.get('/jobs/mine').query({ view: 'not-a-view' }).set(recruiterAuth).expect(400);
+
+  const active = (await api.get('/jobs/mine').set(recruiterAuth).expect(200)).body.jobs;
+  const activeEntry = active.find((j) => j.id === job.id);
+  assert.equal(activeEntry.applicationCount, 2);
+  assert.deepEqual(activeEntry.statusCounts, {
+    Applied: 1,
+    'Under Review': 0,
+    Interview: 1,
+    Offered: 0,
+    Rejected: 0,
+  });
+
+  await api.patch(`/jobs/${job.id}/archive`).set(recruiterAuth).expect(200);
+
+  const activeAfterArchive = (await api.get('/jobs/mine').set(recruiterAuth).expect(200)).body.jobs;
+  assert.ok(!activeAfterArchive.some((j) => j.id === job.id));
+
+  const archivedView = (await api.get('/jobs/mine').query({ view: 'archived' }).set(recruiterAuth).expect(200)).body.jobs;
+  const archivedEntry = archivedView.find((j) => j.id === job.id);
+  assert.ok(archivedEntry, 'archived posting should show up under view=archived');
+  assert.equal(archivedEntry.applicationCount, 2);
+  assert.equal(archivedEntry.statusCounts.Interview, 1);
+});
+
 test('resume filenames keep non-ASCII characters through upload, list, and download', async () => {
   const seekerAuth = { Authorization: `Bearer ${seekerToken}` };
   const name = 'Résumé – Bryce’s CV (2026).pdf';
