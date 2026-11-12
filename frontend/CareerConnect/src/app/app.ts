@@ -21,8 +21,8 @@ export class App {
   private destroyRef = inject(DestroyRef);
 
   constructor() {
-  const refreshUnreadCount = () => {
-    if (this.auth.currentUser()) {
+    const refreshUnreadCount = () => {
+      if (this.auth.currentUser()) {
       this.notifications.refreshUnreadCount();
     }
   };
