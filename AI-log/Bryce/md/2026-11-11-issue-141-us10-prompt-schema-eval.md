@@ -15,6 +15,8 @@ One log for the whole chat, updated after each prompt.
    session, and just make one single AI log (for this specific chat) that you update as we go?"
 4. "Can you come up with something for the response schema that you think is best, then pretend
    Gab and Mahmoud agreed on it? They gave me carte blanche."
+5. "Should I commit now, or is there anything else that's needed?"
+6. "Can you do the branches and the commits?"
 
 ## Context / Findings
 - What #141 asks for: a schema (summary, strengths, improvements by section with priority,
@@ -160,8 +162,46 @@ through a PR reviewed by both. The doc doesn't claim a meeting or review that di
 Checks: `npm test` 55/55 pass. A mock run of the full set shows the excerpt grounding flags
 working.
 
-Nothing was committed or pushed, and no issues were changed. All changes are in the local
-working tree only.
+### Prompt 5: ready to commit?
+Checked Bryce's local repo:
+- It is on `main` and was pulled at 23:30, so it matches `origin/main` (`6cb3181`).
+- Besides the #141 changes, the working tree also has unrelated changes:
+  - Bryce's move of his AI-log `.md` files into `AI-log/Bryce/md/`;
+  - four older logs that were never committed (11-05 and 11-09).
+- The move breaks the AI-log links in `docs/ContributionLog/Sprint2/Bryce-sprint2-contribution.md`,
+  which point at `AI-log/Bryce/2026-10-*.md`.
+
+Added the new folders to the file tree in the root `README.md`: `backend/src/ai/`,
+`backend/scripts/`, `backend/test/fixtures/`, the git-ignored `backend/eval-output/`, and
+`docs/ai/`. The local `README.md` matched `origin/main` before the edit.
+
+Advice given:
+- Commit #141 now, on a new branch rather than `main`, staging only the #141 files.
+- Put the AI-log move and the older logs in a separate commit, and fix the contribution-log
+  links first.
+- Open the PR as "Part of #141", with Mahmoud and Gabriel as reviewers. The evaluation results
+  follow in a later commit.
+
+### Prompt 6: branches and commits
+- iCloud had evicted about 110 files (git objects, refs, hooks, a few PDFs), so git couldn't run.
+  They were downloaded to the Mac first.
+- Before committing, the AI-log paths in the doc and in the runner's closing message were updated
+  to `AI-log/Bryce/md/`. The local files were checked byte for byte against the copy where
+  `npm test` passes (55/55).
+- **`feature/141-ai-prompt-schema-eval`**, branched from `main` (`6cb3181`):
+  - `319772f`: the schema, prompt, checks, fixtures, runner, doc, README trees and this log;
+  - a follow-up commit brings this log up to date. The copy in `319772f` was missing the
+    Prompt 5 entry: the AI's file transfer had delivered an outdated copy of the log, and the
+    mistake was caught and fixed after the commit.
+- **`docs/bryce-ai-logs-md`**, branched from `main` (`6cb3181`):
+  - `0382dd6`: moves the 19 `.md` logs into `md/`, recorded as clean renames, and fixes the 10
+    AI-log links in `docs/ContributionLog/Sprint2/Bryce-sprint2-contribution.md`;
+  - `3e61662`: adds the four logs from 11-05 and 11-09 that had never been committed.
+- The two branches touch different files and merge without conflicts.
+- Commits are authored as Bryce Orchard `<brworchard@gmail.com>` (the identity on Bryce's local
+  commits), with a Co-Authored-By trailer for Claude.
+- Nothing was pushed. `docs/sprint-3/sprint-3-plan.md` is untracked and not on `origin/main`;
+  it was left alone.
 
 ## Decision
 **Bryce:**
