@@ -1,0 +1,62 @@
+{
+  "isResume": true,
+  "strengths": [
+    {
+      "point": "Your experience bullets lead with measurable results, which is what backend hiring managers scan for first.",
+      "evidence": "Cut the p95 latency of the order-search endpoint from 1.8 s to 350 ms"
+    },
+    {
+      "point": "You show reliability and testing work, not only new features.",
+      "evidence": "failed deliveries dropped from 4.1% to 0.3%"
+    },
+    {
+      "point": "Your skills are grouped clearly and match the technologies named in your bullets.",
+      "evidence": "Backend: Node.js, Express, FastAPI, PostgreSQL, Redis, REST"
+    }
+  ],
+  "improvements": [
+    {
+      "section": "experience",
+      "priority": "medium",
+      "excerpt": "Fixed 35 bugs from the backlog",
+      "issue": "This bullet counts tasks but doesn't say why they mattered, so it reads weaker than your other bullets.",
+      "suggestion": "Say what kind of bugs they were or what fixing them changed (fewer support tickets, a release unblocked), or replace it with a stronger result from that term."
+    },
+    {
+      "section": "projects",
+      "priority": "medium",
+      "excerpt": "Designed the database schema and job-search API",
+      "issue": "The CareerBoard project says what you designed but not what came of it.",
+      "suggestion": "Add one outcome, such as what the API let users do or how your reviews helped the team, so it carries the same weight as the TransitPing line."
+    },
+    {
+      "section": "profile",
+      "priority": "low",
+      "excerpt": "enjoys making slow systems fast",
+      "issue": "This is friendly but vague next to the concrete numbers below it.",
+      "suggestion": "Replace it with the kind of role and start date you are looking for, so a recruiter can match you to an opening at a glance."
+    },
+    {
+      "section": "education",
+      "priority": "low",
+      "excerpt": "GPA 3.7/4.3",
+      "issue": "A GPA on a 4.3 scale is unfamiliar to some employers outside Quebec.",
+      "suggestion": "Keep it, and add the letter-grade or percentage equivalent if your school publishes one."
+    }
+  ],
+  "rewordings": [
+    {
+      "section": "experience",
+      "original": "Fixed 35 bugs from the backlog, prioritised with the product owner during weekly triage.",
+      "suggested": "Resolved 35 backlog bugs prioritised with the product owner in weekly triage, reducing open support tickets by [X]%.",
+      "reason": "States the effect of the work, not only the count. Keep the percentage only if you can put in the real figure."
+    },
+    {
+      "section": "projects",
+      "original": "Designed the database schema and job-search API; led code reviews on 40+ pull requests.",
+      "suggested": "Designed the database schema and job-search API for a 6-person team and led code reviews on 40+ pull requests, [what this achieved, e.g. how it helped the team ship].",
+      "reason": "Gives the scale of the project and leaves room for the result; replace the bracket with what actually happened."
+    }
+  ],
+  "summary": "This is a strong, well-organised resume: your co-op bullets lead with concrete results, and the numbers make your backend impact easy to see. The main gains now are in the few bullets that describe work without saying what it achieved, and in giving your course project an outcome."
+}
