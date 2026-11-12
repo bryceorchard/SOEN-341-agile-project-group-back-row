@@ -2,14 +2,15 @@ import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { App } from './app';
-import { AuthService } from './auth.service';
+import { API_BASE, AuthService } from './auth.service';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter([]), provideHttpClient()],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     })
       .compileComponents();
   });
@@ -44,6 +45,7 @@ describe('App nav active link', () => {
           { path: 'profile', component: Blank },
         ]),
         provideHttpClient(),
+        provideHttpClientTesting(),
         { provide: AuthService, useValue: { currentUser: signal(SEEKER), logout: () => {} } },
       ],
     }).compileComponents();
@@ -51,7 +53,14 @@ describe('App nav active link', () => {
 
   async function navLinksAt(url: string): Promise<Record<string, boolean>> {
     const fixture = TestBed.createComponent(App);
+    const httpTesting = TestBed.inject(HttpTestingController);
+    httpTesting.expectOne(`${API_BASE}/notifications/unread-count`).flush({ count: 0 });
+
     await TestBed.inject(Router).navigateByUrl(url);
+    for (const request of httpTesting.match(`${API_BASE}/notifications/unread-count`)) {
+      request.flush({ count: 0 });
+    }
+
     fixture.detectChanges();
     await fixture.whenStable();
     const links = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.nav-links a'));
