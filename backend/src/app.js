@@ -5,6 +5,7 @@ import { notFound, errorHandler } from './middleware.js';
 import authRoutes from './routes/auth.js';
 import profileRoutes from './routes/profile.js';
 import resumeRoutes from './routes/resumes.js';
+import resumeFeedbackRoutes from './routes/resume-feedback.js';
 import jobRoutes from './routes/jobs.js';
 import applicationRoutes from './routes/applications.js';
 import notificationRoutes from './routes/notifications.js';
@@ -17,6 +18,7 @@ export function createApp(db) {
   app.use('/auth', authRoutes(db));
   app.use('/profile', profileRoutes(db));
   app.use('/resumes', resumeRoutes(db));
+  app.use('/resumes', resumeFeedbackRoutes(db));
   app.use('/jobs', jobRoutes(db));
   app.use('/applications', applicationRoutes(db));
   app.use('/notifications', notificationRoutes(db));
