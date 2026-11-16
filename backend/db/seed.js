@@ -63,18 +63,34 @@ db.prepare('UPDATE jobs SET deadline = ? WHERE id = 15').run(closingSoonDeadline
 
 const seeker = db.prepare('SELECT id FROM users WHERE email = ?').get('seeker@example.com');
 const insertApplication = db.prepare(
-  "INSERT OR IGNORE INTO applications (user_id, job_id, status) VALUES (?, ?, ?)"
+  "INSERT OR IGNORE INTO applications (user_id, job_id, status, applied_at, updated_at) VALUES (?, ?, ?, datetime('now', ?), datetime('now', ?))"
 );
+const insertHistory = db.prepare(
+  "INSERT INTO application_status_history (application_id, status, changed_at, changed_by) VALUES (?, ?, datetime('now', ?), ?)"
+);
+// [jobId, days ago applied, later status changes as [status, days ago]]. Spread over several
+// weeks so the analytics dashboard (#134/#135) has something to show; the last change is the
+// application's current status.
 const applications = [
-  [1, 'Applied'],
-  [3, 'Under Review'],
-  [6, 'Interview'],
-  [9, 'Offered'],
-  [11, 'Rejected'],
-  [15, 'Applied'],
+  [1, 2, []],
+  [3, 9, [['Under Review', 6]]],
+  [6, 20, [['Under Review', 16], ['Interview', 10]]],
+  [9, 40, [['Under Review', 35], ['Interview', 28], ['Offered', 14]]],
+  [11, 27, [['Under Review', 24], ['Rejected', 21]]],
+  [15, 1, []],
 ];
-for (const [jobId, status] of applications) {
-  insertApplication.run(seeker.id, jobId, status);
+const ago = (days) => `-${days} days`;
+for (const [jobId, appliedDaysAgo, changes] of applications) {
+  const status = changes.at(-1)?.[0] ?? 'Applied';
+  const updatedDaysAgo = changes.at(-1)?.[1] ?? appliedDaysAgo;
+  const { changes: inserted, lastInsertRowid } = insertApplication.run(
+    seeker.id, jobId, status, ago(appliedDaysAgo), ago(updatedDaysAgo)
+  );
+  if (!inserted) continue; // already seeded; leave its history alone
+
+  const { recruiter_id: jobRecruiter } = db.prepare('SELECT recruiter_id FROM jobs WHERE id = ?').get(jobId);
+  insertHistory.run(lastInsertRowid, 'Applied', ago(appliedDaysAgo), seeker.id);
+  for (const [changedTo, daysAgo] of changes) insertHistory.run(lastInsertRowid, changedTo, ago(daysAgo), jobRecruiter);
 }
 
 console.log('Seeded demo users (password: Password123!), demo jobs, and demo applications');

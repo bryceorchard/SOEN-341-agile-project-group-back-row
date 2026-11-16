@@ -50,6 +50,8 @@ Protected routes need `Authorization: Bearer <token>`.
 | POST   | `/applications`     | `{ jobId, resumeId? }`                           | 201 `{ application }` (409 if already applied, 400 if the posting is closed or archived) |
 | GET    | `/applications`     | query: `status?`                                 | 200 `{ applications }` (current user's own) |
 | PATCH  | `/applications/:id` | `{ status }` one of Applied/Under Review/Interview/Offered/Rejected (recruiter who owns the job only) | 200 `{ application }` |
+| GET    | `/applications/stats` | –                                              | 200 `{ stats }` (analytics over the current user's own applications) |
+| GET    | `/applications/:id/history` | –                                        | 200 `{ history }`, oldest first (the applicant, or the recruiter who owns the job; 404 otherwise) |
 | GET    | `/notifications`      | query: `unread?` (`true` to only show unread)   | 200 `{ notifications }` (current user's own, newest first) |
 | GET    | `/notifications/unread-count` | –                                        | 200 `{ count }` (current user's own) |
 | PATCH  | `/notifications/read-all` | –                                          | 200 `{ count: 0 }` (marks all of the current user's notifications read) |
@@ -61,6 +63,15 @@ Protected routes need `Authorization: Bearer <token>`.
 `job` = `{ id, recruiterId, title, description, location, category, deadline, status, archivedAt, createdAt }` (`/jobs/mine` adds `applicationCount` and
 `statusCounts`, an object with every application status mapped to its count for that posting, e.g. `{ "Applied": 2, "Under Review": 0, ... }`);
 `application` = `{ id, jobId, jobTitle, jobLocation, jobCategory, jobDeadline, jobStatus, resumeId, resumeFilename, status, appliedAt, updatedAt }`.
+Application analytics (#134, US-21): `stats` = `{ total, byStatus, submittedLast7Days, submittedLast30Days, responded, responseRate, perWeek, postings }`.
+`byStatus` is `[{ status, count, percent }]` for all five statuses in pipeline order; `responded` is how many applications have ever had a
+status other than Applied, and `responseRate` is that as a percentage of `total`; `perWeek` is `[{ weekStart, count }]` for the last 8
+weeks, oldest first, weeks starting Monday (UTC) and the last one being the current week; `postings` = `{ open, closed }`, where a posting
+counts as open if it is open and not archived. Percentages are rounded to one decimal and are `0` when there are no applications.
+Computed in `src/application-stats.js`. A `history` entry is `{ status, changedAt, changedBy }`, where `changedBy` is `applicant`,
+`recruiter`, or `null` for rows backfilled by `db/migrate.js` (one per application that had no history, its current status).
+Every status write goes through `recordStatus()` / `changeStatus()` in `src/routes/applications.js`; `changeStatus()` also sends the
+status notification, and re-saving the status an application already has records and sends nothing.
 An entry from `/jobs/:id/applications` is shaped `{ id, applicantEmail, applicantName, applicantHeadline, resumeId, resumeFilename, status, appliedAt }`.
 The candidate review (`/jobs/:id/applications/:applicationId`) returns `application` = `{ id, jobId, status, appliedAt, updatedAt, resumeId, resumeFilename }`
 (open the resume with `GET /resumes/:resumeId/file`), `candidate` = `{ email, fullName, headline, location, phone, bio }`, and
