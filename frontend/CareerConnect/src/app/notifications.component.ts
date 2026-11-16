@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { NotificationService } from './notification.service';
+import { NotificationService, parseServerTime } from './notification.service';
 
 @Component({
   selector: 'app-notifications',
@@ -30,8 +30,8 @@ export class Notifications implements OnInit {
     this.notificationService.markAllRead();
   }
 
-  relativeTime(createdAt: string): string {
-    const difference = Date.now() - new Date(createdAt).getTime();
+  relativeTime(createdAt: string, now = Date.now()): string {
+    const difference = now - parseServerTime(createdAt).getTime();
     const minutes = Math.floor(difference / 60000);
 
     if (minutes < 1) return 'just now';

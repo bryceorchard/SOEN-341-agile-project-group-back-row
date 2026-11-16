@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { App } from './app';
@@ -22,6 +23,8 @@ describe('US-01 Logout', () => {
       imports: [App],
       providers: [
         provideHttpClient(),
+        // The nav bell polls /notifications/unread-count; keep those requests off the network.
+        provideHttpClientTesting(),
         provideRouter([
           { path: 'login', component: StubLogin },
           { path: 'profile', component: StubProfile, canActivate: [authGuard] },

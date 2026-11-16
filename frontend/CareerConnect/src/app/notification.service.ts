@@ -23,6 +23,18 @@ interface UnreadCountResponse {
   count: number;
 }
 
+// The backend stores timestamps with SQLite's datetime('now'): UTC, formatted as
+// "YYYY-MM-DD HH:MM:SS" with no zone marker. new Date() would read that as local time,
+// so mark it as UTC explicitly. Strings that already carry a zone are left alone.
+export function parseServerTime(timestamp: string): Date {
+  const hasZone = /(Z|[+-]\d{2}:?\d{2})$/.test(timestamp);
+  return new Date(hasZone ? timestamp : `${timestamp.replace(' ', 'T')}Z`);
+}
+
+// A failed request (backend down, expired session) shouldn't throw an unhandled error every
+// time the bell polls; the current values simply stay until the next successful refresh.
+const ignoreError = () => {};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -42,6 +54,7 @@ export class NotificationService {
             response.notifications.filter((notification) => !notification.read).length,
           );
         },
+        error: ignoreError,
       });
   }
 
@@ -50,6 +63,7 @@ export class NotificationService {
       .get<UnreadCountResponse>(`${API_BASE}/notifications/unread-count`)
       .subscribe({
         next: (response) => this.unreadCount.set(response.count),
+        error: ignoreError,
       });
   }
 
@@ -65,6 +79,7 @@ export class NotificationService {
           );
           this.refreshUnreadCount();
         },
+        error: ignoreError,
       });
   }
 
@@ -79,6 +94,7 @@ export class NotificationService {
         );
         this.unreadCount.set(0);
       },
+      error: ignoreError,
     });
   }
 }
