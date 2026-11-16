@@ -9,7 +9,8 @@ import request from 'supertest';
 
 const tmp = mkdtempSync(join(tmpdir(), 'cc-test-'));
 process.env.UPLOAD_DIR = join(tmp, 'uploads');
-delete process.env.AI_API_KEY; // the real provider must stay on the deterministic mock
+delete process.env.AI_API_KEY;
+process.env.AI_PROVIDER = 'mock'; // the real provider module must stay on the deterministic mock
 
 const { default: Database } = await import('better-sqlite3');
 const { migrate } = await import('../db/migrate.js');
@@ -23,6 +24,8 @@ const { resetRateLimitForTests } = await import('../src/ai/rate-limit.js');
 
 const FIXTURES = fileURLToPath(new URL('./fixtures/resumes-real/', import.meta.url));
 const samplePdf = readFileSync(join(FIXTURES, 'sample.pdf'));
+const sampleDocx = readFileSync(join(FIXTURES, 'sample.docx'));
+const DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
 // A second app wired with injectable extraction/provider functions, so the error paths
 // (invalid reply, provider outage, not-a-resume) can be tested deterministically with no
@@ -106,9 +109,49 @@ test('a resume with no readable text is 422 and nothing is saved', async () => {
   assert.equal(get.body.feedback, null);
 });
 
+test('replacing the resume file deletes its feedback, which described the old file', async () => {
+  const t = await login(realApi, 'fb-replace@test.com');
+  const up = await realApi.post('/resumes').set('Authorization', `Bearer ${t}`)
+    .attach('resume', samplePdf, { filename: 'sample.pdf', contentType: 'application/pdf' }).expect(201);
+  const id = up.body.resume.id;
+  await realApi.post(`/resumes/${id}/feedback`).set('Authorization', `Bearer ${t}`).expect(201);
+
+  await realApi.put(`/resumes/${id}`).set('Authorization', `Bearer ${t}`)
+    .attach('resume', sampleDocx, { filename: 'new.docx', contentType: DOCX }).expect(200);
+  const get = await realApi.get(`/resumes/${id}/feedback`).set('Authorization', `Bearer ${t}`).expect(200);
+  assert.equal(get.body.feedback, null);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM resume_feedback WHERE resume_id = ?').get(id).n, 0);
+});
+
+test('a resume whose stored file is missing is 404, not 500', async () => {
+  const t = await login(realApi, 'fb-missing@test.com');
+  const up = await realApi.post('/resumes').set('Authorization', `Bearer ${t}`)
+    .attach('resume', samplePdf, { filename: 'sample.pdf', contentType: 'application/pdf' }).expect(201);
+  const { file_path: filePath } = db.prepare('SELECT file_path FROM resumes WHERE id = ?').get(up.body.resume.id);
+  rmSync(filePath);
+
+  const res = await realApi.post(`/resumes/${up.body.resume.id}/feedback`).set('Authorization', `Bearer ${t}`).expect(404);
+  assert.equal(res.body.error, 'Resume file not found');
+});
+
+test('with no AI_API_KEY and no AI_PROVIDER=mock, POST is 503 and nothing is saved (no fake feedback)', async () => {
+  const t = await login(realApi, 'fb-nokey@test.com');
+  const up = await realApi.post('/resumes').set('Authorization', `Bearer ${t}`)
+    .attach('resume', samplePdf, { filename: 'sample.pdf', contentType: 'application/pdf' }).expect(201);
+  delete process.env.AI_PROVIDER;
+  try {
+    await realApi.post(`/resumes/${up.body.resume.id}/feedback`).set('Authorization', `Bearer ${t}`).expect(503);
+  } finally {
+    process.env.AI_PROVIDER = 'mock';
+  }
+  const get = await realApi.get(`/resumes/${up.body.resume.id}/feedback`).set('Authorization', `Bearer ${t}`).expect(200);
+  assert.equal(get.body.feedback, null);
+});
+
 // --- injected provider: error paths and replacement -----------------------------------
 
 let diDb, diApi, diToken, diResumeId;
+let diReply = JSON.stringify({ not: 'valid' }); // what the injected provider answers next
 
 test('setup: a second app with an injectable provider, for the error paths', async () => {
   resetRateLimitForTests(); // a fresh :memory: db reuses small user ids; don't inherit realApi's usage
@@ -116,12 +159,10 @@ test('setup: a second app with an injectable provider, for the error paths', asy
   diDb.pragma('foreign_keys = ON');
   migrate(diDb);
 
-  let reply = JSON.stringify({ not: 'valid' });
   diApi = request(buildDiApp(diDb, {
     extractText: async () => 'some resume text with enough letters to pass the minimum check',
-    getFeedbackReply: async () => reply,
+    getFeedbackReply: async () => diReply,
   }));
-  diApi._setReply = (v) => { reply = v; }; // eslint-disable-line no-underscore-dangle
 
   diToken = await login(diApi, 'di@test.com');
   const up = await diApi.post('/resumes').set('Authorization', `Bearer ${diToken}`)
@@ -136,7 +177,7 @@ test('an invalid provider reply is 502 and nothing is saved', async () => {
 });
 
 test('isResume: false is 422 and nothing is saved', async () => {
-  diApi._setReply(JSON.stringify({ isResume: false, strengths: [], improvements: [], rewordings: [], summary: "This text isn't a resume." }));
+  diReply = JSON.stringify({ isResume: false, strengths: [], improvements: [], rewordings: [], summary: "This text isn't a resume." });
   await diApi.post(`/resumes/${diResumeId}/feedback`).set('Authorization', `Bearer ${diToken}`).expect(422);
   const get = await diApi.get(`/resumes/${diResumeId}/feedback`).set('Authorization', `Bearer ${diToken}`).expect(200);
   assert.equal(get.body.feedback, null);
@@ -163,11 +204,11 @@ test('a provider outage is 503 and nothing is saved', async () => {
 
 test('a second POST replaces the stored feedback rather than adding a row', async () => {
   const sample = JSON.parse(readFileSync(join(FIXTURES, '..', 'ai', 'sample-feedback.json'), 'utf8'));
-  diApi._setReply(JSON.stringify(sample));
+  diReply = JSON.stringify(sample);
   const first = await diApi.post(`/resumes/${diResumeId}/feedback`).set('Authorization', `Bearer ${diToken}`).expect(201);
   assert.equal(first.body.feedback.summary, sample.summary);
 
-  diApi._setReply(JSON.stringify({ ...sample, summary: 'A different, regenerated summary.' }));
+  diReply = JSON.stringify({ ...sample, summary: 'A different, regenerated summary.' });
   const second = await diApi.post(`/resumes/${diResumeId}/feedback`).set('Authorization', `Bearer ${diToken}`).expect(201);
   assert.equal(second.body.feedback.summary, 'A different, regenerated summary.');
 

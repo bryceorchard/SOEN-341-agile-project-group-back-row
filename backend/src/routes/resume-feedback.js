@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { existsSync } from 'node:fs';
 import { HttpError } from '../errors.js';
 import { requireAuth } from '../middleware.js';
 import { extractResumeText } from '../ai/extract-text.js';
@@ -37,6 +38,8 @@ export default function resumeFeedbackRoutes(db, { extractText = extractResumeTe
 
   r.post('/:id/feedback', async (req, res) => {
     const resume = ownResume(req);
+    // Same answer as GET /resumes/:id/file when the record exists but its file doesn't.
+    if (!existsSync(resume.file_path)) throw new HttpError(404, 'Resume file not found');
 
     if (!allowRequest(req.user.id)) {
       throw new HttpError(429, 'Too many feedback requests. Please wait a minute and try again.');
@@ -53,6 +56,7 @@ export default function resumeFeedbackRoutes(db, { extractText = extractResumeTe
       reply = await getFeedbackReply(prompt);
     } catch (err) {
       if (err instanceof ProviderUnavailableError) {
+        console.error('AI resume feedback provider unavailable:', err.message);
         throw new HttpError(503, 'The AI service is unavailable right now. Please try again later.');
       }
       throw err;
