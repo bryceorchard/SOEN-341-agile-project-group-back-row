@@ -17,7 +17,7 @@ The database file is created at `backend/data/careerconnect.db` (gitignored). Ov
 
 ## API
 Run: `npm start` (http://localhost:3000, override with `PORT`). Tests: `npm test`.
-Env: `JWT_SECRET` (set in production), `CORS_ORIGIN` (default `http://localhost:4200`), `DB_PATH`, `UPLOAD_DIR`.
+Env: `JWT_SECRET` (set in production), `CORS_ORIGIN` (default `http://localhost:4200`), `DB_PATH`, `UPLOAD_DIR`, `DEADLINE_REMINDER_DAYS` (default `3`).
 
 Errors are always `{ "error": "message" }` with status 400 / 401 / 404 / 409.
 Protected routes need `Authorization: Bearer <token>`.
@@ -60,4 +60,8 @@ Protected routes need `Authorization: Bearer <token>`.
 An entry from `/jobs/:id/applications` is shaped `{ id, applicantEmail, applicantName, applicantHeadline, resumeId, resumeFilename, status, appliedAt }`.
 `notification` = `{ id, type, title, message, link, jobId, applicationId, read, readAt, createdAt }`, where `type` is one of
 `status_update`, `interview_invite`, `new_application`, `deadline_reminder`. Created by `notify(db, {...})` in `src/notify.js`, the
-one place every trigger (a status change, a new application, and eventually deadline reminders in #137) goes through.
+one place every trigger (a status change, a new application, a deadline reminder) goes through.
+Deadline reminders (`src/deadline-reminders.js`) are generated whenever `GET /notifications` or `GET /notifications/unread-count`
+is called, so no scheduler is needed: an open, unarchived posting whose deadline is within `DEADLINE_REMINDER_DAYS` calendar days
+(deadline day included) gets one `deadline_reminder` for its recruiter and one for each applicant not Rejected or Offered, never
+twice for the same user and posting.
