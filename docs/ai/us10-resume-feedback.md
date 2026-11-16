@@ -183,7 +183,7 @@ providers, the base URL (`https://api.groq.com/openai/v1`). `AI_PROVIDER=mock` s
 sample reply for tests and for local development without a key. Temperature 0.2, so that regenerating
 still varies a little while the evaluation stays fairly repeatable. For gpt-oss, the request must
 also send `reasoning_effort: "low"` and `max_completion_tokens: 5000`; `backend/src/ai/provider.js`
-(#165) doesn't yet.
+does, since the #141 evaluation PR.
 
 ## Evaluation
 
@@ -330,7 +330,6 @@ If Zero Data Retention is on, "and doesn't keep it after replying" can be added.
 
 From the evaluation (details in the v3-medium review sheet):
 
-- **#139 / #165:** send `reasoning_effort: "low"` and `max_completion_tokens: 5000` for gpt-oss.
 - **Injected text:** detect text aimed at AI screeners in #139 (e.g. "ignore all previous
   instructions", "AI resume screeners") and add the "remove this text" improvement in code when the
   model leaves it out.

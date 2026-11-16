@@ -18,6 +18,7 @@ const { createApp } = await import('../src/app.js');
 const { default: authRoutes } = await import('../src/routes/auth.js');
 const { default: resumeRoutes } = await import('../src/routes/resumes.js');
 const { default: resumeFeedbackRoutes } = await import('../src/routes/resume-feedback.js');
+const { PROMPT_VERSION } = await import('../src/ai/prompt.js');
 const { notFound, errorHandler } = await import('../src/middleware.js');
 const { ProviderUnavailableError } = await import('../src/ai/provider.js');
 const { resetRateLimitForTests } = await import('../src/ai/rate-limit.js');
@@ -88,7 +89,7 @@ test('real extraction + the mock provider: feedback is generated, schema-valid a
   const fb = res.body.feedback;
   assert.equal(fb.resumeId, resumeId);
   assert.equal(fb.model, 'mock');
-  assert.equal(fb.promptVersion, 'resume-feedback-v1');
+  assert.equal(fb.promptVersion, PROMPT_VERSION);
   assert.equal(fb.isResume, true);
   assert.ok(fb.summary.length > 0);
   assert.ok(Array.isArray(fb.strengths) && fb.strengths.length > 0);

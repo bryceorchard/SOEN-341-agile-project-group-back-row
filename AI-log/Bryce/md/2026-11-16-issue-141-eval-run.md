@@ -87,7 +87,14 @@ items. Each review sheet is in `AI-log/Bryce/md/`:
   The AI that made this recommendation is itself an Anthropic model.
 - Design doc: status, prompt-design table (v2/v3 rules and why), provider decision, evaluation
   results summary, limitations and Sprint 4 open items updated.
-- Open findings for Sprint 4: #139 must send the two gpt-oss settings; add injection detection in
+- Rebased onto `main` (`8ab9b2f`), which now has #165 (#139's provider and route):
+  - one conflict in the design doc's config paragraph, resolved by keeping both texts;
+  - `test/resume-feedback.test.js` hard-coded `'resume-feedback-v1'`; it now uses
+    `PROMPT_VERSION`;
+  - `src/ai/provider.js` now sends `reasoning_effort: "low"` and `max_completion_tokens: 5000`,
+    with assertions added to `test/ai-provider.test.js`.
+  - Backend `npm test` 143/143.
+- Open findings for Sprint 4: add injection detection in
   code; keep PDF columns apart in extraction; invented outcomes make #140's "check each
   suggestion" notice required; the free plan allows about two requests a minute for the team;
   Haiku comparison; French and not-a-resume fixtures; rerun #147 with v3.
