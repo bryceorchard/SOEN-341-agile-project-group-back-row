@@ -167,10 +167,11 @@ export class Profile implements OnInit {
     });
   }
 
-  viewResume(id: number) {
+  viewResume(id: number, filename: string) {
     this.resume_error.set('');
     openBlobInNewTab(
       this.http_client.get(`${API_BASE}/resumes/${id}/file`, { responseType: 'blob' }),
+      filename,
       (message) => this.resume_error.set(message),
     );
   }

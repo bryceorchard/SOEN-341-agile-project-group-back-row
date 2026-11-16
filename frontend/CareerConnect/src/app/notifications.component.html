@@ -1,0 +1,33 @@
+<section class="notifications-page">
+  <div class="notifications-header">
+    <h1>Notifications</h1>
+
+    <button
+      type="button"
+      (click)="markAllAsRead()"
+      [disabled]="notificationService.unreadCount() === 0"
+    >
+      Mark all as read
+    </button>
+  </div>
+
+  <p *ngIf="notificationService.notifications().length === 0">
+    You have no notifications.
+  </p>
+
+  <div
+    *ngFor="let notification of notificationService.notifications()"
+    class="notification"
+    [class.unread]="!notification.read"
+    [class.interview]="notification.type === 'interview_invite'"
+    (click)="openNotification(notification.id, notification.link)"
+  >
+    <strong>{{ notification.title }}</strong>
+    <span>{{ notification.message }}</span>
+    <small>{{ relativeTime(notification.createdAt) }}</small>
+
+    <span *ngIf="notification.type === 'interview_invite'">
+      Interview invitation
+    </span>
+  </div>
+</section>

@@ -19,7 +19,7 @@ tests: #147.
 resume file ──(#139: pdf-parse / mammoth)──► extracted text
    ──► prepareResumeText()   clean, redact email/phone/postal code, truncate     src/ai/prompt.js
    ──► buildPrompt()         system prompt + <resume>…</resume> + JSON schema     src/ai/prompt.js
-   ──► provider (#139)       structured output, or the mock in tests and CI
+   ──► provider (#139)       structured output, or the mock with AI_PROVIDER=mock   src/ai/provider.js
    ──► parseFeedback()       JSON parse, schema check, sort by priority           src/ai/feedback-schema.js
    ──► resume_feedback row   feedback JSON, model, prompt version, created_at     (#139)
    ──► GET /resumes/:id/feedback ──► feedback panel (#140)
@@ -31,7 +31,7 @@ resume file ──(#139: pdf-parse / mammoth)──► extracted text
 | `backend/src/ai/prompt.js` | `SYSTEM_PROMPT`, `PROMPT_VERSION`, `prepareResumeText()`, `buildUserPrompt()`, `buildPrompt()` |
 | `backend/src/ai/checks.js` | Automatic checks on outputs (grounding, invented numbers, contact leaks, demographic words, bias-pair comparison), used by the evaluation |
 | `backend/test/fixtures/resumes/` | The evaluation set: 6 synthetic resumes and `manifest.json` (what each one tests) |
-| `backend/test/fixtures/ai/sample-feedback.json` | A hand-written valid reply for fixture 01; the reply for #139's mock provider and #140's mocked HTTP response |
+| `backend/test/fixtures/ai/sample-feedback.json` | A hand-written valid reply for fixture 01; #140's mocked HTTP response. #139's mock provider returns an identical copy, `backend/src/ai/mock-feedback.json` (a test checks they match) |
 | `backend/scripts/eval-resume-feedback.js` | `npm run ai:eval`: runs the set through a provider and writes a review sheet |
 | `backend/test/ai-feedback.test.js` | Unit tests for all of the above (no network; runs in CI) |
 
@@ -98,7 +98,9 @@ On any error, nothing is saved and earlier feedback is kept (AT-3).
   - Use `ON DELETE CASCADE` from `resumes`, so deleting a resume deletes its feedback; the privacy
     notice says so.
   - Recruiters who can open an applicant's resume must not see its feedback.
-- The mock provider can return `sample-feedback.json` for every request.
+- The mock provider returns the same sample reply (`src/ai/mock-feedback.json`) for every request. It is used only
+  with `AI_PROVIDER=mock`; with no key and no `AI_PROVIDER=mock` the endpoint returns 503 rather than fake feedback.
+- Replacing a resume's file (`PUT /resumes/:id`) deletes its feedback.
 
 **UI (#140):**
 
@@ -173,7 +175,8 @@ facts, bias-pair differences, schema failures) where Haiku's pass. Record the de
 the AI log.
 
 Config for #139: `AI_API_KEY` (never committed), plus the model id and, for OpenAI-compatible
-providers, the base URL (`https://api.groq.com/openai/v1`). Temperature 0.2, so that regenerating
+providers, the base URL (`https://api.groq.com/openai/v1`). `AI_PROVIDER=mock` switches to the fixed
+sample reply for tests and for local development without a key. Temperature 0.2, so that regenerating
 still varies a little while the evaluation stays fairly repeatable.
 
 ## Evaluation

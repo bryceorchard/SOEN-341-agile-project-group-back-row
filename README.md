@@ -93,6 +93,7 @@ The backend reads these environment variables (all optional in development):
 - `JWT_SECRET` — token signing secret (**must** be set in production)
 - `DB_PATH` — SQLite file location (default `backend/data/careerconnect.db`)
 - `UPLOAD_DIR` — resume upload directory (default `backend/uploads/`)
+- `DEADLINE_REMINDER_DAYS` — how many calendar days before a posting's deadline reminders start (default `3`)
 
 See [`backend/README.md`](backend/README.md) for the full API reference and database notes, and [`docs/ERD.md`](docs/ERD.md) for the data model.
 
