@@ -48,7 +48,7 @@
         <p class="applicant-meta">{{ a.applicantEmail }}<span *ngIf="a.applicantHeadline"> · {{ a.applicantHeadline }}</span></p>
         <p class="applicant-meta">Applied {{ a.appliedAt | slice: 0:10 }}</p>
         <p class="applicant-meta" *ngIf="a.resumeId">Resume: {{ a.resumeFilename || 'attached' }}</p>
-        <button class="btn btn-secondary btn-sm" *ngIf="a.resumeId" (click)="viewResume(a.resumeId)">View resume</button>
+        <button class="btn btn-secondary btn-sm" *ngIf="a.resumeId" (click)="viewResume(a.resumeId, a.resumeFilename || 'resume')">View resume</button>
         <span class="no-resume" *ngIf="!a.resumeId">No resume attached</span>
       </div>
 
