@@ -40,7 +40,8 @@ Protected routes need `Authorization: Bearer <token>`.
 | GET    | `/jobs/categories` | –                                                  | 200 `{ categories }` (distinct, open + non-archived postings only; no auth required) |
 | GET    | `/jobs/mine`   | query: `view?` (`active` default, or `archived`)      | 200 `{ jobs }` (recruiter's own, with `applicationCount` and `statusCounts`) |
 | GET    | `/jobs/:id`    | –                                                     | 200 `{ job }` (no auth required)    |
-| GET    | `/jobs/:id/applications` | query: `status?`                            | 200 `{ applications }` (owning recruiter only; 404 otherwise) |
+| GET    | `/jobs/:id/applications` | query: `status?`, `from?`, `to?` (`YYYY-MM-DD`, inclusive, on the applied date; all filters combine) | 200 `{ applications }` (owning recruiter only; 404 otherwise; 400 for an invalid date or `from` after `to`) |
+| GET    | `/jobs/:id/applications/:applicationId` | –                            | 200 `{ application, candidate, otherApplications }` (owning recruiter only; 404 for other recruiters or an application not on this posting, 403 for job seekers) |
 | POST   | `/jobs`        | `{ title, description, location?, category?, deadline? }` (recruiter only; optional fields are trimmed strings) | 201 `{ job }` (403 if not a recruiter) |
 | PUT    | `/jobs/:id`    | same body as POST (owning recruiter only)             | 200 `{ job }` (404 if not yours)    |
 | PATCH  | `/jobs/:id/status` | `{ status }` one of open/closed (owning recruiter only) | 200 `{ job }` (404 if not yours) |
@@ -61,6 +62,9 @@ Protected routes need `Authorization: Bearer <token>`.
 `statusCounts`, an object with every application status mapped to its count for that posting, e.g. `{ "Applied": 2, "Under Review": 0, ... }`);
 `application` = `{ id, jobId, jobTitle, jobLocation, jobCategory, jobDeadline, jobStatus, resumeId, resumeFilename, status, appliedAt, updatedAt }`.
 An entry from `/jobs/:id/applications` is shaped `{ id, applicantEmail, applicantName, applicantHeadline, resumeId, resumeFilename, status, appliedAt }`.
+The candidate review (`/jobs/:id/applications/:applicationId`) returns `application` = `{ id, jobId, status, appliedAt, updatedAt, resumeId, resumeFilename }`
+(open the resume with `GET /resumes/:resumeId/file`), `candidate` = `{ email, fullName, headline, location, phone, bio }`, and
+`otherApplications` = `[{ id, jobId, jobTitle, jobStatus, status, appliedAt }]`: the same candidate's other applications to this recruiter's postings only.
 `notification` = `{ id, type, title, message, link, jobId, applicationId, read, readAt, createdAt }`, where `type` is one of
 `status_update`, `interview_invite`, `new_application`, `deadline_reminder`. Created by `notify(db, {...})` in `src/notify.js`, the
 one place every trigger (a status change, a new application, a deadline reminder) goes through.
