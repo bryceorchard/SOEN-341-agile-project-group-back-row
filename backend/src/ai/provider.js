@@ -46,6 +46,12 @@ async function callOpenAiCompatible({ apiKey, model, baseUrl }, prompt) {
         messages: [{ role: 'system', content: prompt.system }, { role: 'user', content: prompt.user }],
         response_format: { type: 'json_schema', json_schema: { name: 'resume_feedback', strict: true, schema: prompt.schema } },
         temperature: 0.2,
+        // gpt-oss reasons before answering, and the reasoning counts toward the completion
+        // limit. Without these, long replies were cut off and Groq returned HTTP 400
+        // json_validate_failed (#141 evaluation, 2026-11-16). Input plus the limit must stay
+        // under the free plan's 8,000 tokens a minute.
+        reasoning_effort: 'low',
+        max_completion_tokens: 5000,
       }),
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });

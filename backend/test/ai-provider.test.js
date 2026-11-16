@@ -67,6 +67,8 @@ test('a successful call sends the prompt, model and key, and returns the message
   assert.equal(body.model, 'some/model');
   assert.deepEqual(body.messages, [{ role: 'system', content: 'sys' }, { role: 'user', content: 'usr' }]);
   assert.deepEqual(body.response_format.json_schema.schema, prompt.schema);
+  assert.equal(body.reasoning_effort, 'low');
+  assert.equal(body.max_completion_tokens, 5000);
 });
 
 test('a non-2xx response is ProviderUnavailableError', async () => {
