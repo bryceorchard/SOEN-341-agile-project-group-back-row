@@ -6,10 +6,11 @@
 **chat url:** <https://claude.ai/code/session_01FY2WCQuEAYRBt6CMmSHq5N>
 
 ## Task / Prompt
-"Can you examine the repo, and (to your best abilities) update the claude desktop project
+1. "Can you examine the repo, and (to your best abilities) update the claude desktop project
 instructions please?" The project instructions are the standing instructions Claude gets in
 every chat of the "SOEN 341 Project" on claude.ai. Before this, they held only the repo URL,
 "use gh when possible", and the AI-log format.
+2. "sure please do": open a PR for this AI log.
 
 ## Context / Findings
 - Read `README.md`, `docs/CONTRIBUTING.md`, `docs/README.md`, the PR template, `.github/workflows/ci.yml`,
@@ -50,6 +51,12 @@ every chat of the "SOEN 341 Project" on claude.ai. Before this, they held only t
   The pane was not signed in to claude.ai, and signing in is something Bryce has to do himself,
   so the draft was handed over to paste in.
 - Committed this log on branch `ai-log/bryce-2026-11-16-project-instructions`.
+- Bryce pasted the draft into the project settings himself; the next session context showed the new
+  instructions in place.
+
+### Prompt 2: open a PR
+- Updated this log, pushed it, and opened a PR from `ai-log/bryce-2026-11-16-project-instructions`
+  into `main` using the PR template (type: Docs; no linked issue).
 
 ## Decision
 
