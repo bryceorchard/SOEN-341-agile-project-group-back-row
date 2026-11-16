@@ -222,6 +222,10 @@ AI_API_KEY=... npm run ai:eval -- --provider groq --repeat 2
 AI_API_KEY=... npm run ai:eval -- --provider anthropic --repeat 2
 ```
 
+Groq's free plan allows 8,000 tokens a minute on `openai/gpt-oss-120b`, about two eval requests,
+so the runner waits for the `retry-after` on each 429 and retries (up to 6 times). A full
+`--repeat 2` run (12 requests) takes about 5–8 minutes on the free plan.
+
 Each run writes `backend/eval-output/<date>-<provider>-<model>/` (gitignored): one JSON file per
 fixture and run (raw reply, parsed feedback, flags, latency, tokens) and `REVIEW.md`, the review
 sheet. Never run it in CI.

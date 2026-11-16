@@ -49,16 +49,28 @@ function parseArgs(argv) {
   return args;
 }
 
+// Free plans have tight per-minute token limits (Groq's free gpt-oss-120b: 8,000 tokens/min,
+// about two eval requests), so on 429 wait for the provider's retry-after and try again.
+const MAX_RATE_LIMIT_RETRIES = 6;
+
 async function postJson(url, headers, body) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', ...headers },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(90_000),
-  });
-  const text = await res.text();
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 500)}`);
-  return JSON.parse(text);
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...headers },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(90_000),
+    });
+    const text = await res.text();
+    if (res.status === 429 && attempt < MAX_RATE_LIMIT_RETRIES) {
+      const seconds = Math.min(Math.max(Number(res.headers.get('retry-after')) || 20, 1), 120);
+      console.log(`  rate limited (429); waiting ${Math.ceil(seconds)}s before retry ${attempt + 1}/${MAX_RATE_LIMIT_RETRIES}`);
+      await new Promise((resolve) => setTimeout(resolve, Math.ceil(seconds) * 1000));
+      continue;
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 500)}`);
+    return JSON.parse(text);
+  }
 }
 
 // OpenAI Chat Completions shape: OpenAI, Groq, Gemini's OpenAI-compatible endpoint, Ollama, etc.
