@@ -41,6 +41,12 @@ export class PostingApplicants implements OnInit {
 
   ngOnInit() {
     this.jobId = Number(this.route.snapshot.paramMap.get('id'));
+
+    const statusParam = this.route.snapshot.queryParamMap.get('status');
+    if (statusParam) {
+      this.active_status.set(statusParam);
+    }
+
     this.http_client.get<{ job: JobSummary }>(`${API_BASE}/jobs/${this.jobId}`).subscribe({
       next: (res) => this.job.set(res.job),
       // The applicants request decides access; a missing posting just leaves the header generic.

@@ -49,6 +49,18 @@ for (const [id, owner, title, description, location, category, deadline] of jobs
   insertJob.run(id, owner.id, title, description, location, category, deadline);
 }
 
+// A posting that always closes in two days, so the deadline-reminder demo works whenever the DB is
+// seeded. Its deadline is refreshed on every seed run, since INSERT OR IGNORE keeps the old row.
+const closingSoon = new Date();
+closingSoon.setDate(closingSoon.getDate() + 2);
+const closingSoonDeadline = [
+  closingSoon.getFullYear(),
+  String(closingSoon.getMonth() + 1).padStart(2, '0'),
+  String(closingSoon.getDate()).padStart(2, '0'),
+].join('-');
+insertJob.run(15, recruiter.id, 'Junior QA Automation Tester', 'Automate regression tests for our web app.', 'Montreal, QC', 'Quality Assurance', closingSoonDeadline);
+db.prepare('UPDATE jobs SET deadline = ? WHERE id = 15').run(closingSoonDeadline);
+
 const seeker = db.prepare('SELECT id FROM users WHERE email = ?').get('seeker@example.com');
 const insertApplication = db.prepare(
   "INSERT OR IGNORE INTO applications (user_id, job_id, status) VALUES (?, ?, ?)"
@@ -59,6 +71,7 @@ const applications = [
   [6, 'Interview'],
   [9, 'Offered'],
   [11, 'Rejected'],
+  [15, 'Applied'],
 ];
 for (const [jobId, status] of applications) {
   insertApplication.run(seeker.id, jobId, status);
