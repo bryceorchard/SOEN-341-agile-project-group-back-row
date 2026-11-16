@@ -1,0 +1,23 @@
+%PDF-1.4
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
+3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj
+4 0 obj<</Length 234>>stream
+BT /F1 14 Tf 72 700 Td (Hello Resume Extraction Test) Tj ET
+BT /F1 14 Tf 72 680 Td (This fixture exists only so unit tests can verify that) Tj ET
+BT /F1 14 Tf 72 660 Td (the backend correctly extracts real text from a PDF file.) Tj ET
+endstream
+endobj
+5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000052 00000 n 
+0000000101 00000 n 
+0000000211 00000 n 
+0000000492 00000 n 
+trailer<</Size 6/Root 1 0 R>>
+startxref
+553
+%%EOF
