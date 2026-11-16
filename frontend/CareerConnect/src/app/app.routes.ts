@@ -7,6 +7,7 @@ import { MyApplications } from './my-applications.component';
 import { RecruiterPostings } from './recruiter-postings.component';
 import { PostingApplicants } from './posting-applicants.component';
 import { authGuard, roleGuard } from './guards';
+import { Notifications } from './notifications.component';
 
 export const routes: Routes = [
   {
@@ -40,6 +41,11 @@ export const routes: Routes = [
     path: 'recruiter/postings/:id/applicants',
     component: PostingApplicants,
     canActivate: [authGuard, roleGuard('recruiter')],
+  },
+  {
+  path: 'notifications',
+  component: Notifications,
+  canActivate: [authGuard],
   },
   {
     path: '',
