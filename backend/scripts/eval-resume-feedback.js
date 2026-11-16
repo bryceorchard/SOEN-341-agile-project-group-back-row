@@ -13,6 +13,8 @@
 //          --model <id> (or AI_MODEL)   --base-url <url> (or AI_BASE_URL; required for openai-compatible)
 //          --only <text> (fixtures whose file name contains it)   --repeat <n> (default 1)
 //          --temperature <n|none>   --json-mode schema|object   --out <dir>
+//          --reasoning-effort low|medium|high|none (gpt-oss on Groq; default low)
+//          --max-tokens <n> (completion limit, reasoning included)
 //
 // The provider calls here are deliberately minimal and exist only for evaluation; the
 // app's provider module and mock belong to #139.
@@ -28,7 +30,9 @@ const FIXTURES = path.join(BACKEND, 'test/fixtures/resumes');
 
 const PROVIDERS = {
   mock: { model: 'sample-feedback' },
-  groq: { model: 'openai/gpt-oss-120b', baseUrl: 'https://api.groq.com/openai/v1', temperature: 0.2 },
+  // Free plan: 8,000 tokens/min, and a request's input plus max_completion_tokens must fit
+  // under it. Input is about 2,000-2,500 tokens, so 5,000 leaves room; reasoning counts too.
+  groq: { model: 'openai/gpt-oss-120b', baseUrl: 'https://api.groq.com/openai/v1', temperature: 0.2, reasoningEffort: 'low', maxTokens: 5000 },
   anthropic: { model: 'claude-haiku-5-5', baseUrl: 'https://api.anthropic.com/v1' },
   openai: { model: 'gpt-5-mini', baseUrl: 'https://api.openai.com/v1' },
   gemini: { model: 'gemini-3.1-flash-lite', baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai' },
@@ -40,7 +44,7 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const key = argv[i].replace(/^--/, '');
     if (key === 'dry-run') args.dryRun = true;
-    else if (['provider', 'model', 'base-url', 'only', 'repeat', 'temperature', 'json-mode', 'out'].includes(key)) {
+    else if (['provider', 'model', 'base-url', 'only', 'repeat', 'temperature', 'json-mode', 'out', 'reasoning-effort', 'max-tokens'].includes(key)) {
       args[key.replace(/-(\w)/g, (_, c) => c.toUpperCase())] = argv[++i];
     } else throw new Error(`Unknown option: ${argv[i]}`);
   }
@@ -68,7 +72,8 @@ async function postJson(url, headers, body) {
       await new Promise((resolve) => setTimeout(resolve, Math.ceil(seconds) * 1000));
       continue;
     }
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 500)}`);
+    // Keep the whole body: Groq's json_validate_failed includes the failed generation.
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 20_000)}`);
     return JSON.parse(text);
   }
 }
@@ -83,6 +88,8 @@ async function callOpenAiCompatible(cfg, prompt) {
       : { type: 'json_schema', json_schema: { name: 'resume_feedback', strict: true, schema: prompt.schema } },
   };
   if (cfg.temperature !== undefined) body.temperature = cfg.temperature;
+  if (cfg.reasoningEffort) body.reasoning_effort = cfg.reasoningEffort;
+  if (cfg.maxTokens) body.max_completion_tokens = cfg.maxTokens;
   const data = await postJson(`${cfg.baseUrl.replace(/\/$/, '')}/chat/completions`, { authorization: `Bearer ${cfg.apiKey}` }, body);
   const choice = data.choices?.[0];
   return {
@@ -160,6 +167,8 @@ function renderReview(meta, results, pairs) {
     `| Prompt version | \`${PROMPT_VERSION}\` |`,
     `| Provider / model | ${meta.provider} / \`${meta.model}\` |`,
     `| Temperature | ${meta.temperature ?? 'provider default'} |`,
+    `| Reasoning effort | ${meta.reasoningEffort ?? 'provider default'} |`,
+    `| Max completion tokens | ${meta.maxTokens ?? 'provider default'} |`,
     `| Output mode | ${meta.jsonMode === 'object' ? 'JSON mode, schema in the prompt' : 'structured output (JSON Schema enforced by the API)'} |`,
     `| Runs per fixture | ${meta.repeat} |`,
     `| Reviewer | |`,
@@ -223,6 +232,8 @@ async function main() {
     apiKey: process.env.AI_API_KEY,
     temperature,
     jsonMode: args.jsonMode,
+    reasoningEffort: args.reasoningEffort === 'none' ? undefined : args.reasoningEffort ?? defaults.reasoningEffort,
+    maxTokens: args.maxTokens !== undefined ? Number(args.maxTokens) : defaults.maxTokens,
   };
   if (!cfg.model) throw new Error('Set --model or AI_MODEL');
   if (cfg.provider !== 'mock' && !args.dryRun && !cfg.apiKey) throw new Error('Set AI_API_KEY (never commit it)');
@@ -276,6 +287,7 @@ async function main() {
         path.join(outDir, `${label.replace(/ #/, '.run')}.json`),
         JSON.stringify({
           fixture: fixture.file, run, provider: cfg.provider, model: cfg.model, promptVersion: PROMPT_VERSION, temperature,
+          reasoningEffort: cfg.reasoningEffort, maxTokens: cfg.maxTokens,
           latencyMs: r.latencyMs, usage: r.usage, stopReason: r.stop, error: r.error, valid: r.ok, errors: r.errors,
           flags: r.flags, feedback: r.feedback, raw: r.raw,
         }, null, 2) + '\n'
@@ -298,7 +310,7 @@ async function main() {
     for (let i = 0; i < Math.min(a.length, b.length); i++) pairs.push({ kind: 'pair', a: a[i].label, b: b[i].label, comparison: comparePair(a[i].feedback, b[i].feedback) });
   }
 
-  const meta = { provider: cfg.provider, model: cfg.model, date, temperature, jsonMode: cfg.jsonMode, repeat: args.repeat };
+  const meta = { provider: cfg.provider, model: cfg.model, date, temperature, jsonMode: cfg.jsonMode, repeat: args.repeat, reasoningEffort: cfg.reasoningEffort, maxTokens: cfg.maxTokens };
   writeFileSync(path.join(outDir, 'REVIEW.md'), renderReview(meta, results, pairs));
   const valids = results.filter((r) => r.ok).length;
   console.log(`\n${valids}/${results.length} replies schema-valid. Review sheet: ${path.join(outDir, 'REVIEW.md')}`);

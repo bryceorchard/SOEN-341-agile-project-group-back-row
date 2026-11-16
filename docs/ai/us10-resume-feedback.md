@@ -226,6 +226,13 @@ Groq's free plan allows 8,000 tokens a minute on `openai/gpt-oss-120b`, about tw
 so the runner waits for the `retry-after` on each 429 and retries (up to 6 times). A full
 `--repeat 2` run (12 requests) takes about 5–8 minutes on the free plan.
 
+gpt-oss is a reasoning model: its hidden reasoning counts toward the completion limit. With no
+limit set, the first Groq run (2026-11-16) cut off fixture 01's reply mid-JSON, and Groq's strict
+mode returned `json_validate_failed` (HTTP 400). The runner now sends `reasoning_effort: "low"` and
+`max_completion_tokens: 5000` for Groq (`--reasoning-effort`, `--max-tokens` to change them). The
+input plus that limit has to stay under the free plan's 8,000 tokens a minute. #139's provider
+needs the same two settings.
+
 Each run writes `backend/eval-output/<date>-<provider>-<model>/` (gitignored): one JSON file per
 fixture and run (raw reply, parsed feedback, flags, latency, tokens) and `REVIEW.md`, the review
 sheet. Never run it in CI.
