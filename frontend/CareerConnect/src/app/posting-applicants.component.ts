@@ -76,10 +76,11 @@ export class PostingApplicants implements OnInit {
     });
   }
 
-  viewResume(resumeId: number) {
+  viewResume(resumeId: number, filename: string) {
     this.error.set('');
     openBlobInNewTab(
       this.http_client.get(`${API_BASE}/resumes/${resumeId}/file`, { responseType: 'blob' }),
+      filename,
       (message) => this.error.set(message),
     );
   }
