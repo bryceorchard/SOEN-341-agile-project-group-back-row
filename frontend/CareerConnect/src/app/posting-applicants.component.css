@@ -68,3 +68,66 @@
 .applicants-heading {
   font-size: 1.1rem;
 }
+
+.date-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  margin: -8px 0 20px;
+}
+
+.date-filter label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.date-filter input {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.review-button {
+  margin-left: 6px;
+}
+
+.review-panel {
+  margin-bottom: 20px;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.review-profile {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+  margin: 12px 0;
+  font-size: 0.88rem;
+}
+
+.review-profile dt {
+  color: var(--text-muted);
+}
+
+.review-profile dd {
+  margin: 0;
+}
+
+.review-bio {
+  white-space: pre-line;
+}
+
+.review-others {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-size: 0.88rem;
+}
