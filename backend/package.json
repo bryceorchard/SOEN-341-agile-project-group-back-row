@@ -9,7 +9,8 @@
     "db:reset": "node db/migrate.js --reset && node db/seed.js",
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "ai:eval": "node scripts/eval-resume-feedback.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
