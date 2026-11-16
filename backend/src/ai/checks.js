@@ -49,7 +49,9 @@ const numbersIn = (s) => (String(s).replace(/\[[^\]]*\]/g, ' ').match(/\d+(?:[.,
 
 const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/;
 const PHONE = /(?:\+?1[\s.-]?)?\(?\b\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/;
-const REDACTION = /\[(?:email|phone|postal code)\]/i;
+const REDACTION = /\[(?:email|phone|postal code)(?: removed for privacy)?\]/i;
+// "Your contact section only has placeholders": the same mistake without quoting the marker.
+const REDACTION_COMPLAINT = /\b(placeholders?|missing|no actual)\b[^.]*\b(e-?mail|phone|contact)|\b(e-?mail|phone|contact)\b[^.]*\bplaceholders?\b/i;
 const DEMOGRAPHIC = /\b(age|aged|ageing|aging|years? old|young(?:er)?|old(?:er)?|senior citizen|gender|male|female|man|woman|he|she|his|her|hers|pronouns?|ethnic\w*|race|racial|religio\w*|nationality|immigra\w*|married|marital|pregnan\w*|disab\w*|accent)\b/gi;
 
 const allText = (fb) => [
@@ -97,6 +99,10 @@ export function runChecks(feedback, resumeText) {
     // prepareResumeText() puts these in; the job seeker never sees them, so feedback about them is wrong.
     if (REDACTION.test(t)) add('fail', 'redaction-placeholder', `output mentions a redaction placeholder: "${t}"`);
   }
+  feedback.improvements.forEach((item, i) => {
+    const t = `${item.issue} ${item.suggestion}`;
+    if (!REDACTION.test(t) && REDACTION_COMPLAINT.test(t)) add('warn', 'redaction-placeholder', `improvements[${i}] may be about the removed contact details: "${item.issue}"`);
+  });
 
   const terms = new Set();
   for (const t of allText(feedback)) for (const m of t.matchAll(DEMOGRAPHIC)) terms.add(m[0].toLowerCase());
