@@ -18,6 +18,7 @@ The database file is created at `backend/data/careerconnect.db` (gitignored). Ov
 ## API
 Run: `npm start` (http://localhost:3000, override with `PORT`). Tests: `npm test`.
 Env: `JWT_SECRET` (set in production), `CORS_ORIGIN` (default `http://localhost:4200`), `DB_PATH`, `UPLOAD_DIR`, `DEADLINE_REMINDER_DAYS` (default `3`).
+AI resume feedback (#139): `AI_API_KEY` (never committed), `AI_MODEL` (default `openai/gpt-oss-120b`), `AI_BASE_URL` (default Groq's OpenAI-compatible endpoint, `https://api.groq.com/openai/v1`), `AI_PROVIDER` (set to `mock` to get a fixed sample reply without calling out; the tests set it themselves). With neither a key nor `AI_PROVIDER=mock`, `POST /resumes/:id/feedback` returns 503 rather than fake feedback. For local development without a key: `AI_PROVIDER=mock npm run dev`. See `.env.example`.
 
 Errors are always `{ "error": "message" }` with status 400 / 401 / 404 / 409.
 Protected routes need `Authorization: Bearer <token>`.
@@ -52,6 +53,8 @@ Protected routes need `Authorization: Bearer <token>`.
 | GET    | `/notifications/unread-count` | –                                        | 200 `{ count }` (current user's own) |
 | PATCH  | `/notifications/read-all` | –                                          | 200 `{ count: 0 }` (marks all of the current user's notifications read) |
 | PATCH  | `/notifications/:id/read` | –                                          | 200 `{ notification }` (recipient only; 404 otherwise) |
+| POST   | `/resumes/:id/feedback` | –                                             | 201 `{ feedback }`, replacing any earlier feedback for that resume (owner only; 404 otherwise; 422 no readable text or not a resume; 429 too many requests; 502 the AI reply failed validation; 503 the AI service is unavailable or timed out) |
+| GET    | `/resumes/:id/feedback` | –                                             | 200 `{ feedback }`, or `{ feedback: null }` if none has been generated yet (owner only; 404 otherwise) |
 
 `user` = `{ id, email, role, createdAt }`; `resume` = `{ id, originalFilename, fileType, uploadedAt }`;
 `job` = `{ id, recruiterId, title, description, location, category, deadline, status, archivedAt, createdAt }` (`/jobs/mine` adds `applicationCount` and
@@ -65,3 +68,9 @@ Deadline reminders (`src/deadline-reminders.js`) are generated whenever `GET /no
 is called, so no scheduler is needed: an open, unarchived posting whose deadline is within `DEADLINE_REMINDER_DAYS` calendar days
 (deadline day included) gets one `deadline_reminder` for its recruiter and one for each applicant not Rejected or Offered, never
 twice for the same user and posting.
+`feedback` (resume feedback) = `{ resumeId, createdAt, model, promptVersion, isResume, summary, strengths, improvements, rewordings }`.
+See [`docs/ai/us10-resume-feedback.md`](../docs/ai/us10-resume-feedback.md) for what each field means and the full design. Text is
+extracted from the stored PDF/DOC/DOCX in `src/ai/extract-text.js`; the prompt and schema (#141) live in `src/ai/prompt.js` and
+`src/ai/feedback-schema.js`; the provider call is `src/ai/provider.js` (the real service with `AI_API_KEY`, the fixed reply in
+`src/ai/mock-feedback.json` with `AI_PROVIDER=mock`); each user is limited to a few requests per minute (`src/ai/rate-limit.js`).
+Replacing a resume's file (`PUT /resumes/:id`) deletes its feedback, since it described the old file.
