@@ -25,6 +25,23 @@ export function migrate(db) {
   if (!jobColumns.includes('archived_at')) {
     db.exec('ALTER TABLE jobs ADD COLUMN archived_at TEXT');
   }
+
+  backfillStatusHistory(db);
+}
+
+// Gives every application that has no status history yet (one from before #134, or one
+// inserted directly by seed.js or a test) a single row: its current status, dated when it
+// was applied for if still Applied, otherwise when it was last updated. Idempotent, since
+// applications created through the API always have at least one row already.
+export function backfillStatusHistory(db) {
+  return db
+    .prepare(
+      `INSERT INTO application_status_history (application_id, status, changed_at, changed_by)
+       SELECT a.id, a.status, CASE WHEN a.status = 'Applied' THEN a.applied_at ELSE a.updated_at END, NULL
+       FROM applications a
+       WHERE NOT EXISTS (SELECT 1 FROM application_status_history h WHERE h.application_id = a.id)`
+    )
+    .run().changes;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
