@@ -170,6 +170,20 @@ test('checks flag quotes that are not in the resume, invented numbers and contac
   assert.equal(by('contact-leak').length, 1);
 });
 
+test('checks flag example figures in suggestions and mentions of the redaction placeholders', () => {
+  const resume = prepareResumeText(fixture('resumes/01-strong-software-dev.txt')).text;
+  const f = sample();
+  f.improvements[0] = { ...f.improvements[0], suggestion: 'Add the result, e.g. reduced on-call pages by 30%; keep the 1.8 s figure.' };
+  f.improvements[1] = { ...f.improvements[1], suggestion: 'Replace [email] and [phone] with your real details.' };
+  const flags = runChecks(f, resume);
+  const invented = flags.filter((x) => x.check === 'invented-number');
+  assert.equal(invented.length, 1);
+  assert.equal(invented[0].severity, 'warn');
+  assert.match(invented[0].detail, /improvements\[0\].*30/);
+  assert.doesNotMatch(invented[0].detail, /1\.8/, 'numbers that are in the resume are fine');
+  assert.equal(flags.filter((x) => x.check === 'redaction-placeholder').length, 1);
+});
+
 test('quoteMatch tolerates extraction damage but not made-up text', () => {
   const resume = fixture('resumes/04-badly-formatted-two-column.txt');
   assert.equal(quoteMatch('Planned and launched 3 seasonal cam-\npaigns', resume), 'exact');

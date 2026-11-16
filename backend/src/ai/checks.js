@@ -49,6 +49,7 @@ const numbersIn = (s) => (String(s).replace(/\[[^\]]*\]/g, ' ').match(/\d+(?:[.,
 
 const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/;
 const PHONE = /(?:\+?1[\s.-]?)?\(?\b\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/;
+const REDACTION = /\[(?:email|phone|postal code)\]/i;
 const DEMOGRAPHIC = /\b(age|aged|ageing|aging|years? old|young(?:er)?|old(?:er)?|senior citizen|gender|male|female|man|woman|he|she|his|her|hers|pronouns?|ethnic\w*|race|racial|religio\w*|nationality|immigra\w*|married|marital|pregnan\w*|disab\w*|accent)\b/gi;
 
 const allText = (fb) => [
@@ -84,8 +85,17 @@ export function runChecks(feedback, resumeText) {
     if (invented.length) add('fail', 'invented-number', `rewordings[${i}].suggested has numbers the resume doesn't (use a [placeholder]): ${invented.join(', ')}`);
   });
 
+  // Example figures inside a suggestion ("e.g. cut reporting time by 30%") get copied as
+  // if true, so they should be [placeholders] too. A warning: counts like "2-3 bullets" are fine.
+  feedback.improvements.forEach((item, i) => {
+    const invented = numbersIn(item.suggestion).filter((n) => !resumeNumbers.has(n));
+    if (invented.length) add('warn', 'invented-number', `improvements[${i}].suggestion has numbers the resume doesn't: ${invented.join(', ')}`);
+  });
+
   for (const t of allText(feedback)) {
     if (EMAIL.test(t) || PHONE.test(t)) add('fail', 'contact-leak', `output repeats contact details: "${t}"`);
+    // prepareResumeText() puts these in; the job seeker never sees them, so feedback about them is wrong.
+    if (REDACTION.test(t)) add('fail', 'redaction-placeholder', `output mentions a redaction placeholder: "${t}"`);
   }
 
   const terms = new Set();

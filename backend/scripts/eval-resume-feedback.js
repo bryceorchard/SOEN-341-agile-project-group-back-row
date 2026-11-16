@@ -56,6 +56,7 @@ function parseArgs(argv) {
 // Free plans have tight per-minute token limits (Groq's free gpt-oss-120b: 8,000 tokens/min,
 // about two eval requests), so on 429 wait for the provider's retry-after and try again.
 const MAX_RATE_LIMIT_RETRIES = 6;
+let rateLimitWaitMs = 0; // subtracted from the latency the review sheet reports
 
 async function postJson(url, headers, body) {
   for (let attempt = 0; ; attempt++) {
@@ -70,6 +71,7 @@ async function postJson(url, headers, body) {
       const seconds = Math.min(Math.max(Number(res.headers.get('retry-after')) || 20, 1), 120);
       console.log(`  rate limited (429); waiting ${Math.ceil(seconds)}s before retry ${attempt + 1}/${MAX_RATE_LIMIT_RETRIES}`);
       await new Promise((resolve) => setTimeout(resolve, Math.ceil(seconds) * 1000));
+      rateLimitWaitMs += Math.ceil(seconds) * 1000;
       continue;
     }
     // Keep the whole body: Groq's json_validate_failed includes the failed generation.
@@ -264,9 +266,10 @@ async function main() {
       const label = `${fixture.file.replace(/\.txt$/, '')}${args.repeat > 1 ? ` #${run}` : ''}`;
       const r = { label, fixture, run, flags: [], errors: [] };
       const started = Date.now();
+      const waitedBefore = rateLimitWaitMs;
       try {
         const reply = await call(cfg, prompt);
-        r.latencyMs = Date.now() - started;
+        r.latencyMs = Date.now() - started - (rateLimitWaitMs - waitedBefore);
         r.raw = reply.text;
         r.stop = reply.stop;
         r.usage = reply.usage;
