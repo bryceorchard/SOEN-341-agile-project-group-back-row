@@ -93,6 +93,7 @@ The backend reads these environment variables (all optional in development):
 - `JWT_SECRET` — token signing secret (**must** be set in production)
 - `DB_PATH` — SQLite file location (default `backend/data/careerconnect.db`)
 - `UPLOAD_DIR` — resume upload directory (default `backend/uploads/`)
+- `DEADLINE_REMINDER_DAYS` — how many calendar days before a posting's deadline reminders start (default `3`)
 
 See [`backend/README.md`](backend/README.md) for the full API reference and database notes, and [`docs/ERD.md`](docs/ERD.md) for the data model.
 
@@ -138,7 +139,10 @@ SOEN-341-agile-project-group-back-row/
 │   │   ├── schema.sql                 # Table definitions
 │   │   ├── migrate.js                 # npm run db:migrate
 │   │   └── seed.js                    # npm run db:seed (demo users, profiles, jobs, applications)
+│   ├── scripts/
+│   │   └── eval-resume-feedback.js    # npm run ai:eval: runs the AI feedback evaluation set (#141)
 │   ├── src/
+│   │   ├── ai/                        # AI resume feedback: prompt, response schema, output checks (#141)
 │   │   ├── routes/                    # auth, profile, resumes, jobs, applications
 │   │   ├── app.js                     # Express app: middleware and routes
 │   │   ├── server.js                  # Entry point (npm start)
@@ -146,11 +150,14 @@ SOEN-341-agile-project-group-back-row/
 │   │   ├── middleware.js              # JWT authentication and role checks
 │   │   └── errors.js                  # HTTP error type
 │   ├── test/                          # Backend tests (npm test)
+│   │   └── fixtures/                  # AI evaluation resumes and a sample AI reply (#141)
 │   ├── data/                          # SQLite database file (git-ignored)
+│   ├── eval-output/                   # AI evaluation runs (git-ignored)
 │   ├── uploads/                       # Uploaded resumes (git-ignored)
 │   ├── .nvmrc                         # Backend Node version
 │   └── README.md                      # API reference and database notes
 ├── docs/
+│   ├── ai/                            # AI resume feedback: schema, prompt, provider, evaluation, privacy notice (#141)
 │   ├── ContributionLog/               # Contribution logs (#101)
 │   │   ├── Sprint 1/
 │   │   ├── Sprint2/                   # One file per member

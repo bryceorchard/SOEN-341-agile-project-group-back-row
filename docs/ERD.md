@@ -13,6 +13,7 @@ erDiagram
   jobs ||--o{ applications : receives
   jobs ||--o{ saved_jobs : "saved as"
   applications ||--o{ notifications : triggers
+  applications ||--|{ application_status_history : "status changes"
   resumes ||--o{ applications : "attached to"
 
   users {
@@ -54,7 +55,14 @@ erDiagram
     int user_id FK
     int job_id FK
     int resume_id FK
-    text status "Applied | Interview | Offered | Rejected"
+    text status "Applied | Under Review | Interview | Offered | Rejected"
+  }
+  application_status_history {
+    int id PK
+    int application_id FK
+    text status
+    text changed_at
+    int changed_by FK "users.id, null if backfilled"
   }
   saved_jobs {
     int user_id FK
