@@ -93,26 +93,31 @@ The backend reads these environment variables (all optional in development):
 - `JWT_SECRET` — token signing secret (**must** be set in production)
 - `DB_PATH` — SQLite file location (default `backend/data/careerconnect.db`)
 - `UPLOAD_DIR` — resume upload directory (default `backend/uploads/`)
+- `DEADLINE_REMINDER_DAYS` — how many calendar days before a posting's deadline reminders start (default `3`)
 
 See [`backend/README.md`](backend/README.md) for the full API reference and database notes, and [`docs/ERD.md`](docs/ERD.md) for the data model.
 
 ## Features
 
-Implemented (Sprints 1–2):
+Implemented (Sprints 1–3):
 
 - Registration and login as a job seeker or a recruiter, and profile management
 - Resume upload, replace, view, and delete
 - Job search with keyword, location, and category filters, and a details page for each job
 - Applying to a job, optionally attaching one of your resumes
 - Application dashboard with each application's status (Applied, Under Review, Interview, Offered, Rejected) and a status filter
-- Job postings for recruiters: create, edit, close, and reopen
-- Applicants for each posting, with a status filter and status updates by the recruiter
+- Job postings for recruiters: create, edit, close, reopen, archive, and restore, with application counts per status (US-08)
+- Applicants for each posting, with status and date filters, a candidate review panel, and status updates by the recruiter (US-09)
+- In-app notifications with an unread count: status updates and interview invitations for job seekers, deadline reminders, and new applications for recruiters (US-07, US-22)
+
+In progress (Sprint 3 → 4):
+
+- Application analytics and status history (US-21): API done (`GET /applications/stats`, `GET /applications/:id/history`); dashboard page in #135
+- AI-assisted resume feedback (US-10): API, mock provider, and evaluation done (`POST`/`GET /resumes/:id/feedback`, [design notes](docs/ai/us10-resume-feedback.md)); UI in #140
 
 Planned for later sprints:
 
-- AI-assisted resume feedback (US-10)
 - Saved and favourite jobs (US-04)
-- Notifications and reminders for application deadlines (US-07)
 - More stories in the backlog (US-11 to US-19); see the GitHub issues
 
 ## File Structure
@@ -142,12 +147,15 @@ SOEN-341-agile-project-group-back-row/
 │   │   └── eval-resume-feedback.js    # npm run ai:eval: runs the AI feedback evaluation set (#141)
 │   ├── src/
 │   │   ├── ai/                        # AI resume feedback: prompt, response schema, output checks (#141)
-│   │   ├── routes/                    # auth, profile, resumes, jobs, applications
+│   │   ├── routes/                    # auth, profile, resumes, jobs, applications, notifications, resume feedback
 │   │   ├── app.js                     # Express app: middleware and routes
 │   │   ├── server.js                  # Entry point (npm start)
 │   │   ├── config.js                  # Environment variables and defaults
 │   │   ├── middleware.js              # JWT authentication and role checks
-│   │   └── errors.js                  # HTTP error type
+│   │   ├── errors.js                  # HTTP error type
+│   │   ├── notify.js                  # Creates notifications on application events (#136)
+│   │   ├── deadline-reminders.js      # Deadline reminder notifications (#137)
+│   │   └── application-stats.js       # Application analytics and status history (#134)
 │   ├── test/                          # Backend tests (npm test)
 │   │   └── fixtures/                  # AI evaluation resumes and a sample AI reply (#141)
 │   ├── data/                          # SQLite database file (git-ignored)
@@ -157,15 +165,17 @@ SOEN-341-agile-project-group-back-row/
 │   └── README.md                      # API reference and database notes
 ├── docs/
 │   ├── ai/                            # AI resume feedback: schema, prompt, provider, evaluation, privacy notice (#141)
-│   ├── ContributionLog/               # Contribution logs (#101)
+│   ├── ContributionLog/               # Contribution logs (#101, #151)
 │   │   ├── Sprint 1/
 │   │   ├── Sprint2/                   # One file per member
+│   │   ├── Sprint3/
 │   │   └── contribution-template.md
 │   ├── minutes/                       # Meeting minutes: attendance, decisions, action items (#27)
 │   │   ├── minutes-template.md        # Template for new meetings
 │   │   └── YYYY_MM_DD_Meeting_Minutes.md
 │   ├── sprint-1/                      # Sprint 1 plan (backlog, priorities, work-plan table) and Appendix A
 │   ├── sprint-2/                      # Sprint 2 plan (goal, ranked backlog, work plan, risks) (#98)
+│   ├── sprint-3/                      # Sprint 3 plan (#148)
 │   ├── user-stories/                  # Requirements, kept separate by source
 │   │   ├── AI Generated User Stories/
 │   │   └── Team Generated User Stories/
@@ -188,8 +198,11 @@ SOEN-341-agile-project-group-back-row/
 │   │   │   ├── jobs.component.*           # Job search and filters
 │   │   │   ├── job-detail.component.*     # Job details and applying
 │   │   │   ├── my-applications.component.*     # Job seeker's applications dashboard
-│   │   │   ├── recruiter-postings.component.*  # Recruiter's postings: create, edit, close/reopen
-│   │   │   └── posting-applicants.component.*  # Applicants for a posting and status updates
+│   │   │   ├── recruiter-postings.component.*  # Recruiter's postings: create, edit, close/reopen, archive
+│   │   │   ├── posting-applicants.component.*  # Applicants for a posting, filters, candidate review
+│   │   │   ├── notifications.component.*       # Notification list (#138)
+│   │   │   ├── notification.service.ts         # Unread count for the nav bell
+│   │   │   └── us*-acceptance.spec.ts          # Automated acceptance tests, one file per story
 │   │   ├── index.html
 │   │   ├── main.ts
 │   │   └── styles.css                 # Global styles

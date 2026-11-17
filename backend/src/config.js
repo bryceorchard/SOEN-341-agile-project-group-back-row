@@ -14,3 +14,6 @@ export const ALLOWED_RESUME_TYPES = {
   'application/msword': '.doc',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
 };
+
+// Deadline reminders go out once a posting's deadline is this many calendar days away or fewer.
+export const DEADLINE_REMINDER_DAYS = Number(process.env.DEADLINE_REMINDER_DAYS ?? 3);

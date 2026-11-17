@@ -54,7 +54,7 @@
         <span class="resume-meta">{{ typeLabel(r.fileType) }} · Uploaded {{ r.uploadedAt | date: 'mediumDate' }}</span>
       </div>
       <div class="resume-actions">
-        <button class="btn btn-secondary btn-sm" (click)="viewResume(r.id)">View</button>
+        <button class="btn btn-secondary btn-sm" (click)="viewResume(r.id, r.originalFilename)">View</button>
 
         <ng-container *ngIf="replacing_id() === r.id; else replaceButton">
           <input type="file" accept=".pdf,.doc,.docx" (change)="onReplaceSelect($event, r.id)" />

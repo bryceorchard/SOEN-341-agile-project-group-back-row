@@ -41,6 +41,61 @@
     </button>
   </div>
 
+  <form class="date-filter" (ngSubmit)="applyDates()">
+    <label>
+      From
+      <input type="date" name="from" [(ngModel)]="from_input" />
+    </label>
+    <label>
+      To
+      <input type="date" name="to" [(ngModel)]="to_input" />
+    </label>
+    <button class="btn btn-secondary btn-sm" type="submit">Apply dates</button>
+    <button class="btn btn-secondary btn-sm" type="button" *ngIf="applied_from() || applied_to() || from_input || to_input" (click)="clearDates()">Clear dates</button>
+  </form>
+  <div class="alert alert-error date-error" *ngIf="date_error()">{{ date_error() }}</div>
+
+  <div class="card review-panel" *ngIf="review() as r">
+    <div class="review-header">
+      <div>
+        <h2>{{ r.candidate.fullName || r.candidate.email }}</h2>
+        <p class="applicant-meta">{{ r.candidate.email }}<span *ngIf="r.candidate.headline"> · {{ r.candidate.headline }}</span></p>
+      </div>
+      <button class="btn btn-secondary btn-sm" type="button" (click)="closeReview()">Close</button>
+    </div>
+
+    <dl class="review-profile">
+      <dt>Location</dt><dd>{{ r.candidate.location || '—' }}</dd>
+      <dt>Phone</dt><dd>{{ r.candidate.phone || '—' }}</dd>
+      <dt>Bio</dt><dd class="review-bio">{{ r.candidate.bio || '—' }}</dd>
+      <dt>Applied</dt><dd>{{ r.application.appliedAt | slice: 0:10 }}</dd>
+      <dt>Resume</dt>
+      <dd>
+        <ng-container *ngIf="r.application.resumeId; else noReviewResume">
+          {{ r.application.resumeFilename || 'attached' }}
+          <button class="btn btn-secondary btn-sm" type="button" (click)="viewResume(r.application.resumeId, r.application.resumeFilename || 'resume')">View resume</button>
+        </ng-container>
+        <ng-template #noReviewResume>No resume attached</ng-template>
+      </dd>
+      <dt>Status</dt>
+      <dd>
+        <select class="review-status" [ngModel]="r.application.status" (ngModelChange)="setReviewStatus($event)" name="review-status">
+          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+        </select>
+      </dd>
+    </dl>
+
+    <h3>Other applications to your postings</h3>
+    <ul class="review-others" *ngIf="r.otherApplications.length; else noOthers">
+      <li *ngFor="let o of r.otherApplications">
+        <a [routerLink]="['/recruiter/postings', o.jobId, 'applicants']">{{ o.jobTitle }}</a>
+        · {{ o.status }} · Applied {{ o.appliedAt | slice: 0:10 }}<span *ngIf="o.jobStatus === 'closed'"> · posting closed</span>
+      </li>
+    </ul>
+    <ng-template #noOthers><p class="applicant-meta">No other applications to your postings.</p></ng-template>
+  </div>
+  <div class="alert alert-error" *ngIf="review_error()">{{ review_error() }}</div>
+
   <div class="applicant-list" *ngIf="applicants().length; else noApplicants">
     <div class="card applicant-row" *ngFor="let a of applicants()">
       <div class="applicant-info">
@@ -48,8 +103,9 @@
         <p class="applicant-meta">{{ a.applicantEmail }}<span *ngIf="a.applicantHeadline"> · {{ a.applicantHeadline }}</span></p>
         <p class="applicant-meta">Applied {{ a.appliedAt | slice: 0:10 }}</p>
         <p class="applicant-meta" *ngIf="a.resumeId">Resume: {{ a.resumeFilename || 'attached' }}</p>
-        <button class="btn btn-secondary btn-sm" *ngIf="a.resumeId" (click)="viewResume(a.resumeId)">View resume</button>
+        <button class="btn btn-secondary btn-sm" *ngIf="a.resumeId" (click)="viewResume(a.resumeId, a.resumeFilename || 'resume')">View resume</button>
         <span class="no-resume" *ngIf="!a.resumeId">No resume attached</span>
+        <button class="btn btn-primary btn-sm review-button" type="button" (click)="openReview(a)">Review</button>
       </div>
 
       <div class="applicant-status">
@@ -60,6 +116,6 @@
     </div>
   </div>
   <ng-template #noApplicants>
-    <p class="empty-state">No applicants yet.</p>
+    <p class="empty-state">{{ hasFilters() ? 'No applicants match these filters.' : 'No applicants yet.' }}</p>
   </ng-template>
 </div>
