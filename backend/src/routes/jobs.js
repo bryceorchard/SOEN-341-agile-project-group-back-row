@@ -26,6 +26,17 @@ function optionalText(value, field) {
   return value.trim() || null;
 }
 
+// Optional ISO date query param (YYYY-MM-DD). Missing/blank → null; anything else that isn't a real
+// calendar date (e.g. 2026-02-30 or "yesterday") is a 400 instead of a silently wrong filter.
+function optionalDate(value, field) {
+  if (value === undefined || value === '') return null;
+  const parsed = typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T00:00:00Z`) : null;
+  // Month 13 makes an Invalid Date; Feb 30 rolls over to Mar 2, so it no longer matches the input.
+  const ok = parsed !== null && !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+  if (!ok) throw new HttpError(400, `${field} must be a date in YYYY-MM-DD format`);
+  return value;
+}
+
 function validateJobBody(body) {
   const { title, description, location, category, deadline } = body ?? {};
   if (typeof title !== 'string' || !title.trim()) throw new HttpError(400, 'Title is required');
@@ -131,7 +142,8 @@ export default function jobRoutes(db) {
     res.json({ job: toApi(job) });
   });
 
-  // Owning recruiter only: who applied to this posting. Optional ?status= filter.
+  // Owning recruiter only: who applied to this posting. Optional filters, all combined (AND):
+  // ?status=, ?from= and ?to= (YYYY-MM-DD, inclusive, on the day the application was submitted).
   r.get('/:id/applications', requireAuth, requireRole('recruiter'), (req, res) => {
     const job = db.prepare('SELECT * FROM jobs WHERE id = ? AND recruiter_id = ?').get(req.params.id, req.user.id);
     if (!job) throw new HttpError(404, 'Job not found');
@@ -140,12 +152,24 @@ export default function jobRoutes(db) {
     if (status !== undefined && !APPLICATION_STATUSES.includes(status)) {
       throw new HttpError(400, `status must be one of: ${APPLICATION_STATUSES.join(', ')}`);
     }
+    const from = optionalDate(req.query.from, 'from');
+    const to = optionalDate(req.query.to, 'to');
+    if (from && to && from > to) throw new HttpError(400, 'from must be on or before to');
 
     const clauses = ['a.job_id = @jobId'];
     const params = { jobId: job.id };
     if (status !== undefined) {
       clauses.push('a.status = @status');
       params.status = status;
+    }
+    // applied_at is 'YYYY-MM-DD HH:MM:SS'; comparing its date part makes both ends inclusive.
+    if (from) {
+      clauses.push('date(a.applied_at) >= @from');
+      params.from = from;
+    }
+    if (to) {
+      clauses.push('date(a.applied_at) <= @to');
+      params.to = to;
     }
 
     const rows = db
@@ -172,6 +196,70 @@ export default function jobRoutes(db) {
         resumeFilename: a.resume_filename,
         status: a.status,
         appliedAt: a.applied_at,
+      })),
+    });
+  });
+
+  // Owning recruiter only: everything needed to review one candidate. Their full profile, the resume
+  // they applied with, and their other applications to this recruiter's postings (never anyone else's).
+  // Another recruiter gets 404 (same as a missing posting, so nothing leaks); a job seeker gets 403.
+  r.get('/:id/applications/:applicationId', requireAuth, requireRole('recruiter'), (req, res) => {
+    const job = db.prepare('SELECT * FROM jobs WHERE id = ? AND recruiter_id = ?').get(req.params.id, req.user.id);
+    if (!job) throw new HttpError(404, 'Job not found');
+
+    const application = db
+      .prepare(
+        `SELECT a.*, r.original_filename AS resume_filename
+         FROM applications a
+         LEFT JOIN resumes r ON r.id = a.resume_id
+         WHERE a.id = ? AND a.job_id = ?`
+      )
+      .get(req.params.applicationId, job.id);
+    if (!application) throw new HttpError(404, 'Application not found');
+
+    const candidate = db
+      .prepare(
+        `SELECT u.email, p.full_name, p.headline, p.location, p.phone, p.bio
+         FROM users u LEFT JOIN profiles p ON p.user_id = u.id
+         WHERE u.id = ?`
+      )
+      .get(application.user_id);
+
+    const others = db
+      .prepare(
+        `SELECT a.id, a.job_id, a.status, a.applied_at, j.title AS job_title, j.status AS job_status
+         FROM applications a
+         JOIN jobs j ON j.id = a.job_id
+         WHERE a.user_id = ? AND j.recruiter_id = ? AND a.id != ?
+         ORDER BY a.applied_at DESC, a.id DESC`
+      )
+      .all(application.user_id, req.user.id, application.id);
+
+    res.json({
+      application: {
+        id: application.id,
+        jobId: application.job_id,
+        status: application.status,
+        appliedAt: application.applied_at,
+        updatedAt: application.updated_at,
+        resumeId: application.resume_id,
+        resumeFilename: application.resume_filename ?? null,
+      },
+      candidate: {
+        email: candidate.email,
+        fullName: candidate.full_name ?? null,
+        headline: candidate.headline ?? null,
+        location: candidate.location ?? null,
+        phone: candidate.phone ?? null,
+        bio: candidate.bio ?? null,
+      },
+      otherApplications: others.map((o) => ({
+        id: o.id,
+        jobId: o.job_id,
+        jobTitle: o.job_title,
+        jobStatus: o.job_status,
+        status: o.status,
+        appliedAt: o.applied_at,
       })),
     });
   });

@@ -36,6 +36,17 @@ CREATE TABLE IF NOT EXISTS resumes (
 
 CREATE INDEX IF NOT EXISTS idx_resumes_user_id ON resumes(user_id);
 
+-- One row per resume (#139): POST /resumes/:id/feedback replaces it rather than
+-- accumulating history. `feedback` is the normalized JSON object from parseFeedback().
+CREATE TABLE IF NOT EXISTS resume_feedback (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  resume_id      INTEGER NOT NULL UNIQUE REFERENCES resumes(id) ON DELETE CASCADE,
+  feedback       TEXT    NOT NULL,
+  model          TEXT    NOT NULL,
+  prompt_version TEXT    NOT NULL,
+  created_at     TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS jobs (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   recruiter_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -70,6 +81,20 @@ CREATE TABLE IF NOT EXISTS applications (
 
 CREATE INDEX IF NOT EXISTS idx_applications_user_id ON applications(user_id);
 CREATE INDEX IF NOT EXISTS idx_applications_job_id ON applications(job_id);
+
+-- Every status an application has had (#134). A row is written on apply and on each real
+-- status change (see recordStatus() in src/routes/applications.js). changed_by is NULL for
+-- rows backfilled by migrate.js, where who made the change isn't known.
+CREATE TABLE IF NOT EXISTS application_status_history (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  application_id INTEGER NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
+  status         TEXT    NOT NULL
+                         CHECK (status IN ('Applied', 'Under Review', 'Interview', 'Offered', 'Rejected')),
+  changed_at     TEXT    NOT NULL DEFAULT (datetime('now')),
+  changed_by     INTEGER REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_status_history_application_id ON application_status_history(application_id);
 
 -- In-app notifications. job_id/application_id are kept for building links; both are
 -- nullable since a future notification type (e.g. a general announcement) might need neither.

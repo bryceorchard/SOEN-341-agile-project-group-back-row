@@ -81,6 +81,8 @@ export default function resumeRoutes(db) {
     db.prepare(
       "UPDATE resumes SET file_path = ?, original_filename = ?, file_type = ?, uploaded_at = datetime('now') WHERE id = ?"
     ).run(req.file.path, req.file.originalname, req.file.mimetype, row.id);
+    // Any AI feedback (#139) described the old file, so it goes too.
+    db.prepare('DELETE FROM resume_feedback WHERE resume_id = ?').run(row.id);
     rmSync(row.file_path, { force: true });
 
     res.json({ resume: toApi(db.prepare('SELECT * FROM resumes WHERE id = ?').get(row.id)) });

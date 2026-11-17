@@ -1,5 +1,6 @@
 .angular/
 node_modules/
+coverage/
 package-lock.json
 
 # Personal editor/tool config
