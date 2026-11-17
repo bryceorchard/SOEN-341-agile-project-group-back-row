@@ -6,7 +6,9 @@
 **chat url:** <https://claude.ai/code/session_01FY2WCUVzHhh6jfPgpa9xFn>
 
 ## Task / Prompt
-"Can you look over the entire repo and figure out what needs to be done to finish sprint 3, in order?"
+1. "Can you look over the entire repo and figure out what needs to be done to finish sprint 3, in order?"
+2. "Can you do all the items that don't require that much work?" Follow-up: keep the AI logs as `.md`, no
+   PDF; Bryce fills in Decision / Reflection later.
 
 ## Context / Findings
 State of `main` at `c0a6605` (after #181), evaluation day:
@@ -36,6 +38,21 @@ State of `main` at `c0a6605` (after #181), evaluation day:
   open PRs, unmerged branches, CI checks, routes, tests, `AI-log/`, `docs/minutes/` and `docs/ContributionLog/`.
 - Ran both test suites.
 - Produced an ordered list of the remaining work (in the chat). No issues, PRs or board fields were changed.
+
+Prompt 2 (low-effort items):
+- Issues: ticked verified boxes in #47 (#139, #141), #128 (#134), #139 (all tasks + DoD), #149 (AI feature
+  documented; Mahmoud's PDF), #154 (CI never needs a real AI key). Closed #139 and Sprint 2's #42 as completed.
+  Closed the Sprint 1, Sprint 1 planning and Sprint 2 milestones (0 open issues each).
+- PR #184 (`docs/sprint3-readme-minutes`): README Features and file tree updated for Sprint 3; renamed
+  `2026_11_05_Meeting_Minutes copy.md` to `2026_11_05_Meeting_Minutes.md` (#150).
+- PR #185 (`docs/sprint-3-planning`): the Sprint 3 plan, which had no PR; branch updated with `main`.
+- PR #186 (`gene-AI-Logs`): Gene's three PDFs. Needs "Update branch" (20 behind); left for Gene since it pushes
+  to his branch.
+- Skipped `Sprint-3/Contribution`: Zohair's `Zohair-sprint3-contribution.md` there is an empty 1-byte file.
+- PR #187 (`chore/154-ci-coverage`): coverage in both CI jobs. Backend `npm run test:coverage` (159 pass, 98.40%
+  lines / 90.64% branches); frontend `ng test --coverage` with `@vitest/coverage-v8` 5.0.1 (133 pass, 95.55% lines /
+  84.7% branches). `npm run build` couldn't run locally (sandbox blocks Google Fonts); CI covers it.
+- Started a combined Sprint 3 PDF of Bryce's logs; stopped at Bryce's request (logs stay `.md`). Nothing committed.
 
 ## Decision
 **Bryce:**
