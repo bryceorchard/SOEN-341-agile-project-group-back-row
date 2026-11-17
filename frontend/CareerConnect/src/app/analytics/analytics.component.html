@@ -1,0 +1,30 @@
+<h1>Analytics</h1>
+
+@if (loading()) {
+  <p class="empty-state">Loading…</p>
+} @else if (error()) {
+  <div class="alert alert-error">{{ error() }}</div>
+} @else if (stats(); as s) {
+  @if (s.total === 0) {
+    <p class="empty-state">You haven't applied to any jobs yet. <a routerLink="/jobs">Browse open postings</a>.</p>
+  } @else {
+    <div class="metric-list">
+      <app-metric-tile label="Total applications" [value]="s.total" />
+      <app-metric-tile label="Last 7 days" [value]="s.submittedLast7Days" />
+      <app-metric-tile label="Last 30 days" [value]="s.submittedLast30Days" />
+      <app-metric-tile label="Response rate" [value]="s.responseRate + '%'" [hint]="s.responded + ' of ' + s.total + ' got a reply'" />
+    </div>
+
+    <h2>Application flow</h2>
+    <section class="sankey-scroller" aria-label="Application flow by period" tabindex="0">
+      @for (spec of sankeySpecs(); track spec.title) {
+        <app-sankey-view class="sankey-panel" [spec]="spec" />
+      }
+    </section>
+
+    @if (weekSpec(); as w) {
+      <h2>Per week</h2>
+      <app-chart-view [spec]="w" />
+    }
+  }
+}

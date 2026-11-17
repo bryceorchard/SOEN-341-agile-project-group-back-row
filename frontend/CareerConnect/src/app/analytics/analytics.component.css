@@ -1,0 +1,3 @@
+.metric-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.sankey-scroller { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 24px; }
+.sankey-panel { flex: 0 0 100%; scroll-snap-align: start; }

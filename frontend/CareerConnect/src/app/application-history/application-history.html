@@ -1,0 +1,11 @@
+@if (loading()) {
+  <p class="empty-state">Loading history…</p>
+} @else if (error()) {
+  <p class="alert alert-error">{{ error() }}</p>
+} @else {
+  <ol class="history-list">
+    @for (r of rows(); track $index) {
+      <li><span class="badge">{{ r.status }}</span> {{ r.at | date: 'medium' }} <span class="by">· {{ r.by }}</span></li>
+    }
+  </ol>
+}
