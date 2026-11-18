@@ -120,3 +120,121 @@ describe('Profile details', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Bio: 2000 characters max.');
   });
 });
+
+describe('Profile AI Feedback', () => {
+  const SEEKER = { id: 1, email: 'seeker@test.com', role: 'job_seeker' as const, createdAt: '' };
+  const MOCK_RESUME = { id: 101, originalFilename: 'test.pdf', fileType: 'application/pdf', uploadedAt: '2023-01-01T00:00:00Z' };
+  
+  let fixture: ComponentFixture<Profile>;
+  let http: HttpTestingController;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [Profile],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AuthService, useValue: { currentUser: signal(SEEKER) } },
+      ],
+    }).compileComponents();
+    fixture = TestBed.createComponent(Profile);
+    http = TestBed.inject(HttpTestingController);
+    
+    fixture.detectChanges();
+    http.expectOne(`${API_BASE}/resumes`).flush({ resumes: [MOCK_RESUME] });
+    http.expectOne(`${API_BASE}/profile`).flush({ profile: {} });
+    await render();
+  });
+
+  afterEach(() => http.verify());
+
+  async function render() {
+    fixture.detectChanges();
+    await fixture.whenStable();
+  }
+
+  function getNativeElement(): HTMLElement {
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  function clickButtonByText(text: string) {
+    const buttons = Array.from(getNativeElement().querySelectorAll('button'));
+    const btn = buttons.find(b => b.textContent?.trim() === text);
+    if (!btn) throw new Error(`Button "${text}" not found`);
+    btn.click();
+  }
+
+  it('shows loading state, fetches saved feedback, and renders structured data', async () => {
+    clickButtonByText('AI Feedback');
+    fixture.detectChanges();
+
+    expect(getNativeElement().textContent).toContain('Loading AI feedback...');
+
+    const req = http.expectOne(`${API_BASE}/resumes/101/feedback`);
+    expect(req.request.method).toBe('GET');
+
+    const MOCK_FEEDBACK = {
+      resumeId: 101, 
+      createdAt: '2023-01-02T00:00:00Z', 
+      model: 'test-model', 
+      promptVersion: '1.0',
+      isResume: true, 
+      summary: 'Excellent layout and pacing.', 
+      strengths: ['Great bullet points'], 
+      improvements: [], 
+      rewordings: []
+    };
+    req.flush({ feedback: MOCK_FEEDBACK });
+    await render();
+
+    const text = getNativeElement().textContent;
+    expect(text).not.toContain('Loading AI feedback...');
+    expect(text).toContain('Excellent layout and pacing.');
+    expect(text).toContain('Great bullet points');
+  });
+
+  it('displays an error if the feedback GET request fails', async () => {
+    clickButtonByText('AI Feedback');
+    
+    const req = http.expectOne(`${API_BASE}/resumes/101/feedback`);
+    req.flush({ error: 'AI service timed out' }, { status: 503, statusText: 'Service Unavailable' });
+    await render();
+
+    expect(getNativeElement().textContent).toContain('AI service timed out');
+  });
+
+  it('shows privacy notice if no feedback exists, then POSTs to generate and display new feedback', async () => {
+    clickButtonByText('AI Feedback');
+    
+    http.expectOne(`${API_BASE}/resumes/101/feedback`).flush({ feedback: null });
+    await render();
+
+    expect(getNativeElement().textContent).toContain('By proceeding, your resume text will be sent to an external AI service');
+    
+    clickButtonByText('Get AI feedback');
+    fixture.detectChanges();
+    expect(getNativeElement().textContent).toContain('Loading AI feedback...');
+
+    const req = http.expectOne(`${API_BASE}/resumes/101/feedback`);
+    expect(req.request.method).toBe('POST');
+    
+    req.flush({
+      feedback: {
+        resumeId: 101, 
+        createdAt: '2023-01-02T00:00:00Z', 
+        model: 'test-model', 
+        promptVersion: '1.0',
+        isResume: true, 
+        summary: 'Brand new generated summary.', 
+        strengths: [], 
+        improvements: [{ section: 'Skills', priority: 'High', suggestion: 'Add framework specifics.' }], 
+        rewordings: []
+      }
+    });
+    await render();
+
+    const text = getNativeElement().textContent;
+    expect(text).toContain('Brand new generated summary.');
+    expect(text).toContain('Add framework specifics.');
+  });
+});

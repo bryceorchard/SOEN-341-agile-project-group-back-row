@@ -12,8 +12,18 @@ interface Resume {
   uploadedAt: string;
 }
 
-// Mirrors backend/src/config.js's ALLOWED_RESUME_TYPES / MAX_RESUME_BYTES so bad files
-// are rejected before we even open a connection, with a friendlier message than the API gives.
+export interface Feedback {
+  resumeId: number;
+  createdAt: string;
+  model: string;
+  promptVersion: string;
+  isResume: boolean;
+  summary: string;
+  strengths: string[];
+  improvements: { section: string; priority: string; suggestion?: string; details?: string }[];
+  rewordings: { original?: string; suggested?: string; rewording?: string }[];
+}
+
 const ALLOWED_RESUME_TYPES: Record<string, string> = {
   'application/pdf': 'PDF',
   'application/msword': 'DOC',
@@ -21,7 +31,6 @@ const ALLOWED_RESUME_TYPES: Record<string, string> = {
 };
 const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 
-// Mirrors backend/src/routes/profile.js, which rejects any profile field over 2000 characters.
 export const PROFILE_FIELD_MAX = 2000;
 const PROFILE_FIELD_LABELS: Record<string, string> = {
   fullName: 'Full name',
@@ -31,7 +40,6 @@ const PROFILE_FIELD_LABELS: Record<string, string> = {
   bio: 'Bio',
 };
 
-// Exported so it can be unit-tested without standing up the whole component.
 export function validateResumeFile(file: File): string | null {
   if (!ALLOWED_RESUME_TYPES[file.type]) {
     return 'Resume must be a PDF, DOC or DOCX file.';
@@ -73,6 +81,13 @@ export class Profile implements OnInit {
   profile_error = signal('');
   replacing_id = signal<number | null>(null);
 
+  active_feedback_id = signal<number | null>(null);
+  feedback_loading = signal(false);
+  feedback_error = signal('');
+  current_feedback = signal<Feedback | null>(null);
+
+  private feedback_cache = new Map<number, Feedback | null>();
+
   upload_form: FormGroup;
   profile_form: FormGroup;
 
@@ -103,7 +118,6 @@ export class Profile implements OnInit {
     });
   }
 
-  // Labels of the fields that are over the length limit, for the inline message.
   tooLongFields(): string[] {
     return Object.keys(PROFILE_FIELD_LABELS)
       .filter((name) => this.profile_form.get(name)?.hasError('maxlength'))
@@ -205,10 +219,57 @@ export class Profile implements OnInit {
         this.refreshResumes();
       },
       error: (err) => {
-        // Close the file picker so the user can click Replace again to retry.
         this.replacing_id.set(null);
         this.resume_error.set(err?.error?.error ?? 'Could not replace the resume.');
       },
+    });
+  }
+
+  toggleFeedback(id: number) {
+    if (this.active_feedback_id() === id) {
+      this.active_feedback_id.set(null);
+      return;
+    }
+    
+    this.active_feedback_id.set(id);
+    this.feedback_error.set('');
+
+    if (this.feedback_cache.has(id)) {
+      this.current_feedback.set(this.feedback_cache.get(id) ?? null);
+      this.feedback_loading.set(false);
+      return;
+    }
+
+    this.feedback_loading.set(true);
+    this.current_feedback.set(null);
+
+    this.http_client.get<{ feedback: Feedback | null }>(`${API_BASE}/resumes/${id}/feedback`).subscribe({
+      next: (res) => {
+        this.feedback_cache.set(id, res.feedback);
+        this.current_feedback.set(res.feedback);
+        this.feedback_loading.set(false);
+      },
+      error: (err) => {
+        this.feedback_error.set(err?.error?.error ?? 'Failed to load feedback.');
+        this.feedback_loading.set(false);
+      }
+    });
+  }
+
+  generateFeedback(id: number) {
+    this.feedback_loading.set(true);
+    this.feedback_error.set('');
+
+    this.http_client.post<{ feedback: Feedback }>(`${API_BASE}/resumes/${id}/feedback`, {}).subscribe({
+      next: (res) => {
+        this.feedback_cache.set(id, res.feedback);
+        this.current_feedback.set(res.feedback);
+        this.feedback_loading.set(false);
+      },
+      error: (err) => {
+        this.feedback_error.set(err?.error?.error ?? 'Could not generate feedback. Please try again.');
+        this.feedback_loading.set(false);
+      }
     });
   }
 
