@@ -13,6 +13,8 @@ import request from 'supertest';
 
 const tmp = mkdtempSync(join(tmpdir(), 'cc-us10-'));
 process.env.UPLOAD_DIR = join(tmp, 'uploads');
+delete process.env.AI_API_KEY;
+process.env.AI_PROVIDER = 'mock'; // the real provider module must stay on the deterministic mock
 
 const { default: Database } = await import('better-sqlite3');
 const { migrate } = await import('../db/migrate.js');
@@ -21,7 +23,7 @@ const { default: authRoutes } = await import('../src/routes/auth.js');
 const { default: resumeRoutes } = await import('../src/routes/resumes.js');
 const { default: resumeFeedbackRoutes } = await import('../src/routes/resume-feedback.js');
 const { notFound, errorHandler } = await import('../src/middleware.js');
-const { ProviderUnavailableError } = await import('../src/ai/provider.js');
+const { ProviderUnavailableError, MOCK_REPLY } = await import('../src/ai/provider.js');
 const { resetRateLimitForTests } = await import('../src/ai/rate-limit.js');
 
 const FIXTURES = fileURLToPath(new URL('./fixtures/resumes-real/', import.meta.url));
@@ -95,7 +97,7 @@ test('US-10 AT-4: a user who does not own the resume is refused, and no resume d
     extractText: async () => { extractCalled = true; return 'resume text with enough letters to pass the minimum check'; },
     getFeedbackReply: async () => {
       providerCalled = true;
-      return JSON.stringify({ isResume: true, strengths: [], improvements: [], rewordings: [], summary: 'ok' });
+      return MOCK_REPLY;
     },
   }));
 
@@ -113,5 +115,10 @@ test('US-10 AT-4: a user who does not own the resume is refused, and no resume d
 
   assert.equal(extractCalled, false, "the resume's text was never extracted for an unauthorized request");
   assert.equal(providerCalled, false, 'the AI provider was never called for an unauthorized request');
+
+  // Control: the owner's request does reach both, so the spies above are actually wired in.
+  await api.post(`/resumes/${resumeId}/feedback`).set('Authorization', `Bearer ${ownerToken}`).expect(201);
+  assert.equal(extractCalled, true);
+  assert.equal(providerCalled, true);
   db.close();
 });
