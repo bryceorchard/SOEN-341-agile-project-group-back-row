@@ -103,25 +103,23 @@
 
             <h4>Strengths</h4>
             <ul>
-              <li *ngFor="let strength of fb.strengths">{{ strength }}</li>
+              <li *ngFor="let strength of fb.strengths">
+                {{ strength.point }} <em class="resume-meta">— "{{ strength.evidence }}"</em>
+              </li>
             </ul>
 
             <h4>Improvements</h4>
             <ul>
               <li *ngFor="let imp of fb.improvements">
-                <strong>{{ imp.section }}</strong> <em>(Priority: {{ imp.priority }})</em> - {{ imp.suggestion || imp.details }}
+                <strong>{{ imp.section }}</strong> <em>(Priority: {{ imp.priority }})</em> - {{ imp.issue }} {{ imp.suggestion }}
               </li>
             </ul>
 
             <h4>Suggested Rewordings</h4>
             <ul>
               <li *ngFor="let rw of fb.rewordings">
-                <ng-container *ngIf="rw.original">
-                  "<s>{{ rw.original }}</s>" &rarr; "<strong>{{ rw.suggested }}</strong>"
-                </ng-container>
-                <ng-container *ngIf="!rw.original">
-                  {{ rw.rewording || rw }}
-                </ng-container>
+                "<s>{{ rw.original }}</s>" &rarr; "<strong>{{ rw.suggested }}</strong>"
+                <div class="resume-meta">{{ rw.reason }}</div>
               </li>
             </ul>
           </div>

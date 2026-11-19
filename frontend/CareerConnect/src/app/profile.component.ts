@@ -19,9 +19,9 @@ export interface Feedback {
   promptVersion: string;
   isResume: boolean;
   summary: string;
-  strengths: string[];
-  improvements: { section: string; priority: string; suggestion?: string; details?: string }[];
-  rewordings: { original?: string; suggested?: string; rewording?: string }[];
+  strengths: { point: string; evidence: string }[];
+  improvements: { section: string; priority: string; excerpt: string; issue: string; suggestion: string }[];
+  rewordings: { section: string; original: string; suggested: string; reason: string }[];
 }
 
 const ALLOWED_RESUME_TYPES: Record<string, string> = {

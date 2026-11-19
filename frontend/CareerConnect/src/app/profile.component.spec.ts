@@ -178,10 +178,10 @@ describe('Profile AI Feedback', () => {
       createdAt: '2023-01-02T00:00:00Z', 
       model: 'test-model', 
       promptVersion: '1.0',
-      isResume: true, 
-      summary: 'Excellent layout and pacing.', 
-      strengths: ['Great bullet points'], 
-      improvements: [], 
+      isResume: true,
+      summary: 'Excellent layout and pacing.',
+      strengths: [{ point: 'Great bullet points', evidence: 'Cut p95 latency from 1.8s to 350ms' }],
+      improvements: [],
       rewordings: []
     };
     req.flush({ feedback: MOCK_FEEDBACK });
@@ -191,6 +191,7 @@ describe('Profile AI Feedback', () => {
     expect(text).not.toContain('Loading AI feedback...');
     expect(text).toContain('Excellent layout and pacing.');
     expect(text).toContain('Great bullet points');
+    expect(text).not.toContain('[object Object]');
   });
 
   it('displays an error if the feedback GET request fails', async () => {
@@ -224,11 +225,11 @@ describe('Profile AI Feedback', () => {
         createdAt: '2023-01-02T00:00:00Z', 
         model: 'test-model', 
         promptVersion: '1.0',
-        isResume: true, 
-        summary: 'Brand new generated summary.', 
-        strengths: [], 
-        improvements: [{ section: 'Skills', priority: 'High', suggestion: 'Add framework specifics.' }], 
-        rewordings: []
+        isResume: true,
+        summary: 'Brand new generated summary.',
+        strengths: [],
+        improvements: [{ section: 'skills', priority: 'high', excerpt: 'Backend: Node.js', issue: 'Missing framework versions.', suggestion: 'Add framework specifics.' }],
+        rewordings: [{ section: 'experience', original: 'Worked on backend stuff.', suggested: 'Built the backend API for CareerConnect.', reason: 'More specific and measurable.' }]
       }
     });
     await render();
