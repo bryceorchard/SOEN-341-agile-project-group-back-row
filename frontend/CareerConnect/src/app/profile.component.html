@@ -48,22 +48,82 @@
   <div *ngIf="resume_error()" class="alert alert-error">{{ resume_error() }}</div>
 
   <ul class="resume-list" *ngIf="resumes().length; else noResumes">
-    <li *ngFor="let r of resumes()" class="resume-row">
-      <div class="resume-info">
-        <span class="resume-name">{{ r.originalFilename }}</span>
-        <span class="resume-meta">{{ typeLabel(r.fileType) }} · Uploaded {{ r.uploadedAt | date: 'mediumDate' }}</span>
+    <li *ngFor="let r of resumes()" class="resume-row" style="display: block;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div class="resume-info">
+          <span class="resume-name">{{ r.originalFilename }}</span>
+          <span class="resume-meta">{{ typeLabel(r.fileType) }} · Uploaded {{ r.uploadedAt | date: 'mediumDate' }}</span>
+        </div>
+        <div class="resume-actions">
+          <button class="btn btn-secondary btn-sm" (click)="viewResume(r.id, r.originalFilename)">View</button>
+
+          <ng-container *ngIf="replacing_id() === r.id; else replaceButton">
+            <input type="file" accept=".pdf,.doc,.docx" (change)="onReplaceSelect($event, r.id)" />
+          </ng-container>
+          <ng-template #replaceButton>
+            <button class="btn btn-secondary btn-sm" (click)="startReplace(r.id)">Replace</button>
+          </ng-template>
+
+          <button class="btn btn-secondary btn-sm" (click)="toggleFeedback(r.id)">AI Feedback</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteResume(r.id)">Delete</button>
+        </div>
       </div>
-      <div class="resume-actions">
-        <button class="btn btn-secondary btn-sm" (click)="viewResume(r.id, r.originalFilename)">View</button>
 
-        <ng-container *ngIf="replacing_id() === r.id; else replaceButton">
-          <input type="file" accept=".pdf,.doc,.docx" (change)="onReplaceSelect($event, r.id)" />
+      <div class="feedback-section" *ngIf="active_feedback_id() === r.id" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #ddd;">
+
+        <div *ngIf="feedback_loading()" class="alert alert-info">
+          Loading AI feedback... (This request can take several seconds)
+        </div>
+
+        <div *ngIf="feedback_error()" class="alert alert-error">
+          {{ feedback_error() }}
+        </div>
+
+        <ng-container *ngIf="!feedback_loading()">
+          <div *ngIf="!current_feedback() && !feedback_error()">
+            <p><strong>Notice:</strong> By proceeding, your resume text will be sent to an external AI service to generate feedback.</p>
+            <button class="btn btn-primary btn-sm" (click)="generateFeedback(r.id)">Get AI feedback</button>
+          </div>
+
+          <div *ngIf="current_feedback() as fb">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div>
+                <h3 style="margin: 0;">AI Resume Feedback</h3>
+                <small class="resume-meta">Generated on {{ fb.createdAt | date: 'medium' }}</small>
+              </div>
+              <button class="btn btn-secondary btn-sm" (click)="generateFeedback(r.id)">Regenerate</button>
+            </div>
+
+            <div *ngIf="!fb.isResume" class="alert alert-warning">
+              Note: The AI did not confidently recognize this document as a standard resume.
+            </div>
+
+            <h4>Summary</h4>
+            <p>{{ fb.summary }}</p>
+
+            <h4>Strengths</h4>
+            <ul>
+              <li *ngFor="let strength of fb.strengths">
+                {{ strength.point }} <em class="resume-meta">— "{{ strength.evidence }}"</em>
+              </li>
+            </ul>
+
+            <h4>Improvements</h4>
+            <ul>
+              <li *ngFor="let imp of fb.improvements">
+                <strong>{{ imp.section }}</strong> <em>(Priority: {{ imp.priority }})</em> - {{ imp.issue }} {{ imp.suggestion }}
+              </li>
+            </ul>
+
+            <h4>Suggested Rewordings</h4>
+            <ul>
+              <li *ngFor="let rw of fb.rewordings">
+                "<s>{{ rw.original }}</s>" &rarr; "<strong>{{ rw.suggested }}</strong>"
+                <div class="resume-meta">{{ rw.reason }}</div>
+              </li>
+            </ul>
+          </div>
         </ng-container>
-        <ng-template #replaceButton>
-          <button class="btn btn-secondary btn-sm" (click)="startReplace(r.id)">Replace</button>
-        </ng-template>
-
-        <button class="btn btn-danger btn-sm" (click)="deleteResume(r.id)">Delete</button>
       </div>
     </li>
   </ul>
