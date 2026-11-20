@@ -48,3 +48,116 @@
 .resume-actions input[type='file'] {
   font-size: 0.78rem;
 }
+
+/* AI resume feedback (US-10, #140) */
+.feedback-panel {
+  margin: 4px 0 16px;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+}
+
+.feedback-status {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+}
+
+.feedback-notice {
+  margin: 0 0 12px;
+  font-size: 0.86rem;
+}
+
+.feedback-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.feedback-header h3 {
+  margin: 0;
+}
+
+.feedback-body h4 {
+  margin: 16px 0 6px;
+}
+
+.feedback-body h5 {
+  margin: 10px 0 4px;
+  font-size: 0.86rem;
+}
+
+.feedback-summary {
+  margin: 0;
+}
+
+.feedback-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.feedback-list li {
+  margin-bottom: 10px;
+}
+
+.feedback-list p {
+  margin: 4px 0;
+}
+
+/* Improvements: the priority badge starts each item, so no bullet. */
+.feedback-group .feedback-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.feedback-quote {
+  margin: 4px 0;
+  padding: 2px 10px;
+  border-left: 3px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  font-style: italic;
+}
+
+.feedback-issue {
+  font-weight: 500;
+}
+
+.rewording-original {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.rewording-suggested {
+  font-weight: 500;
+}
+
+.priority-high {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.priority-medium {
+  background: var(--accent-2-bg);
+  color: #92650a;
+}
+
+.priority-low {
+  background: var(--surface);
+  color: var(--primary);
+}
+
+mark.placeholder {
+  padding: 0 2px;
+  border-radius: 4px;
+  background: var(--accent-2-bg);
+  color: #92650a;
+  font-weight: 600;
+}
+
+.feedback-placeholder-note {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
