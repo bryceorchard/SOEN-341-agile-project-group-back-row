@@ -10,6 +10,8 @@
    ai log folder, and plan.md."
    - Follow-up choice: AI logs go in `docs/sprint-N/ai-log/<Name>/`, moved out of the root `AI-log/`.
 2. "Can you add it to #166?" (Gene's refactor proposal PR, branch `Refactor-Proposal`).
+3. "Move Sprint-3/Contribution commits onto #166. Also post a comment in #166, and give me a
+   message I can send in the Discord."
 
 ## Context / Findings
 - Before: `docs/minutes/` (6 minutes + template), `docs/ContributionLog/` (folders `Sprint 1/`,
@@ -48,6 +50,18 @@
   (`fc35e51`). Git's rename detection put `2026-11-16-pr166-refactor-proposal-review.md` in Sprint 2;
   moved to Sprint 3.
 - Backend tests: 162 pass, 0 fail. No frontend files changed.
+- Prompt 3:
+  - `Sprint-3/Contribution` had 4 commits (`1b65303`, `dd54849`, `a3584e2` by Zohair; `f1babae` by Bryce),
+    30 behind `main`, no PR. Cherry-picked all 4 onto `Refactor-Proposal` with authorship kept
+    (`d4f5b76`, `1f50bba`, `88a3b07`, `3bd65a7`). Rename detection put `2026-11-16-sprint3-contribution-log.md`
+    in Sprint 2; moved to Sprint 3.
+  - `b88e3ae`: moved Bryce's and Zohair's Sprint 3 contribution logs to `docs/sprint-3/contributions/`,
+    pointed Bryce's 15 AI-log links at `../ai-log/Bryce/md/` and the Sprint 3 plan link at `../plan.md`.
+    0 broken relative links.
+  - Bryce's Sprint 3 contribution log records his 2026-11-16 review of #166 asking to keep `AI-log/`
+    at the root. Left as written (historical); the #166 comment says the decision changed.
+  - Posted a comment on #166 summarising the moves and drafted a Discord message for the team.
+  - `Sprint-3/Contribution` branch left in place (not deleted).
 
 ## Decision
 **Bryce:**
