@@ -120,7 +120,7 @@ On any error, nothing is saved and earlier feedback is kept (AT-3).
 The full text is `SYSTEM_PROMPT` in `backend/src/ai/prompt.js`. The user message only says whether
 there is a target role and wraps the resume in `<resume>` tags. v2 and v3 came out of the Groq
 evaluation on 2026-11-16; each change is tied to the finding that caused it in the "Prompt
-changes" table of the run's review sheet (`AI-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v*.md`).
+changes" table of the run's review sheet (`docs/sprint-3/ai-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v*.md`).
 
 | Rule | Why | Tested by |
 | --- | --- | --- |
@@ -245,7 +245,7 @@ sheet. Never run it in CI.
 
 ### Recording results (DoD for #141)
 
-1. Copy `REVIEW.md` to `AI-log/Bryce/md/<date>-us10-eval-<model>.md` and fill in the checklist,
+1. Copy `REVIEW.md` to `docs/sprint-N/ai-log/Bryce/md/<date>-us10-eval-<model>.md` and fill in the checklist,
    notes and bias verdict for each fixture.
 2. If the prompt needs changing, edit `SYSTEM_PROMPT`, bump `PROMPT_VERSION`, rerun, and fill in
    the "Prompt changes" table, so each change is tied to the finding that caused it.
@@ -256,10 +256,10 @@ sheet. Never run it in CI.
 Four runs of the six fixtures, twice each, on Groq `openai/gpt-oss-120b`. Review sheets, each with
 every output, the filled-in checklist, notes, bias verdict and prompt changes:
 
-- [`2026-11-16-us10-eval-gpt-oss-120b-v1.md`](../../AI-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v1.md): prompt v1, and the earlier attempt without a completion limit
-- [`2026-11-16-us10-eval-gpt-oss-120b-v2.md`](../../AI-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v2.md)
-- [`2026-11-16-us10-eval-gpt-oss-120b-v3-low.md`](../../AI-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v3-low.md)
-- [`2026-11-16-us10-eval-gpt-oss-120b-v3-medium.md`](../../AI-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v3-medium.md): comparison of all runs and the decision
+- [`2026-11-16-us10-eval-gpt-oss-120b-v1.md`](../sprint-3/ai-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v1.md): prompt v1, and the earlier attempt without a completion limit
+- [`2026-11-16-us10-eval-gpt-oss-120b-v2.md`](../sprint-3/ai-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v2.md)
+- [`2026-11-16-us10-eval-gpt-oss-120b-v3-low.md`](../sprint-3/ai-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v3-low.md)
+- [`2026-11-16-us10-eval-gpt-oss-120b-v3-medium.md`](../sprint-3/ai-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v3-medium.md): comparison of all runs and the decision
 
 | Problem (outputs out of 12) | v1 | v2 | v3 low | v3 medium |
 |---|---|---|---|---|

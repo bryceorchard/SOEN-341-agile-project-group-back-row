@@ -25,7 +25,7 @@ Finish the remaining core features, make the test suite cover all of them, and s
 
 Alongside: at least one acceptance test per Sprint 3 story (we aim for two or more), unit tests for every Sprint 3
 feature running in CI, an up-to-date board, meeting minutes, a contribution log per member, the AI usage log, and a
-Sprint 3 PDF report in each member's `AI-log/<Name>/` folder.
+Sprint 3 PDF report in each member's `ai-log/<Name>/` folder.
 
 ## Where we are (2026-11-05)
 

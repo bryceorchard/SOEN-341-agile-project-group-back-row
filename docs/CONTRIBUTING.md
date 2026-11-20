@@ -91,5 +91,5 @@ An issue/PR is **done** when:
 - [ ] CI is green (build + tests pass).
 - [ ] Tests exist for new behaviour where applicable.
 - [ ] Documentation updated (README / docs / code comments) where relevant.
-- [ ] Any AI assistance used is logged in `AI-log/<name>/` per the AI Usage Log format.
+- [ ] Any AI assistance used is logged in `docs/sprint-N/ai-log/<Name>/` per the AI Usage Log format.
 - [ ] The issue is closed and its board card moved to **Done**.
