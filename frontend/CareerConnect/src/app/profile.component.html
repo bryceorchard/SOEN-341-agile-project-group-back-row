@@ -48,8 +48,8 @@
   <div *ngIf="resume_error()" class="alert alert-error">{{ resume_error() }}</div>
 
   <ul class="resume-list" *ngIf="resumes().length; else noResumes">
-    <li *ngFor="let r of resumes()" class="resume-row" style="display: block;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+    <li *ngFor="let r of resumes()" class="resume-item">
+      <div class="resume-row">
         <div class="resume-info">
           <span class="resume-name">{{ r.originalFilename }}</span>
           <span class="resume-meta">{{ typeLabel(r.fileType) }} · Uploaded {{ r.uploadedAt | date: 'mediumDate' }}</span>
@@ -64,67 +64,113 @@
             <button class="btn btn-secondary btn-sm" (click)="startReplace(r.id)">Replace</button>
           </ng-template>
 
-          <button class="btn btn-secondary btn-sm" (click)="toggleFeedback(r.id)">AI Feedback</button>
+          <button
+            class="btn btn-secondary btn-sm"
+            [attr.aria-expanded]="active_feedback_id() === r.id"
+            (click)="toggleFeedback(r.id)"
+          >
+            {{ active_feedback_id() === r.id ? 'Hide AI feedback' : 'AI feedback' }}
+          </button>
           <button class="btn btn-danger btn-sm" (click)="deleteResume(r.id)">Delete</button>
         </div>
       </div>
 
-      <div class="feedback-section" *ngIf="active_feedback_id() === r.id" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #ddd;">
+      <section class="feedback-panel" *ngIf="active_feedback_id() === r.id" aria-label="AI resume feedback">
+        <p *ngIf="feedback_loading() === 'load'" class="feedback-status" role="status">Loading saved feedback…</p>
+        <p *ngIf="feedback_loading() === 'generate'" class="feedback-status" role="status">
+          Generating AI feedback… This can take several seconds.
+        </p>
 
-        <div *ngIf="feedback_loading()" class="alert alert-info">
-          Loading AI feedback... (This request can take several seconds)
-        </div>
-
-        <div *ngIf="feedback_error()" class="alert alert-error">
-          {{ feedback_error() }}
-        </div>
+        <div *ngIf="feedback_error()" class="alert alert-error" role="alert">{{ feedback_error() }}</div>
 
         <ng-container *ngIf="!feedback_loading()">
-          <div *ngIf="!current_feedback() && !feedback_error()">
-            <p><strong>Notice:</strong> By proceeding, your resume text will be sent to an external AI service to generate feedback.</p>
-            <button class="btn btn-primary btn-sm" (click)="generateFeedback(r.id)">Get AI feedback</button>
+          <button
+            *ngIf="feedback_error_kind() === 'load'"
+            class="btn btn-secondary btn-sm"
+            (click)="loadFeedback(r.id)"
+          >
+            Try again
+          </button>
+
+          <div *ngIf="!current_feedback() && feedback_error_kind() !== 'load'" class="feedback-start">
+            <p class="feedback-notice">
+              <strong>Before you start:</strong> the text of this resume is sent to an external AI service to
+              generate feedback. Your email, phone number and postal code are removed first. The feedback is
+              saved with this resume and deleted when you replace or delete the resume. AI feedback can be wrong;
+              check it before changing your resume.
+            </p>
+            <button class="btn btn-primary btn-sm" (click)="generateFeedback(r.id)">
+              {{ feedback_error_kind() === 'generate' ? 'Try again' : 'Get AI feedback' }}
+            </button>
           </div>
 
-          <div *ngIf="current_feedback() as fb">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div *ngIf="current_feedback() as fb" class="feedback-body">
+            <div class="feedback-header">
               <div>
-                <h3 style="margin: 0;">AI Resume Feedback</h3>
-                <small class="resume-meta">Generated on {{ fb.createdAt | date: 'medium' }}</small>
+                <h3>AI resume feedback</h3>
+                <span class="resume-meta">Generated {{ generatedAt(fb.createdAt) | date: 'medium' }}</span>
               </div>
               <button class="btn btn-secondary btn-sm" (click)="generateFeedback(r.id)">Regenerate</button>
             </div>
 
-            <div *ngIf="!fb.isResume" class="alert alert-warning">
-              Note: The AI did not confidently recognize this document as a standard resume.
-            </div>
-
             <h4>Summary</h4>
-            <p>{{ fb.summary }}</p>
+            <p class="feedback-summary">{{ fb.summary }}</p>
 
-            <h4>Strengths</h4>
-            <ul>
-              <li *ngFor="let strength of fb.strengths">
-                {{ strength.point }} <em class="resume-meta">— "{{ strength.evidence }}"</em>
-              </li>
-            </ul>
+            <ng-container *ngIf="fb.isResume">
+              <h4>Strengths</h4>
+              <ul *ngIf="fb.strengths.length; else noStrengths" class="feedback-list">
+                <li *ngFor="let strength of fb.strengths">
+                  {{ strength.point }}
+                  <blockquote class="feedback-quote">{{ strength.evidence }}</blockquote>
+                </li>
+              </ul>
+              <ng-template #noStrengths><p class="resume-meta">No strengths listed.</p></ng-template>
 
-            <h4>Improvements</h4>
-            <ul>
-              <li *ngFor="let imp of fb.improvements">
-                <strong>{{ imp.section }}</strong> <em>(Priority: {{ imp.priority }})</em> - {{ imp.issue }} {{ imp.suggestion }}
-              </li>
-            </ul>
+              <h4>Improvements</h4>
+              <p *ngIf="!improvement_groups().length" class="resume-meta">No improvements suggested.</p>
+              <div *ngFor="let group of improvement_groups()" class="feedback-group">
+                <h5>{{ sectionLabel(group.section) }}</h5>
+                <ul class="feedback-list">
+                  <li *ngFor="let imp of group.items">
+                    <span class="badge" [ngClass]="'priority-' + imp.priority">{{ imp.priority }}</span>
+                    <blockquote *ngIf="imp.excerpt" class="feedback-quote">{{ imp.excerpt }}</blockquote>
+                    <p class="feedback-issue">{{ imp.issue }}</p>
+                    <p class="feedback-suggestion">
+                      <ng-container *ngFor="let part of textParts(imp.suggestion)">
+                        <mark *ngIf="part.placeholder; else plainSuggestion" class="placeholder">{{ part.text }}</mark>
+                        <ng-template #plainSuggestion>{{ part.text }}</ng-template>
+                      </ng-container>
+                    </p>
+                  </li>
+                </ul>
+              </div>
 
-            <h4>Suggested Rewordings</h4>
-            <ul>
-              <li *ngFor="let rw of fb.rewordings">
-                "<s>{{ rw.original }}</s>" &rarr; "<strong>{{ rw.suggested }}</strong>"
-                <div class="resume-meta">{{ rw.reason }}</div>
-              </li>
-            </ul>
+              <ng-container *ngIf="fb.rewordings.length">
+                <h4>Suggested rewordings</h4>
+                <ul class="feedback-list">
+                  <li *ngFor="let rw of fb.rewordings">
+                    <span class="resume-meta">{{ sectionLabel(rw.section) }}</span>
+                    <p class="rewording-original">{{ rw.original }}</p>
+                    <p class="rewording-suggested">
+                      <span aria-hidden="true">→ </span>
+                      <ng-container *ngFor="let part of textParts(rw.suggested)">
+                        <mark *ngIf="part.placeholder; else plainRewording" class="placeholder">{{ part.text }}</mark>
+                        <ng-template #plainRewording>{{ part.text }}</ng-template>
+                      </ng-container>
+                    </p>
+                    <p class="resume-meta">{{ rw.reason }}</p>
+                  </li>
+                </ul>
+              </ng-container>
+
+              <p *ngIf="has_placeholders()" class="feedback-placeholder-note">
+                <mark class="placeholder">[Highlighted text]</mark> is a placeholder. Replace it with your own figure
+                or detail before using the suggestion.
+              </p>
+            </ng-container>
           </div>
         </ng-container>
-      </div>
+      </section>
     </li>
   </ul>
   <ng-template #noResumes>
