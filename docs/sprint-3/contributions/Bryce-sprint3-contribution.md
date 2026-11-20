@@ -19,7 +19,7 @@ Scrum lead for Sprint 3. Planned the sprint and created its issues, milestone an
 | AI logs | #149 | 0.75 | 2026-11-12 | [Jump to Task](#task-11---ai-logs) |
 
 ## Task #1 - Sprint 3 plan, issues, board
-**Associated Links:** [#148](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/148), [Sprint 3 board](https://github.com/users/bryceorchard/projects/8), [Sprint 3 milestone](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/milestone/4), [PR #185](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/185), [`sprint-3-plan.md`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/blob/main/docs/sprint-3/sprint-3-plan.md), [AI log](../../../AI-log/Bryce/md/2026-11-05-sprint3-plan-issues-board.md), [AI log](../../../AI-log/Bryce/md/2026-11-05-sprint2-issues-on-sprint3-board.md)
+**Associated Links:** [#148](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/148), [Sprint 3 board](https://github.com/users/bryceorchard/projects/8), [Sprint 3 milestone](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/milestone/4), [PR #185](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/185), [`plan.md`](../plan.md), [AI log](../ai-log/Bryce/md/2026-11-05-sprint3-plan-issues-board.md), [AI log](../ai-log/Bryce/md/2026-11-05-sprint2-issues-on-sprint3-board.md)
 
 Created the `Sprint 3` milestone and `sprint-3` label, and 29 issues (#128–#156):
 
@@ -31,7 +31,7 @@ Created the `Sprint 3` milestone and `sprint-3` label, and 29 issues (#128–#15
 Widened US-07 (#44) and added Sprint 3 criteria to US-08 (#45) and US-09 (#46). Split the work so every member owns feature tasks. Created the Sprint 3 project with Start and Target fields and a Timeline view, and moved the 18 open Sprint 2 issues and the backlog stories onto it. Wrote the Sprint 3 plan (goal, grading-weighted priorities, timeline, critical path, ranked work plan, capacity, risks), merged in #185.
 
 ## Task #2 - Review and fix PRs #157, #158
-**Associated Links:** [PR #157](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/157), [PR #158](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/158), [`ec2465f`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/ec2465f), [`04c92c9`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/04c92c9), [`ec7494b`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/ec7494b), [`4373e18`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/4373e18), [AI log](../../../AI-log/Bryce/md/2026-11-09-pr157-pr158-review.md), [AI log](../../../AI-log/Bryce/md/2026-11-09-merge-pr157-pr158.md)
+**Associated Links:** [PR #157](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/157), [PR #158](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/158), [`ec2465f`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/ec2465f), [`04c92c9`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/04c92c9), [`ec7494b`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/ec7494b), [`4373e18`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/4373e18), [AI log](../ai-log/Bryce/md/2026-11-09-pr157-pr158-review.md), [AI log](../ai-log/Bryce/md/2026-11-09-merge-pr157-pr158.md)
 
 Reviewed Mahmoud's two Sprint 3 backend PRs: posting archive and recruiter dashboard summary (#157, for #130) and notifications (#158, for #136). Found that the two PRs conflict in `routes/applications.js`, and that #158 sent a notification when a status was re-saved unchanged and returned same-second notifications oldest first. On #158's branch:
 
@@ -43,7 +43,7 @@ Reviewed Mahmoud's two Sprint 3 backend PRs: posting archive and recruiter dashb
 Approved and merged both. `main` after the merge: 36/36 backend tests, CI green.
 
 ## Task #3 - US-10 prompt, schema, eval set
-**Associated Links:** [#141](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/141), [US-10 #47](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/47), [PR #162](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/162), [`ec95388`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/ec95388), [`us10-resume-feedback.md`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/blob/main/docs/ai/us10-resume-feedback.md), [AI log](../../../AI-log/Bryce/md/2026-11-11-issue-141-us10-prompt-schema-eval.md)
+**Associated Links:** [#141](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/141), [US-10 #47](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/47), [PR #162](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/162), [`ec95388`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/ec95388), [`us10-resume-feedback.md`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/blob/main/docs/ai/us10-resume-feedback.md), [AI log](../ai-log/Bryce/md/2026-11-11-issue-141-us10-prompt-schema-eval.md)
 
 Wrote the contract that the AI backend (#139) and UI (#140) build against. PR #162 (+1,794/−1, 19 files):
 
@@ -57,7 +57,7 @@ Wrote the contract that the AI backend (#139) and UI (#140) build against. PR #1
 55 backend tests (17 new), no network calls.
 
 ## Task #4 - Review and fix PR #164
-**Associated Links:** [PR #164](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/164), [#137](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/137), [#138](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/138), [`5611242`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/5611242), [`2d206a7`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/2d206a7), [`cc32732`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/cc32732), [`8e0f7fc`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/8e0f7fc), [`a3a99a3`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/a3a99a3), [`901515c`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/901515c), [AI log](../../../AI-log/Bryce/md/2026-11-16-pr164-review.md)
+**Associated Links:** [PR #164](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/164), [#137](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/137), [#138](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/138), [`5611242`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/5611242), [`2d206a7`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/2d206a7), [`cc32732`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/cc32732), [`8e0f7fc`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/8e0f7fc), [`a3a99a3`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/a3a99a3), [`901515c`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/901515c), [AI log](../ai-log/Bryce/md/2026-11-16-pr164-review.md)
 
 Reviewed Zohair's deadline reminders and notification centre. The frontend CI job was red (the bell's polling made real HTTP calls in `logout.spec.ts`), the tests and seed data the DoD required were missing, and three date bugs were reproduced under `TZ=America/Toronto`: notification times 5 h off, no reminder on the deadline day itself, and unparseable deadlines treated as inside the window. Pushed to the PR branch:
 
@@ -71,7 +71,7 @@ Reviewed Zohair's deadline reminders and notification centre. The frontend CI jo
 Result: backend 65/65, frontend 86/86, CI green. Approved and merged.
 
 ## Task #5 - Review and fix PR #165
-**Associated Links:** [PR #165](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/165), [#139](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/139), [`878c718`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/878c718), [AI log](../../../AI-log/Bryce/md/2026-11-16-pr165-review.md)
+**Associated Links:** [PR #165](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/165), [#139](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/139), [`878c718`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/878c718), [AI log](../ai-log/Bryce/md/2026-11-16-pr165-review.md)
 
 Reviewed Mahmoud's AI resume feedback service and endpoint. Reproduced a bug: after `PUT /resumes/:id` replaced the file, `GET /resumes/:id/feedback` still returned feedback for the old file. With no API key, the provider also silently fell back to the mock and stored canned feedback for every user. `878c718` on the PR branch:
 
@@ -84,7 +84,7 @@ Reviewed Mahmoud's AI resume feedback service and endpoint. Reproduced a bug: af
 Merged `main` in to resolve the README conflict. Backend 96/96 tests. Approved and merged; closed #139.
 
 ## Task #6 - US-10 evaluation run
-**Associated Links:** [#141](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/141), [PR #181](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/181), [`c0a6605`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/c0a6605), [AI log](../../../AI-log/Bryce/md/2026-11-16-issue-141-eval-run.md), review sheets [v1](../../../AI-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v1.md), [v2](../../../AI-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v2.md), [v3 low](../../../AI-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v3-low.md), [v3 medium](../../../AI-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v3-medium.md)
+**Associated Links:** [#141](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/141), [PR #181](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/181), [`c0a6605`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/c0a6605), [AI log](../ai-log/Bryce/md/2026-11-16-issue-141-eval-run.md), review sheets [v1](../ai-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v1.md), [v2](../ai-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v2.md), [v3 low](../ai-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v3-low.md), [v3 medium](../ai-log/Bryce/md/2026-11-16-us10-eval-gpt-oss-120b-v3-medium.md)
 
 Ran the evaluation set on Groq `openai/gpt-oss-120b`: four runs (prompt v1, v2, v3 at low and medium reasoning), 6 fixtures × 2 each, 48 outputs reviewed by hand. Revised the prompt twice from the findings:
 
@@ -94,7 +94,7 @@ Ran the evaluation set on Groq `openai/gpt-oss-120b`: four runs (prompt v1, v2, 
 Recorded the configuration: prompt v3, `reasoning_effort: "low"`, `max_completion_tokens: 5000` (48/48 schema-valid; medium was no better and 2–3× slower). Added those two fields to `provider.js` (without them, 2 of 3 requests failed with HTTP 400). The eval runner now retries on 429. Closed #141 with PR #181 (+4,640/−64, 13 files); 143 backend tests, no network.
 
 ## Task #7 - Application analytics backend
-**Associated Links:** [#134](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/134), [US-21 #128](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/128), [PR #179](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/179), [`a8c1701`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/a8c1701), [AI log](../../../AI-log/Bryce/md/2026-11-16-issue-134-application-analytics.md)
+**Associated Links:** [#134](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/134), [US-21 #128](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/128), [PR #179](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/179), [`a8c1701`](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/commit/a8c1701), [AI log](../ai-log/Bryce/md/2026-11-16-issue-134-application-analytics.md)
 
 Backend for US-21. PR #179 (+499/−48, 9 files):
 
@@ -117,7 +117,7 @@ Backend for US-21. PR #179 (+499/−48, 9 files):
 - Updated branches with `main` where branch protection required it (#160, #161, #166, #170, #171, #182). Noted on #95 and #103 that #175 closed them.
 
 ## Task #9 - Sprint 3 close-out
-**Associated Links:** [PR #184](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/184), [PR #185](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/185), [PR #186](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/186), [AI log](../../../AI-log/Bryce/md/2026-11-16-sprint3-remaining-work.md)
+**Associated Links:** [PR #184](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/184), [PR #185](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/185), [PR #186](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/186), [AI log](../ai-log/Bryce/md/2026-11-16-sprint3-remaining-work.md)
 
 On evaluation day, went through the whole repo (issues, PRs, branches, CI, tests, docs) and produced an ordered list of what was left. Then:
 
@@ -132,6 +132,6 @@ On evaluation day, went through the whole repo (issues, PRs, branches, CI, tests
 Both CI jobs now print a coverage report. Backend: new `npm run test:coverage` using Node's built-in coverage. Frontend: `@vitest/coverage-v8` and `ng test --coverage`. No thresholds, and the job names are unchanged, so the required checks on `main` still match. At merge: backend 159 tests, 98.40% lines; frontend 133 tests, 95.55% lines.
 
 ## Task #11 - AI logs
-**Associated Links:** [#149](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/149), [PR #163](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/163), [PR #172](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/172), [PR #183](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/183), [AI log](../../../AI-log/Bryce/md/2026-11-16-project-instructions-update.md)
+**Associated Links:** [#149](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/149), [PR #163](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/163), [PR #172](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/172), [PR #183](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/pull/183), [AI log](../ai-log/Bryce/md/2026-11-16-project-instructions-update.md)
 
 Logged each AI interaction of the sprint in `AI-log/Bryce/md/`. PR #163 moved the 19 Sprint 2 logs into `md/` (renames only, contribution-log links updated) and added the missing Sprint 3 logs. PRs #172 and #183 added the logs for updating the team's Claude project instructions and for the remaining-work review.
