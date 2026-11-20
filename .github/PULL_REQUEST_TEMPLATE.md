@@ -25,7 +25,7 @@ Closes #
 - [ ] CI is green (`npm ci` + `npm test` in `backend/`)
 - [ ] Tests added/updated for new behaviour (where applicable)
 - [ ] Docs updated (README / docs / comments) where relevant
-- [ ] AI assistance (if any) logged under `AI-log/<name>/`
+- [ ] AI assistance (if any) logged under `docs/sprint-N/ai-log/<Name>/`
 
 ## Notes for reviewers
 
