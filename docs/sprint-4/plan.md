@@ -16,11 +16,11 @@ Finish and validate everything for the final evaluation, as the Sprint 4 handout
 
 1. **All core features finalized, integrated and tested** (handout Features 1–5). The only gap is the US-21
    analytics and history page (#135).
-2. **Two Generative-AI features** (Feature 6): finish and validate US-10 AI resume feedback (#47), and build
-   US-11 AI job matching (#54), which is one of the handout's listed options.
-3. **One team-proposed unique feature, not AI** (US-23, #199). The team picks it on the call today; the TA must
-   approve it before anyone builds it (#200).
-4. **Quality and maintenance:** reorganized repository (#206), coding standards and lint in CI (#207), static
+2. **Feature 6, two features that make CareerConnect unique:** finish and validate US-10 AI resume feedback
+   (#47), and build one team-proposed feature that is not AI (US-23, #199). The handout asks for "at least two
+   innovative AI-enhanced features"; on 2026-11-25 the prof clarified that the second one is this non-AI unique
+   feature. The team picks it on the call today, and the TA must approve it before anyone builds it (#200).
+3. **Quality and maintenance:** reorganized repository (#206), coding standards and lint in CI (#207), static
    analysis in CI with a findings report and fixes linked to it (#208–#210), and a review on every PR (#211).
 
 Alongside: acceptance and unit tests for all Sprint 4 work, a green CI pipeline, minutes, contribution logs,
@@ -35,8 +35,9 @@ the AI usage log, a Sprint 4 PDF per member, the summary report and the final de
 - **US-10 works end to end:** backend (#165), UI (#193, #197), prompt and evaluation (#162, #181). Left:
   acceptance tests #147 (AT-3 and AT-4 automated in #194), the open items from the evaluation, and the
   validation write-up the handout now asks for (section 5.4).
-- **US-11 does not exist yet.** The 2026-11-12 meeting picked job recommendation as the second AI feature; it is
-  the handout's "AI job matching suggestions" option, so it needs no TA approval.
+- **The unique feature isn't picked yet.** The 2026-11-12 meeting had tentatively chosen AI job recommendation
+  (US-11, #54) as a second AI feature. The prof has since said the second Feature 6 slot is the non-AI unique
+  feature, so US-11 stays in the backlog.
 - **Quality:** no linter and no static analysis on `main`. Coverage already shows in both CI jobs (#187). The
   repository reorganization proposal is PR #166 (docs part pushed, waiting for a review).
 - **Sprint 3 leftovers:** five process issues are still open (see
@@ -48,7 +49,7 @@ The Sprint 4 handout grades the sprint as follows. Priority follows the points a
 
 | Criterion (weight)                    | What earns it                                                           | Issues                                    |
 | ------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------- |
-| Features implementation (20)          | Features 1–6 on `main`; two AI features; US-23 approved and built       | #47, #54, #128, #135, #199–#205           |
+| Features implementation (20)          | Features 1–6 on `main`: US-10 validated; US-23 approved and built       | #47, #128, #135, #199, #200, #202–#205    |
 | Contribution by team members (10)     | Every member owns feature or quality work with visible commits and PRs | See [Team capacity](#team-capacity)       |
 | Acceptance/unit tests (10)            | ATs for every Sprint 4 story, verified on `main`; unit tests for all code | #144, #147, #212–#215                   |
 | Continuous integration pipeline (10)  | Tests, lint and static analysis in CI, green on `main`; no real AI calls | #207, #208, #214                         |
@@ -77,10 +78,10 @@ in their backend issue and stub it until it merges.
 | Date       | Milestone                                                                                                   |
 | ---------- | ----------------------------------------------------------------------------------------------------------- |
 | Wed Nov 25 | Plan, issues and board (#216); AI-log reminder (#217); team call picks the unique feature (#200)            |
-| Thu Nov 26 | TA approval for US-23 (#200); US-11 schema agreed (#201); repository move merged (#206); lint in CI (#207); first static-analysis report (#208); US-11 ATs final (#212) |
-| Fri Nov 27 | US-11 backend merged (#202); US-23 backend; US-23 ATs (#212); US-10 hardening if time allows (#204); contribution-log reminder (#219) |
-| Sat Nov 28 | **Feature freeze:** US-11 page (#203), analytics page (#135), US-23 frontend; static-analysis fixes merged (#209, #210) |
-| Sun Nov 29 | ATs verified on `main` plus a regression pass (#215); CI green (#214); final static-analysis report (#208); AI validation (#201, #205); logs, PDFs, summary report (#217, #219, #220); demo dry run (#221) |
+| Thu Nov 26 | TA approval for US-23 (#200); US-23 API contract in #202; repository move merged (#206); lint in CI (#207); first static-analysis report (#208) |
+| Fri Nov 27 | US-23 backend merged (#202); US-23 ATs final (#212, #213); US-10 hardening if time allows (#204); contribution-log reminder (#219) |
+| Sat Nov 28 | **Feature freeze:** US-23 frontend (#203), analytics page (#135); static-analysis fixes merged (#209, #210) |
+| Sun Nov 29 | ATs verified on `main` plus a regression pass (#215); CI green (#214); final static-analysis report (#208); US-10 validation (#205); logs, PDFs, summary report (#217, #219, #220); demo dry run (#221) |
 | Mon Nov 30 | Lab evaluation                                                                                              |
 
 The `Sprint 4` milestone shows as "due by November 29" in GitHub's UI (it stores midnight UTC on the 30th),
@@ -89,15 +90,15 @@ which matches the plan: everything is merged by the end of Sunday.
 ## Critical path
 
 1. **US-23 needs TA approval before any code.** Pick it on today's call, send it to the TA in writing tonight,
-   and confirm on Thursday at the latest (#200). Keep it to one backend and one frontend task.
+   and confirm on Thursday at the latest (#200). Then approval → backend (#202, contract first) → frontend
+   (#203), with the ATs (#213) written alongside.
 2. **Repository move first** (#206, Thu). It moves `frontend/CareerConnect/` to `frontend/`, so every frontend
    branch rebases once. It has to land before the feature PRs open, not after.
 3. **Lint before static-analysis fixes.** #207 sets the rules and fixes or disables existing violations; #208
    runs the analysis; #209 and #210 fix what's left, so nothing is fixed twice.
-4. **US-11: schema → backend → page.** #201's schema (Thu) unblocks #202 and #203. CI must never call the real
-   AI service (#214).
-5. **Review every PR** (#211). No merge without an approving review from someone else.
-6. **Verify on `main`, not on branches** (#215), then the demo (#221).
+4. **Review every PR** (#211). No merge without an approving review from someone else.
+5. **Verify on `main`, not on branches** (#215), then the demo (#221). CI must never call the real AI
+   service (#214).
 
 ## Ranked backlog (work plan)
 
@@ -109,42 +110,40 @@ Open Sprint 4 issues in priority order, then by target date.
 | 2 | #206 | [Task] Repo: Reorganize the repository structure (#166) | Task | Gene + Bryce | Wed Nov 25 | Thu Nov 26 | P0 | Todo |
 | 3 | #207 | [Task] Process: Coding standards + ESLint in CI | Task | Bryce | Wed Nov 25 | Thu Nov 26 | P0 | Todo |
 | 4 | #212 | [Task] Requirements: Finalize Sprint 4 user stories, tasks and acceptance tests | Task | Zohair | Wed Nov 25 | Fri Nov 27 | P0 | Todo |
-| 5 | #202 | [Task] Backend: AI job-matching service + endpoint (US-11) | Task | Mahmoud | Thu Nov 26 | Fri Nov 27 | P0 | Todo |
+| 5 | #202 | [Task] Backend: Team-proposed unique feature (US-23) | Task | Set on the call | Thu Nov 26 | Fri Nov 27 | P0 | Todo |
 | 6 | #199 | US-23: Team-proposed unique feature (non-AI, to be picked 2026-11-25) | User Story | Zohair + Bryce | Wed Nov 25 | Sat Nov 28 | P0 | Todo |
-| 7 | #54 | US-11: AI job-matchmaking suggestions | User Story | Bryce + Mahmoud + Gabriel | Wed Nov 25 | Sat Nov 28 | P0 | Todo |
-| 8 | #128 | US-21: Application analytics and history dashboard | User Story | Bryce + Gene | Wed Nov 25 | Sat Nov 28 | P0 | Todo |
-| 9 | #135 | [Task] Frontend: Application analytics + history dashboard (US-21) | Task | Gene | Wed Nov 25 | Sat Nov 28 | P0 | Todo |
-| 10 | #203 | [Task] Frontend: "Recommended for you" job-matching page (US-11) | Task | Gabriel | Thu Nov 26 | Sat Nov 28 | P0 | Todo |
-| 11 | #209 | [Task] Quality: Fix static-analysis findings — backend | Task | Mahmoud | Fri Nov 27 | Sat Nov 28 | P0 | Todo |
-| 12 | #210 | [Task] Quality: Fix static-analysis findings — frontend | Task | Gabriel | Fri Nov 27 | Sat Nov 28 | P0 | Todo |
-| 13 | #201 | [Task] AI: Prompt, response schema and evaluation set for job matching (US-11) | Task | Bryce | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
-| 14 | #205 | [Task] AI: Final validation of AI resume feedback (US-10) | Task | Bryce | Thu Nov 26 | Sun Nov 29 | P0 | Todo |
-| 15 | #47 | US-10 [AI-Generated]: AI-assisted resume feedback | User Story | Gabriel + Bryce + Mahmoud + Zohair | Wed Nov 25 | Sun Nov 29 | P0 | In Progress |
-| 16 | #208 | [Task] DevOps: Static analysis in CI + analysis report | Task | Luca | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
-| 17 | #213 | Acceptance tests: US-11 AI job-matching suggestions | Acceptance Test | Zohair + Luca | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
-| 18 | #144 | Acceptance tests: US-21 Application analytics and history dashboard | Acceptance Test | Zohair + Luca | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
-| 19 | #147 | Acceptance tests: US-10 AI resume feedback (Sprint 3 slice) | Acceptance Test | Zohair + Luca | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
-| 20 | #214 | [Task] QA: Unit tests for all Sprint 4 code + CI upkeep | Task | Luca | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
-| 21 | #215 | [Task] QA: Automate and verify Sprint 4 acceptance tests + regression of Features 1–5 | Task | Luca | Fri Nov 27 | Sun Nov 29 | P0 | Todo |
-| 22 | #217 | [Task] AI Usage Log + Sprint 4 PDF reports (all members) | Task | Bryce | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
-| 23 | #219 | [Task] Detailed contribution log (Sprint 4) | Task | Gene | Fri Nov 27 | Sun Nov 29 | P0 | Todo |
-| 24 | #220 | [Task] Sprint 4 summary report | Task | Gene | Sat Nov 28 | Sun Nov 29 | P0 | Todo |
-| 25 | #221 | [Task] Sprint 4 final demo preparation | Task | Luca | Sat Nov 28 | Sun Nov 29 | P0 | Todo |
-| 26 | #211 | [Task] Process: Code review on every Sprint 4 PR | Task | Bryce | Wed Nov 25 | Mon Nov 30 | P0 | Todo |
-| 27 | #216 | [Task] Sprint 4 planning + work plan + board | Task | Bryce | Wed Nov 25 | Mon Nov 30 | P0 | In Progress |
-| 28 | #218 | [Task] Meeting minutes for Sprint 4 | Task | Gene | Wed Nov 25 | Mon Nov 30 | P0 | Todo |
-| 29 | #204 | [Task] Backend: Harden AI resume feedback — injected text and PDF columns (US-10) | Task | Mahmoud | Thu Nov 26 | Fri Nov 27 | P2 | Todo |
+| 7 | #128 | US-21: Application analytics and history dashboard | User Story | Bryce + Gene | Wed Nov 25 | Sat Nov 28 | P0 | Todo |
+| 8 | #135 | [Task] Frontend: Application analytics + history dashboard (US-21) | Task | Gene | Wed Nov 25 | Sat Nov 28 | P0 | Todo |
+| 9 | #203 | [Task] Frontend: Team-proposed unique feature (US-23) | Task | Set on the call | Thu Nov 26 | Sat Nov 28 | P0 | Todo |
+| 10 | #209 | [Task] Quality: Fix static-analysis findings — backend | Task | Mahmoud | Fri Nov 27 | Sat Nov 28 | P0 | Todo |
+| 11 | #210 | [Task] Quality: Fix static-analysis findings — frontend | Task | Gabriel | Fri Nov 27 | Sat Nov 28 | P0 | Todo |
+| 12 | #205 | [Task] AI: Final validation of AI resume feedback (US-10) | Task | Bryce | Thu Nov 26 | Sun Nov 29 | P0 | Todo |
+| 13 | #47 | US-10 [AI-Generated]: AI-assisted resume feedback | User Story | Gabriel + Bryce + Mahmoud + Zohair | Wed Nov 25 | Sun Nov 29 | P0 | In Progress |
+| 14 | #208 | [Task] DevOps: Static analysis in CI + analysis report | Task | Luca | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
+| 15 | #213 | Acceptance tests: US-23 team-proposed unique feature | Acceptance Test | Zohair + Luca | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
+| 16 | #144 | Acceptance tests: US-21 Application analytics and history dashboard | Acceptance Test | Zohair + Luca | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
+| 17 | #147 | Acceptance tests: US-10 AI resume feedback (Sprint 3 slice) | Acceptance Test | Zohair + Luca | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
+| 18 | #214 | [Task] QA: Unit tests for all Sprint 4 code + CI upkeep | Task | Luca | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
+| 19 | #215 | [Task] QA: Automate and verify Sprint 4 acceptance tests + regression of Features 1–5 | Task | Luca | Fri Nov 27 | Sun Nov 29 | P0 | Todo |
+| 20 | #217 | [Task] AI Usage Log + Sprint 4 PDF reports (all members) | Task | Bryce | Wed Nov 25 | Sun Nov 29 | P0 | Todo |
+| 21 | #219 | [Task] Detailed contribution log (Sprint 4) | Task | Gene | Fri Nov 27 | Sun Nov 29 | P0 | Todo |
+| 22 | #220 | [Task] Sprint 4 summary report | Task | Gene | Sat Nov 28 | Sun Nov 29 | P0 | Todo |
+| 23 | #221 | [Task] Sprint 4 final demo preparation | Task | Luca | Sat Nov 28 | Sun Nov 29 | P0 | Todo |
+| 24 | #211 | [Task] Process: Code review on every Sprint 4 PR | Task | Bryce | Wed Nov 25 | Mon Nov 30 | P0 | Todo |
+| 25 | #216 | [Task] Sprint 4 planning + work plan + board | Task | Bryce | Wed Nov 25 | Mon Nov 30 | P0 | In Progress |
+| 26 | #218 | [Task] Meeting minutes for Sprint 4 | Task | Gene | Wed Nov 25 | Mon Nov 30 | P0 | Todo |
+| 27 | #204 | [Task] Backend: Harden AI resume feedback — injected text and PDF columns (US-10) | Task | Mahmoud | Thu Nov 26 | Fri Nov 27 | P2 | Todo |
 
-The US-23 backend, frontend and acceptance-test issues are added after the TA approves the feature (#200).
+The US-23 issues #202, #203 and #213 are placeholders (first created for US-11). They get renamed, filled in and
+assigned after the TA approves the feature (#200).
 
 Every task and AT issue is linked as a sub-issue of its story:
 
 | Story | Sub-issues |
 | ----- | ---------- |
-| #54 US-11 | #201, #202, #203, #213 |
 | #47 US-10 | #139, #140, #141 (closed in Sprint 3), #147, #204, #205 |
 | #128 US-21 | #134 (closed in Sprint 3), #135, #144 |
-| #199 US-23 | #200, then the tasks created after approval |
+| #199 US-23 | #200, #202, #203, #213 |
 
 ### Carried over from Sprint 3
 
@@ -153,16 +152,18 @@ Every task and AT issue is linked as a sub-issue of its story:
 - **Still on the Sprint 3 milestone:** #149 (AI-log PDFs), #151 (contribution logs), #154 (unit tests + CI),
   #155 (AT verification) and #156 (demo). They were Sprint 3 deliverables. They are on the board with
   Sprint = "Sprint 3" and Priority P1, to be closed out as part of #216.
-- **Backlog:** #40 and #55–#62 are on the board with Sprint = "Backlog" and Priority P3. US-11 (#54) moved out of
-  the backlog into Sprint 4.
+- **Backlog:** #40 and #54–#62 are on the board with Sprint = "Backlog" and Priority P3. That includes US-11 AI job
+  matching (#54), which is not in Sprint 4 (see [Sprint goal](#sprint-goal)).
 
 ## Unique feature shortlist
 
-For the team call on Wed 2026-11-25. The handout requires TA approval before a team-proposed feature is built,
+For the team call on Wed 2026-11-25. US-23 is one of the two Feature 6 features, so it carries the same weight
+as US-10 and should be what makes CareerConnect stand out. The handout requires TA approval before it is built,
 and the sprint leaves Friday and Saturday to build it. What makes a candidate fit:
 
-- **Not AI**, and different from Features 1–6 in the handout.
-- **Small:** one backend task and one frontend task, no new external service.
+- **Not AI**, and different from Features 1–5 in the handout.
+- **Sized for two days:** one backend task (#202) and one frontend task (#203), no new external service. With
+  US-11 out of the sprint, Mahmoud and Gabriel have room for an M–L feature.
 - **Reuses what's on `main`:** applications, status history, notifications, postings.
 - **Easy to demo** in a minute and to cover with two or three acceptance tests.
 
@@ -185,15 +186,14 @@ member owns at least one feature or quality task with its tests, on top of their
 
 | Member  | Role                 | Feature work                                              | Quality work                                     | Role work                                                    |
 | ------- | -------------------- | --------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------ |
-| Bryce   | Scrum lead / process | US-11 prompt, schema, evaluation (#201); US-10 validation (#205) | Coding standards + lint (#207); repo move with Gene (#206) | Plan + board (#216), AI logs + PDFs (#217), code review (#211), US-23 approval with Zohair (#200) |
-| Mahmoud | Backend              | US-11 backend (#202); US-10 hardening (#204, P2)          | Backend static-analysis fixes (#209)             | Backend reviews                                              |
-| Gabriel | Frontend / UI        | US-11 page (#203)                                         | Frontend static-analysis fixes (#210)            | Frontend reviews, UI consistency                             |
+| Bryce   | Scrum lead / process | US-10 validation (#205)                                   | Coding standards + lint (#207); repo move with Gene (#206) | Plan + board (#216), AI logs + PDFs (#217), code review (#211), US-23 approval with Zohair (#200) |
+| Mahmoud | Backend              | US-23 backend (#202, proposed); US-10 hardening (#204, P2) | Backend static-analysis fixes (#209)             | Backend reviews                                              |
+| Gabriel | Frontend / UI        | US-23 frontend (#203, proposed)                           | Frontend static-analysis fixes (#210)            | Frontend reviews, UI consistency                             |
 | Luca    | Integration & QA     | —                                                         | Static analysis in CI (#208), unit tests + CI (#214) | AT verification + regression (#215), demo (#221)         |
 | Gene    | Documentation        | Analytics and history page (#135)                         | Repository move (#206)                           | Minutes (#218), contribution logs (#219), summary report (#220) |
-| Zohair  | Requirements         | US-23 (after approval)                                    | —                                                | Pick + TA approval (#200), finalize ATs (#212), ATs with Luca (#213, #144, #147) |
+| Zohair  | Requirements         | US-23 backend with Mahmoud (#202, proposed)               | —                                                | Pick + TA approval (#200), finalize ATs (#212), ATs with Luca (#213, #144, #147) |
 
-US-23 owners are set on the call. Zohair has the most room for feature work; the frontend half can go to
-whoever finishes first (Gene after #135, or Gabriel after #203).
+US-23 owners are set on the call; the split above is a proposal. #202 and #203 are unassigned until then.
 
 ## Effort estimation
 
@@ -202,10 +202,8 @@ T-shirt sizing (S ≈ ≤ 2 h, M ≈ half a day, L ≈ a full day or more):
 | Item                                                                  | Size |
 | --------------------------------------------------------------------- | :--: |
 | #200 Pick US-23, write it up, TA approval                             |  S   |
-| US-23 backend + frontend (after approval)                             | M–L  |
-| #201 US-11 prompt, schema, evaluation, validation doc                 |  M   |
-| #202 US-11 backend service + endpoint                                 |  L   |
-| #203 US-11 page                                                       |  M   |
+| #202 US-23 backend (after approval)                                   | M–L  |
+| #203 US-23 frontend (after approval)                                  |  M   |
 | #204 US-10 injected text + PDF columns                                |  M   |
 | #205 US-10 final validation                                           |  M   |
 | #135 Analytics and history page                                       |  L   |
@@ -213,7 +211,7 @@ T-shirt sizing (S ≈ ≤ 2 h, M ≈ half a day, L ≈ a full day or more):
 | #207 Coding standards + ESLint in CI                                  |  M   |
 | #208 Static analysis in CI + report                                   |  M   |
 | #209, #210 Static-analysis fixes                                      |  M   |
-| #212, #213 Finalize stories and ATs                                   |  S   |
+| #212, #213 Finalize stories and US-23 ATs                             |  S   |
 | #214, #215 Unit tests, AT verification, regression                    |  M   |
 | #211, #216–#221 Reviews, plan, logs, minutes, report, demo            |  M   |
 
@@ -226,8 +224,8 @@ T-shirt sizing (S ≈ ≤ 2 h, M ≈ half a day, L ≈ a full day or more):
 | Repository move conflicts with open branches                          | Lost work, broken CI                       | Merge it first (Thu); one `git mv` PR; announce it; everyone rebases once                           |
 | Static analysis reports many findings                                 | Fixes break features, or run out of time   | Bugs and vulnerabilities first; "won't fix" with a reason is allowed; tests run on every fix         |
 | AI provider rate limit (free Groq plan, about 2 requests a minute for the team) | Demo or evaluation runs fail      | Mock provider as fallback; saved results shown without new calls; plan the demo order (#205, #221)  |
-| US-11 recommends postings that don't exist                            | Wrong output at the demo                   | `jobId` checked in code against the postings sent (#201, #202)                                      |
-| Resume text sent to an external AI service                            | Privacy question at the evaluation         | Notice before every request; contact details removed; same approach as US-10                        |
+| US-23 is too small to stand as a Feature 6 feature                    | Features implementation points lost        | Pick one that uses the app's own data and has a visible result; confirm the scope with the TA (#200) |
+| Resume text sent to an external AI service (US-10)                    | Privacy question at the evaluation         | Notice before every request; contact details removed; documented in #205                            |
 | Reviews become rubber stamps                                          | Code Review points lost                    | Reviewer checklist in the PR template; written comments required (#211)                             |
 | Logs, PDFs and the report left to Sunday                              | Up to 10 points                            | Reminders on Wed Nov 25 and Fri Nov 27; per-member checklists in #217 and #219                      |
 | Admins can bypass branch protection                                   | PRs merged without review                  | Every PR gets one approval before merge, including the Scrum lead's                                 |

@@ -6,7 +6,7 @@
 **chat url:** <https://claude.ai/code/session_01FY2WCUMdW26MJhaKjzatBj>
 
 ## Task / Prompt
-"alright, we're in sprint 4 now. Can you create a new sprint-4 github project, import the old issues, and create
+1. "alright, we're in sprint 4 now. Can you create a new sprint-4 github project, import the old issues, and create
 new issues please? also create a sprint-4-planning document. we need to implement a non-ai unique feature, and
 we're gonna call as a team later today to brainstorm"
 
@@ -17,6 +17,10 @@ Questions asked by the AI and answered by Bryce:
 - Second AI feature: the handout requires at least two AI features and the team only has US-10, so plan US-11 AI
   job matching (#54) as well.
 - Evaluation date (not in the handout): Mon 2026-11-30.
+
+2. "actually, the prof clarified that the 2nd ai feature is actually the 'non-ai unique feature' that i mentioned.
+   can you fix that?" Asked by the AI: what to do with the four US-11 issues. Bryce: reuse #202, #203 and #213 as
+   the US-23 placeholders and close #201.
 
 ## Context / Findings
 Sources reviewed: the Sprint 4 and Sprint 3 handouts, `docs/sprint-3/sprint-3-plan.md`, `docs/CONTRIBUTING.md`,
@@ -90,6 +94,19 @@ on #216.
 - All 29 Sprint 4 milestone issues re-read through the API: titles, labels, assignees, milestone; no leftover
   placeholders.
 - All 43 board items re-read from the table: Status, Priority, Sprint, Start and Target match the plan.
+
+**Prompt 2: US-11 dropped from Sprint 4**
+- #54 back to the backlog: body, labels and assignees as they were before Sprint 4 planning, no milestone; board
+  set to Backlog / P3 / Backlog with no dates. Its four sub-issue links removed.
+- #201 closed as not planned, with a note at the top, milestone and `sprint-4` removed; card archived on the
+  Sprint 4 board.
+- #202, #203 and #213 renamed and rewritten as the US-23 backend, frontend and acceptance-test placeholders,
+  unassigned (#213 stays with Zohair + Luca), linked as sub-issues of #199. Their board fields didn't need to change.
+- Removed the US-11 references from #199, #200, #212, #214, #215, #217, #220 and #221.
+- Plan updated: Feature 6 is US-10 plus US-23; timeline, critical path, ranked backlog (27 rows), sub-issues,
+  capacity (proposed US-23 owners: Mahmoud + Zohair backend, Gabriel frontend), effort and risks.
+- Checked through the API: the `Sprint 4` milestone has 27 issues; US-11 is only mentioned in the notes that
+  explain the change. Board: 27 Sprint 4 items, 42 in total. markdownlint: 0 errors.
 
 ## Decision
 **Bryce:**
