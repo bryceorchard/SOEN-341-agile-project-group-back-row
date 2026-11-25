@@ -75,7 +75,9 @@ verification link, high priority) moved to the Sprint 4 milestone with `sprint-4
 
 **Plan:** `docs/sprint-4/plan.md`: goal, starting point, grading-to-issues table, priorities, day-by-day timeline
 with a feature freeze on Sat Nov 28, critical path, ranked work plan (29 rows), Sprint 3 carry-overs, a shortlist
-of unique-feature candidates for the call, capacity, effort and risks. markdownlint: 0 errors.
+of unique-feature candidates for the call, capacity, effort and risks. markdownlint: 0 errors. Committed with this
+log on `docs/sprint-4-planning` (`8c19c61`); PR #222, not merged. Ticked the "issues created" and "project" boxes
+on #216.
 
 **Problems hit**
 - The board's table only pastes values when the copied value comes from a cell; the browser pane blocks the
