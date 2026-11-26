@@ -49,8 +49,10 @@ We use a feature-branch workflow with `main` as the single integration branch.
 - **Required reviews:** at least **one** approving review from someone other than the
   author before merge. For changes that cross areas (e.g. backend + frontend), request
   a reviewer from each affected area.
-- **CI must be green.** The GitHub Actions `CI` workflow (Node 22, `npm ci`, `npm test`
-  in `backend/`) must pass before merge.
+- **CI must be green.** The GitHub Actions `CI` workflow must pass before merge: the
+  `backend` job (`npm ci`, tests with coverage in `backend/`) and the `frontend` job
+  (`npm ci`, tests with coverage and a build in `frontend/`), both on the Node version in
+  the root `.nvmrc`.
 - Resolve all review conversations before merging.
 - **Merge method:** squash and merge, so `main` keeps a clean, linear history. The
   squash commit message should summarize the change and reference the issue.

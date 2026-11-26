@@ -10,6 +10,7 @@ docs/
 ├── README.md                # this index
 ├── CONTRIBUTING.md          # team process: workflow, branching, PRs, review, DoR/DoD (#23)
 ├── ERD.md                   # database entity-relationship diagram
+├── refactor-proposal.md     # repository restructure proposal (#166, #206)
 ├── ai/
 │   └── us10-resume-feedback.md  # AI resume feedback: schema, prompt, provider, evaluation, privacy notice (#141)
 ├── sprint-N/                # one folder per sprint (sprint-1 … sprint-4)
