@@ -3,7 +3,6 @@
 
   <ng-container *ngIf="auth.currentUser() as user; else guestLinks">
     <div class="nav-links" *ngIf="user.role === 'job_seeker'">
-      <a>TEST</a>
       <a routerLink="/jobs" routerLinkActive="active">Jobs</a>
       <a routerLink="/applications" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">My applications</a>
       <a routerLink="/applications/analytics" routerLinkActive="active">Analytics</a>
