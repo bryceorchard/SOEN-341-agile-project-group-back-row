@@ -12,6 +12,7 @@
 2. "Can you add it to #166?" (Gene's refactor proposal PR, branch `Refactor-Proposal`).
 3. "Move Sprint-3/Contribution commits onto #166. Also post a comment in #166, and give me a
    message I can send in the Discord."
+4. (2026-11-26) "Can you look over it one more time? I'd like to merge asap."
 
 ## Context / Findings
 - Before: `docs/minutes/` (6 minutes + template), `docs/ContributionLog/` (folders `Sprint 1/`,
@@ -62,6 +63,15 @@
     at the root. Left as written (historical); the #166 comment says the decision changed.
   - Posted a comment on #166 summarising the moves and drafted a Discord message for the team.
   - `Sprint-3/Contribution` branch left in place (not deleted).
+- Prompt 4 (final check before merge, 2026-11-26):
+  - `main` unchanged since `3e079fa`; #166 is 12 ahead, 0 behind. CI on `c49f7cf`: `backend` and `frontend` pass.
+  - No open PR adds files at the old paths. #222 (Sprint 4 plan) already uses `docs/sprint-4/plan.md`.
+  - `Sprint-3/Contribution` files are byte-identical to their moved copies on #166.
+  - 0 broken relative links; no absolute GitHub links into moved paths. Remaining old-path mentions are in
+    historical AI logs, contribution entries and Gene's proposal text, left as written.
+  - #206 tracks the reorganisation; #166 covers only its first task (docs), so it should say `Refs #206`, not `Closes`.
+  - Blocking the merge: Bryce's own `CHANGES_REQUESTED` review from 2026-11-16, and no approval yet.
+    Branch protection dismisses stale approvals, so this log was pushed before any approval.
 
 ## Decision
 **Bryce:**
