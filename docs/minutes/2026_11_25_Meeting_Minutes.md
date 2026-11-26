@@ -18,7 +18,7 @@
 *Briefly Present. Provided input and left
 ## Agenda
 
--Determine Unique feature
+- Determine Unique feature
 
 ## Discussion
 
