@@ -13,6 +13,8 @@
 3. "Move Sprint-3/Contribution commits onto #166. Also post a comment in #166, and give me a
    message I can send in the Discord."
 4. (2026-11-26) "Can you look over it one more time? I'd like to merge asap."
+   - Follow-ups: approve it under Bryce's account; retitle, rewrite the body, add labels and milestone, then merge.
+5. "Check out #206 too."
 
 ## Context / Findings
 - Before: `docs/minutes/` (6 minutes + template), `docs/ContributionLog/` (folders `Sprint 1/`,
@@ -72,6 +74,25 @@
   - #206 tracks the reorganisation; #166 covers only its first task (docs), so it should say `Refs #206`, not `Closes`.
   - Blocking the merge: Bryce's own `CHANGES_REQUESTED` review from 2026-11-16, and no approval yet.
     Branch protection dismisses stale approvals, so this log was pushed before any approval.
+  - Retitled #166 "Docs: per-sprint docs layout and refactor proposal", body set to `Refs #206`,
+    labels `documentation` + `sprint-4`, milestone Sprint 4. Approved on `86dc70c` and squash-merged as `9f936cb`.
+    CI on `main` passes. Ticked the docs task on #206.
+- Prompt 5 (#206, remaining tasks):
+  - Scope from #206 and Bryce's 2026-11-16 review of #166: `frontend/CareerConnect/` → `frontend/` with `git mv`,
+    Node 24 in a root `.nvmrc`, `.tool-versions` removed, CI, PR template, README and `docs/README.md` updated.
+    Root npm workspaces and a merged lockfile are not in #206's tasks, so they were left out.
+  - Missed in prompt 4: the Nov 16 review also asked to rename the proposal without spaces and fix its
+    Google Docs export formatting. #166 merged without that. Fixed here.
+  - Changes on `chore/repo-structure-206`:
+    - `frontend/CareerConnect/*` → `frontend/` (all renames, 100% similarity); `frontend/.tool-versions`
+      (pinned 26.10.0, outside the backend's `>=22 <25`) and `backend/.nvmrc` (22) deleted; root `.nvmrc` = 24.
+    - `ci.yml`: both jobs use `node-version-file: .nvmrc`; frontend `working-directory` and
+      `cache-dependency-path` point at `frontend/`.
+    - README prerequisites, setup steps and tree; PR template CI line; CONTRIBUTING CI rule; `docs/README.md` index.
+    - `docs/Back Row Career Connect Refactor Draft.md` → `docs/refactor-proposal.md`: headings, `\-` bullets
+      and tabs in the tree fixed; wording unchanged.
+  - Tests: backend 162/162 pass (Node 22 locally); frontend 26 files, 151/151 pass. `npm run build` fails
+    in the sandbox only because `fonts.googleapis.com` is blocked (font inlining); CI runs the real build on Node 24.
 
 ## Decision
 **Bryce:**

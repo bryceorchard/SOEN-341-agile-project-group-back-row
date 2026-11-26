@@ -22,7 +22,7 @@ Closes #
 
 - [ ] Acceptance criteria in the linked issue are met
 - [ ] At least one approving review; all conversations resolved
-- [ ] CI is green (`npm ci` + `npm test` in `backend/`)
+- [ ] CI is green (`backend` and `frontend` jobs)
 - [ ] Tests added/updated for new behaviour (where applicable)
 - [ ] Docs updated (README / docs / comments) where relevant
 - [ ] AI assistance (if any) logged under `docs/sprint-N/ai-log/<Name>/`
