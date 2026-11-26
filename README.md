@@ -57,17 +57,16 @@ CareerConnect brings both sides into one platform. Job seekers create a profile,
 ### Prerequisites
 
 - **git**
-- **Node.js** — the backend and frontend pin their own versions:
-  - Backend: Node 22 (see `backend/.nvmrc`; requires `>=22 <25`)
-  - Frontend: Node `^22.22.3`, `^24.15` or `>=26` (Angular 22's requirement; CI uses Node 24). `frontend/CareerConnect/.tool-versions` pins one for asdf users.
-- A Node version manager (**nvm** recommended) so you can switch between them.
+- **Node.js 24** for both the backend and the frontend (`.nvmrc` at the repo root; CI uses the same file).
+  The backend allows `>=22 <25` and Angular 22 needs `^22.22.3`, `^24.15` or `>=26`, so 24 is the version both accept.
+- A Node version manager (**nvm** recommended). `nvm use` in either folder picks up the root `.nvmrc`.
 
 ### Backend setup and start
 
 ```
 cd backend
-nvm install --lts   # Windows: nvm install lts
-nvm use             
+nvm install         # installs the version in .nvmrc (Windows: nvm install 24)
+nvm use             # Windows: nvm use 24
 npm install
 npm run db:migrate  # create tables
 npm run db:seed     # add demo users (password: Password123!)
@@ -79,7 +78,7 @@ npm start
 In a second terminal:
 
 ```
-cd frontend/CareerConnect
+cd frontend
 npm install
 npm start
 ```
@@ -131,13 +130,6 @@ SOEN-341-agile-project-group-back-row/
 │   ├── workflows/
 │   │   └── ci.yml                     # GitHub Actions: backend and frontend jobs (install, test, build)
 │   └── PULL_REQUEST_TEMPLATE.md       # PR checklist (Definition of Done)
-├── AI-log/                            # Individual AI usage logs, one folder per member (#99)
-│   ├── Bryce/
-│   ├── Gabriel/
-│   ├── Gene/
-│   ├── Luca/
-│   ├── Mahmoud/
-│   └── Zohair/
 ├── backend/                           # Express 5 API with a SQLite database
 │   ├── db/
 │   │   ├── schema.sql                 # Table definitions
@@ -161,28 +153,23 @@ SOEN-341-agile-project-group-back-row/
 │   ├── data/                          # SQLite database file (git-ignored)
 │   ├── eval-output/                   # AI evaluation runs (git-ignored)
 │   ├── uploads/                       # Uploaded resumes (git-ignored)
-│   ├── .nvmrc                         # Backend Node version
 │   └── README.md                      # API reference and database notes
 ├── docs/
 │   ├── ai/                            # AI resume feedback: schema, prompt, provider, evaluation, privacy notice (#141)
-│   ├── ContributionLog/               # Contribution logs (#101, #151)
-│   │   ├── Sprint 1/
-│   │   ├── Sprint2/                   # One file per member
-│   │   ├── Sprint3/
-│   │   └── contribution-template.md
-│   ├── minutes/                       # Meeting minutes: attendance, decisions, action items (#27)
-│   │   ├── minutes-template.md        # Template for new meetings
-│   │   └── YYYY_MM_DD_Meeting_Minutes.md
-│   ├── sprint-1/                      # Sprint 1 plan (backlog, priorities, work-plan table) and Appendix A
-│   ├── sprint-2/                      # Sprint 2 plan (goal, ranked backlog, work plan, risks) (#98)
-│   ├── sprint-3/                      # Sprint 3 plan (#148)
+│   ├── sprint-1/ … sprint-4/          # One folder per sprint (#24, #98, #148)
+│   │   ├── plan.md                    # Sprint plan: goal, ranked backlog / work plan, capacity, risks
+│   │   ├── minutes/                   # Meeting minutes held during the sprint (#27)
+│   │   ├── contributions/             # One contribution log per member (#101, #151)
+│   │   └── ai-log/<Name>/             # Each member's AI usage logs for the sprint (#99)
+│   ├── templates/                     # Minutes and contribution-log templates
 │   ├── user-stories/                  # Requirements, kept separate by source
 │   │   ├── AI Generated User Stories/
 │   │   └── Team Generated User Stories/
 │   ├── CONTRIBUTING.md                # Team process: workflow, branching, PRs, review, DoR/DoD
 │   ├── ERD.md                         # Entity-relationship diagram (current and planned features)
+│   ├── refactor-proposal.md           # Repository restructure proposal (#166, #206)
 │   └── README.md                      # Layout of the docs folder
-├── frontend/CareerConnect/            # Angular 22 app
+├── frontend/                          # Angular 22 app
 │   ├── public/                        # Static assets (favicon)
 │   ├── src/
 │   │   ├── app/                       # Each component has .ts, .html, .css and a .spec.ts unit test
@@ -206,12 +193,12 @@ SOEN-341-agile-project-group-back-row/
 │   │   ├── index.html
 │   │   ├── main.ts
 │   │   └── styles.css                 # Global styles
-│   ├── .tool-versions                 # Frontend Node version (asdf)
 │   ├── angular.json                   # Angular build and test configuration
 │   ├── package.json
 │   ├── tsconfig*.json                 # TypeScript configuration
 │   └── README.md
 ├── .gitignore
+├── .nvmrc                             # Node version for backend, frontend and CI (24)
 ├── LICENSE                            # GNU General Public License v3
 └── README.md                          # This file, the primary README
 ```

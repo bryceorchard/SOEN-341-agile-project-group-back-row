@@ -25,7 +25,7 @@ Every acceptance test file is new (no team test was changed or removed), and eac
 | US-22 acceptance tests | #146, #155 | 1.00 | 2026-11-16 | [Jump to Task](#task-12---us-22-acceptance-tests) |
 
 ## Task #1 - US-01 acceptance tests
-**Associated Links:** [#88](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/88), [AI log](../../../AI-log/Luca/2026-11-12-us01-acceptance-tests.md)
+**Associated Links:** [#88](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/88), [AI log](../ai-log/Luca/2026-11-12-us01-acceptance-tests.md)
 
 `us01-acceptance.spec.ts` (6 tests) and `logout.spec.ts` (2 tests) cover:
 
@@ -37,12 +37,12 @@ Every acceptance test file is new (no team test was changed or removed), and eac
 After review, I restored the two team spec files my first version had replaced and moved my tests into their own file, so the test count only goes up.
 
 ## Task #2 - US-02 tests + filename fix
-**Associated Links:** [#89](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/89), [AI log](../../../AI-log/Luca/2026-11-16-us02-acceptance-tests.md)
+**Associated Links:** [#89](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/89), [AI log](../ai-log/Luca/2026-11-16-us02-acceptance-tests.md)
 
 Fixed AT-4: a PDF now opens in a tab titled with its original filename and has a Download link, and Word files download under their original name (`open-blob.ts`). Added `us02-acceptance.spec.ts` (7) and `us02-acceptance.test.js` (5) for AT-3 to AT-6.
 
 ## Task #3 - US-03 acceptance tests
-**Associated Links:** [#90](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/90), [AI log](../../../AI-log/Luca/2026-11-16-us03-acceptance-tests.md)
+**Associated Links:** [#90](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/90), [AI log](../ai-log/Luca/2026-11-16-us03-acceptance-tests.md)
 
 `us03-acceptance.spec.ts` (3) and `us03-acceptance.test.js` (3):
 
@@ -51,7 +51,7 @@ Fixed AT-4: a PDF now opens in a tab titled with its original filename and has a
 - AT-3: the "No jobs match your search." message
 
 ## Task #4 - US-20 acceptance tests
-**Associated Links:** [#91](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/91), [AI log](../../../AI-log/Luca/2026-11-16-us20-acceptance-tests.md)
+**Associated Links:** [#91](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/91), [AI log](../ai-log/Luca/2026-11-16-us20-acceptance-tests.md)
 
 `us20-acceptance.spec.ts` (5) and `us20-acceptance.test.js` (3):
 
@@ -62,7 +62,7 @@ Fixed AT-4: a PDF now opens in a tab titled with its original filename and has a
 Flagged in the PR: the link text doesn't match the AT wording, and POST /applications has no job-seeker role check.
 
 ## Task #5 - US-05 acceptance tests
-**Associated Links:** [#92](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/92), [AI log](../../../AI-log/Luca/2026-11-16-us05-acceptance-tests.md)
+**Associated Links:** [#92](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/92), [AI log](../ai-log/Luca/2026-11-16-us05-acceptance-tests.md)
 
 `us05-acceptance.spec.ts` (3) and `us05-acceptance.test.js` (3):
 
@@ -72,12 +72,12 @@ Flagged in the PR: the link text doesn't match the AT wording, and POST /applica
 - AT-4: a removed job is blocked
 
 ## Task #6 - US-06 acceptance tests
-**Associated Links:** [#93](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/93), [AI log](../../../AI-log/Luca/2026-11-16-us06-acceptance-tests.md)
+**Associated Links:** [#93](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/93), [AI log](../ai-log/Luca/2026-11-16-us06-acceptance-tests.md)
 
 `us06-acceptance.spec.ts` (1) and `us06-acceptance.test.js` (1) cover AT-2: when a recruiter changes the status to Interview, the job seeker sees it on their dashboard.
 
 ## Task #7 - US-08 acceptance tests
-**Associated Links:** [#94](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/94), [AI log](../../../AI-log/Luca/2026-11-16-us08-acceptance-tests.md)
+**Associated Links:** [#94](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/94), [AI log](../ai-log/Luca/2026-11-16-us08-acceptance-tests.md)
 
 `us08-acceptance.spec.ts` (3) and `us08-acceptance.test.js` (4):
 
@@ -87,7 +87,7 @@ Flagged in the PR: the link text doesn't match the AT wording, and POST /applica
 - AT-4: other recruiters can't change someone else's posting
 
 ## Task #8 - US-09 acceptance tests
-**Associated Links:** [#95](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/95), [AI log](../../../AI-log/Luca/2026-11-16-us09-acceptance-tests.md)
+**Associated Links:** [#95](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/95), [AI log](../ai-log/Luca/2026-11-16-us09-acceptance-tests.md)
 
 `us09-acceptance.spec.ts` (2) and `us09-acceptance.test.js` (5):
 
@@ -97,7 +97,7 @@ Flagged in the PR: the link text doesn't match the AT wording, and POST /applica
 - AT-4 and AT-5: access control
 
 ## Task #9 - US-08 Sprint 3 tests
-**Associated Links:** [#142](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/142), [#155](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/155), [AI log](../../../AI-log/Luca/2026-11-16-us08-s3-acceptance-tests.md)
+**Associated Links:** [#142](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/142), [#155](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/155), [AI log](../ai-log/Luca/2026-11-16-us08-s3-acceptance-tests.md)
 
 `us08-s3-acceptance.spec.ts` (5) and `us08-s3-acceptance.test.js` (5):
 
@@ -107,7 +107,7 @@ Flagged in the PR: the link text doesn't match the AT wording, and POST /applica
 - AT-8: permissions
 
 ## Task #10 - Date filter and review panel
-**Associated Links:** [#132](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/132), [#133](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/133), [#143](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/143), [AI log](../../../AI-log/Luca/2026-11-16-date-filter-review-panel.md)
+**Associated Links:** [#132](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/132), [#133](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/133), [#143](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/143), [AI log](../ai-log/Luca/2026-11-16-date-filter-review-panel.md)
 
 My Sprint 3 feature tasks for US-09:
 
@@ -118,7 +118,7 @@ My Sprint 3 feature tasks for US-09:
 The tests caught an impossible date (2026-13-01) returning 500; it now returns 400.
 
 ## Task #11 - US-07 acceptance tests
-**Associated Links:** [#145](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/145), [#155](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/155), [AI log](../../../AI-log/Luca/2026-11-16-us07-acceptance-tests.md)
+**Associated Links:** [#145](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/145), [#155](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/155), [AI log](../ai-log/Luca/2026-11-16-us07-acceptance-tests.md)
 
 `us07-acceptance.spec.ts` (3) and `us07-acceptance.test.js` (5):
 
@@ -129,7 +129,7 @@ The tests caught an impossible date (2026-13-01) returning 500; it now returns 4
 - AT-5: other users can't see or mark your notifications
 
 ## Task #12 - US-22 acceptance tests
-**Associated Links:** [#146](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/146), [#155](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/155), [AI log](../../../AI-log/Luca/2026-11-16-us22-acceptance-tests.md)
+**Associated Links:** [#146](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/146), [#155](https://github.com/bryceorchard/SOEN-341-agile-project-group-back-row/issues/155), [AI log](../ai-log/Luca/2026-11-16-us22-acceptance-tests.md)
 
 `us22-acceptance.spec.ts` (3) and `us22-acceptance.test.js` (3):
 
