@@ -21,7 +21,7 @@ describe('ChartView', () => {
     expect(el.querySelector('figcaption')?.textContent).toBe('Applications per week');
     const img = el.querySelector('[role="img"]')!;
     expect(img.getAttribute('aria-label')).toBe('Applications per week');
-    expect(img.querySelector('canvas')?.getAttribute('aria-hidden')).toBe('true');
+    expect(img.querySelector('canvas')).not.toBeNull();
     const rows = [...el.querySelectorAll('.chart-data tbody tr')].map((r) =>
       [...r.children].map((c) => c.textContent),
     );
