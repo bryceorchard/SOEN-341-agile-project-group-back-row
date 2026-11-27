@@ -38,6 +38,13 @@ const GRACE = {
   status: 'Interview',
 };
 
+// Form controls with no associated <label> (static analysis D8, Web:InputWithoutLabelCheck).
+function unlabelledControls(root: HTMLElement): string[] {
+  return Array.from(root.querySelectorAll<HTMLInputElement>('input, select, textarea'))
+    .filter((c) => !c.labels?.length)
+    .map((c) => c.outerHTML);
+}
+
 describe('PostingApplicants', () => {
   let harness: RouterTestingHarness;
   let http: HttpTestingController;
@@ -92,6 +99,22 @@ describe('PostingApplicants', () => {
 
   // Fails the test if the page made a request we didn't expect (or skipped one we did).
   afterEach(() => http.verify());
+
+  it('labels each status dropdown, in the list and in the review panel', async () => {
+    await openPage();
+    expect(unlabelledControls(page())).toEqual([]);
+    expect(page().querySelector<HTMLSelectElement>('#status-1')!.labels![0].textContent).toBe('Status for Ada Lovelace');
+
+    page().querySelector<HTMLButtonElement>('.review-button')!.click();
+    http.expectOne(`${API_BASE}/jobs/${JOB_ID}/applications/${ADA.id}`).flush({
+      application: { id: ADA.id, jobId: JOB_ID, status: 'Applied', appliedAt: ADA.appliedAt, updatedAt: ADA.appliedAt, resumeId: null, resumeFilename: null },
+      candidate: { email: ADA.applicantEmail, fullName: ADA.applicantName, headline: null, location: null, phone: null, bio: null },
+      otherApplications: [],
+    });
+    await render();
+    expect(page().querySelector('#review-status')).not.toBeNull();
+    expect(unlabelledControls(page())).toEqual([]);
+  });
 
   it('loads and shows the applicants for the posting', async () => {
     await openPage();

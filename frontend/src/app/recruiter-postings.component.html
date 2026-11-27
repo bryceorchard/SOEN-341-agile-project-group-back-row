@@ -23,25 +23,25 @@
   <h2>New posting</h2>
   <form [formGroup]="create_form" (ngSubmit)="onCreate()">
     <div class="field">
-      <label>Title</label>
-      <input formControlName="title" placeholder="e.g. Backend Developer" />
+      <label for="new-posting-title">Title</label>
+      <input id="new-posting-title" formControlName="title" placeholder="e.g. Backend Developer" />
     </div>
     <div class="field">
-      <label>Description</label>
-      <textarea formControlName="description" rows="3" placeholder="What the role involves"></textarea>
+      <label for="new-posting-description">Description</label>
+      <textarea id="new-posting-description" formControlName="description" rows="3" placeholder="What the role involves"></textarea>
     </div>
     <div class="filters-row">
       <div class="field">
-        <label>Location (optional)</label>
-        <input formControlName="location" placeholder="Montreal, QC" />
+        <label for="new-posting-location">Location (optional)</label>
+        <input id="new-posting-location" formControlName="location" placeholder="Montreal, QC" />
       </div>
       <div class="field">
-        <label>Category (optional)</label>
-        <input formControlName="category" placeholder="Engineering" />
+        <label for="new-posting-category">Category (optional)</label>
+        <input id="new-posting-category" formControlName="category" placeholder="Engineering" />
       </div>
       <div class="field">
-        <label>Deadline (optional)</label>
-        <input formControlName="deadline" type="date" />
+        <label for="new-posting-deadline">Deadline (optional)</label>
+        <input id="new-posting-deadline" formControlName="deadline" type="date" />
       </div>
     </div>
     <button class="btn btn-primary" type="submit" [disabled]="create_form.invalid">Create posting</button>
@@ -54,25 +54,25 @@
     <ng-container *ngIf="editing_id() === p.id; else viewRow">
       <form [formGroup]="edit_form" (ngSubmit)="onSaveEdit(p.id)">
         <div class="field">
-          <label>Title</label>
-          <input formControlName="title" />
+          <label for="edit-posting-title">Title</label>
+          <input id="edit-posting-title" formControlName="title" />
         </div>
         <div class="field">
-          <label>Description</label>
-          <textarea formControlName="description" rows="3"></textarea>
+          <label for="edit-posting-description">Description</label>
+          <textarea id="edit-posting-description" formControlName="description" rows="3"></textarea>
         </div>
         <div class="filters-row">
           <div class="field">
-            <label>Location</label>
-            <input formControlName="location" />
+            <label for="edit-posting-location">Location</label>
+            <input id="edit-posting-location" formControlName="location" />
           </div>
           <div class="field">
-            <label>Category</label>
-            <input formControlName="category" />
+            <label for="edit-posting-category">Category</label>
+            <input id="edit-posting-category" formControlName="category" />
           </div>
           <div class="field">
-            <label>Deadline</label>
-            <input formControlName="deadline" type="date" />
+            <label for="edit-posting-deadline">Deadline</label>
+            <input id="edit-posting-deadline" formControlName="deadline" type="date" />
           </div>
         </div>
         <div class="posting-actions">

@@ -8,21 +8,21 @@
     <p class="auth-subtitle">Sign in, or create an account below</p>
 
     <div class="field">
-      <label>Email</label>
-      <input placeholder="you@example.com" type="text" [formControl]="user" />
+      <label for="login-email">Email</label>
+      <input id="login-email" placeholder="you@example.com" type="text" [formControl]="user" />
       <p *ngIf="user.value && !isValidEmail(user.value)" class="alert alert-error">Enter a valid email address</p>
     </div>
 
     <div class="field">
-      <label>Password</label>
-      <input placeholder="••••••••" type="password" [formControl]="pass" />
+      <label for="login-password">Password</label>
+      <input id="login-password" placeholder="••••••••" type="password" [formControl]="pass" />
       <p class="hint">Password must be at least 8 characters.</p>  
       <p *ngIf="pass.value && pass.value.length < 8" class="alert alert-error">Password must be at least 8 characters</p>
     </div>
 
     <div class="field">
-      <label>Signing up as</label>
-      <div class="role-toggle">
+      <span class="field-label" id="login-role-label">Signing up as</span>
+      <div class="role-toggle" role="group" aria-labelledby="login-role-label">
         <button
           type="button"
           class="role-option"

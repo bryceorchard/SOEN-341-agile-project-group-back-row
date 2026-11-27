@@ -82,7 +82,8 @@ a {
   margin-bottom: 16px;
 }
 
-.field label {
+.field label,
+.field .field-label {
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-muted);
@@ -264,4 +265,17 @@ a {
 
 .bubble-gold {
   background: radial-gradient(circle at 32% 28%, rgba(251, 191, 36, 0.4), rgba(251, 191, 36, 0.04) 72%);
+}
+
+/* Label read by screen readers but not shown (controls whose purpose is clear on screen). */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

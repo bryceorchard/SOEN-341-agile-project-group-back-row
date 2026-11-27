@@ -9,6 +9,13 @@ import { API_BASE } from './auth.service';
 @Component({ template: '' })
 class Blank {}
 
+// Form controls with no associated <label> (static analysis D8, Web:InputWithoutLabelCheck).
+function unlabelledControls(root: HTMLElement): string[] {
+  return Array.from(root.querySelectorAll<HTMLInputElement>('input, select, textarea'))
+    .filter((c) => !c.labels?.length)
+    .map((c) => c.outerHTML);
+}
+
 describe('Login', () => {
   let fixture: ComponentFixture<Login>;
   let page: Login;
@@ -69,6 +76,14 @@ describe('Login', () => {
     passwordInput.value = password;
     passwordInput.dispatchEvent(new Event('input'));
   }
+
+  it('labels every form control, and the role buttons as a group', async () => {
+    await render();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(unlabelledControls(root)).toEqual([]);
+    const group = root.querySelector('[role="group"]')!;
+    expect(root.querySelector('#' + group.getAttribute('aria-labelledby'))?.textContent?.trim()).toBe('Signing up as');
+  });
 
   describe('server responses', () => {
     it('shows "Wrong email or password" on a 401 from login', async () => {

@@ -77,9 +77,9 @@
         </ng-container>
         <ng-template #noReviewResume>No resume attached</ng-template>
       </dd>
-      <dt>Status</dt>
+      <dt><label for="review-status">Status</label></dt>
       <dd>
-        <select class="review-status" [ngModel]="r.application.status" (ngModelChange)="setReviewStatus($event)" name="review-status">
+        <select id="review-status" class="review-status" [ngModel]="r.application.status" (ngModelChange)="setReviewStatus($event)" name="review-status">
           <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
         </select>
       </dd>
@@ -109,7 +109,8 @@
       </div>
 
       <div class="applicant-status">
-        <select [ngModel]="a.status" (ngModelChange)="setStatus(a, $event)" name="status-{{ a.id }}">
+        <label class="visually-hidden" for="status-{{ a.id }}">Status for {{ a.applicantName || a.applicantEmail }}</label>
+        <select id="status-{{ a.id }}" [ngModel]="a.status" (ngModelChange)="setStatus(a, $event)" name="status-{{ a.id }}">
           <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
         </select>
       </div>

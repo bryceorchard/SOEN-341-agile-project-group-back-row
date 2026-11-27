@@ -45,6 +45,13 @@ describe('fileTypeLabel', () => {
   });
 });
 
+// Form controls with no associated <label> (static analysis D8, Web:InputWithoutLabelCheck).
+function unlabelledControls(root: HTMLElement): string[] {
+  return Array.from(root.querySelectorAll<HTMLInputElement>('input, select, textarea'))
+    .filter((c) => !c.labels?.length)
+    .map((c) => c.outerHTML);
+}
+
 describe('Profile details', () => {
   const SEEKER = { id: 1, email: 'seeker@test.com', role: 'job_seeker' as const, createdAt: '' };
   const SAVED = { fullName: 'Sam Seeker', headline: 'Junior developer', location: 'Montreal', phone: null, bio: 'Hi' };
@@ -88,6 +95,11 @@ describe('Profile details', () => {
   function submit() {
     (fixture.nativeElement as HTMLElement).querySelector('.profile-card form')!.dispatchEvent(new Event('submit'));
   }
+
+  it('labels every profile field and the resume upload input', () => {
+    expect(unlabelledControls(fixture.nativeElement)).toEqual([]);
+    expect(fixture.nativeElement.querySelector('#resume-upload')).not.toBeNull();
+  });
 
   it('loads the saved profile into the form', () => {
     expect(input('fullName').value).toBe('Sam Seeker');
@@ -245,6 +257,14 @@ describe('Profile AI Feedback', () => {
     http.expectOne({ method: 'GET', url: feedbackUrl(row === 0 ? 101 : 102) }).flush({ feedback });
     await render();
   }
+
+  it('labels the replacement file input', async () => {
+    component.startReplace(RESUME_A.id);
+    await render();
+    const input = fixture.nativeElement.querySelector(`#resume-replace-${RESUME_A.id}`) as HTMLInputElement;
+    expect(input.labels![0].textContent).toBe('Replacement file for a.pdf');
+    expect(unlabelledControls(fixture.nativeElement)).toEqual([]);
+  });
 
   it('loads saved feedback with GET and renders summary, strengths, generated time and Regenerate', async () => {
     click('AI feedback');

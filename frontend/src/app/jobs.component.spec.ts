@@ -30,6 +30,13 @@ describe('buildJobsQuery', () => {
   });
 });
 
+// Form controls with no associated <label> (static analysis D8, Web:InputWithoutLabelCheck).
+function unlabelledControls(root: HTMLElement): string[] {
+  return Array.from(root.querySelectorAll<HTMLInputElement>('input, select, textarea'))
+    .filter((c) => !c.labels?.length)
+    .map((c) => c.outerHTML);
+}
+
 describe('Jobs page: filters round-trip through the URL', () => {
   let harness: RouterTestingHarness;
   let http: HttpTestingController;
@@ -56,6 +63,13 @@ describe('Jobs page: filters round-trip through the URL', () => {
     expect(sent).toEqual(params);
     req.flush({ jobs: [] });
   }
+
+  it('labels every filter', async () => {
+    await open('/jobs');
+    expectJobsRequest({});
+    harness.detectChanges();
+    expect(unlabelledControls(harness.routeNativeElement as HTMLElement)).toEqual([]);
+  });
 
   it('restores the filters from the URL on load and searches with them', async () => {
     const page = await open('/jobs?keyword=backend&location=Montreal&category=Engineering');

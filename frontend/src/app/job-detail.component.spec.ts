@@ -20,6 +20,13 @@ const JOB = {
 
 const SEEKER = { id: 1, email: 'seeker@test.com', role: 'job_seeker' as const, createdAt: '' };
 
+// Form controls with no associated <label> (static analysis D8, Web:InputWithoutLabelCheck).
+function unlabelledControls(root: HTMLElement): string[] {
+  return Array.from(root.querySelectorAll<HTMLInputElement>('input, select, textarea'))
+    .filter((c) => !c.labels?.length)
+    .map((c) => c.outerHTML);
+}
+
 describe('JobDetail', () => {
   let harness: RouterTestingHarness;
   let http: HttpTestingController;
@@ -62,6 +69,7 @@ describe('JobDetail', () => {
 
     expect(page().querySelector('form')).not.toBeNull();
     expect(page().textContent).not.toContain('Application status');
+    expect(unlabelledControls(page())).toEqual([]);
   });
 
   it('shows the application status instead of the apply form when already applied', async () => {
