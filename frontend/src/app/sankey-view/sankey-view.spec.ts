@@ -23,6 +23,15 @@ describe('SankeyView', () => {
     expect(fixture.nativeElement.textContent).not.toContain('No applications in this period.');
   });
 
+  it('exposes the diagram as one labelled image wrapping the canvas', async () => {
+    fixture.componentRef.setInput('spec', { title: 'Last 7 days (1 application)', flows: [{ from: 'Submitted', to: 'Applied', value: 1 }] });
+    await fixture.whenStable();
+    const img = fixture.nativeElement.querySelector('[role="img"]') as HTMLElement;
+    expect(img.getAttribute('aria-label')).toBe('Sankey diagram: Last 7 days (1 application)');
+    expect(img.querySelector('canvas')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('canvas[role]')).toBeNull();
+  });
+
   it('shows an empty message when the period has no applications', async () => {
     fixture.componentRef.setInput('spec', { title: 'Last 7 days (0 applications)', flows: [] });
     await fixture.whenStable();

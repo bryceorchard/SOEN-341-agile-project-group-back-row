@@ -6,7 +6,8 @@ import { ChartHandle, ChartSpec, renderChart } from '../chart-adapter';
   template: `
     <figure>
       <figcaption>{{ spec().title }}</figcaption>
-      <canvas #canvas role="img" [attr.aria-label]="spec().title"></canvas>
+      <!-- Same pattern as sankey-view: the image role is on the wrapper, not the canvas. -->
+      <div role="img" [attr.aria-label]="spec().title"><canvas #canvas></canvas></div>
       <table class="chart-data">
         <caption class="sr-only">{{ spec().title }} (values)</caption>
         <tbody>
