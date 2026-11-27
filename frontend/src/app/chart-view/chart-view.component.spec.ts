@@ -1,21 +1,30 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { ChartView } from "./chart-view.component";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ChartView } from './chart-view.component';
 
-describe("ChartView", () => {
-  let component: ChartView;
+describe('ChartView', () => {
   let fixture: ComponentFixture<ChartView>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ChartView],
-    }).compileComponents();
-
+    await TestBed.configureTestingModule({ imports: [ChartView] }).compileComponents();
     fixture = TestBed.createComponent(ChartView);
-    component = fixture.componentInstance;
+    fixture.componentRef.setInput('spec', {
+      kind: 'bar',
+      title: 'Applications per week',
+      labels: ['2026-11-16', '2026-11-23'],
+      values: [1, 3],
+    });
     await fixture.whenStable();
   });
 
-  it("should create", () => {
-    expect(component).toBeTruthy();
+  it('renders the title and a data table with one row per label', () => {
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('figcaption')?.textContent).toBe('Applications per week');
+    const rows = [...el.querySelectorAll('.chart-data tbody tr')].map((r) =>
+      [...r.children].map((c) => c.textContent),
+    );
+    expect(rows).toEqual([
+      ['2026-11-16', '1'],
+      ['2026-11-23', '3'],
+    ]);
   });
 });

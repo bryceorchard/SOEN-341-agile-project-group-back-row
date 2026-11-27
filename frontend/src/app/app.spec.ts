@@ -68,7 +68,7 @@ describe('App nav active link', () => {
   }
 
   it('highlights only the link for the current page', async () => {
-    expect(await navLinksAt('/applications')).toEqual({ Jobs: false, 'My applications': true, Analytics: false,Profile: false });
+    expect(await navLinksAt('/applications')).toEqual({ Jobs: false, 'My applications': true, Analytics: false, Profile: false });
   });
 
   it('keeps Jobs highlighted when the search has query params', async () => {
