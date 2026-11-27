@@ -4,6 +4,8 @@
 // leaked contact details, demographic words); whether the feedback is accurate, specific
 // and fair is still judged by a person. `resumeText` is the prepared text the model saw.
 
+import { hasEmail } from './email.js';
+
 const normalize = (s) =>
   String(s)
     .normalize('NFKC')
@@ -18,11 +20,23 @@ const normalize = (s) =>
 
 const words = (s) => normalize(s).match(/[\p{L}\p{N}%$]+/gu) ?? [];
 
+// Strips spaces and the punctuation in EDGE from both ends. A loop instead of
+// /^[\s"'.,;:-]+|[\s"'.,;:-]+$/g, whose second branch backtracks on long inner runs
+// of those characters (javascript:S8786).
+const EDGE = /[\s"'.,;:-]/;
+function trimEdges(s) {
+  let start = 0;
+  let end = s.length;
+  while (start < end && EDGE.test(s[start])) start++;
+  while (end > start && EDGE.test(s[end - 1])) end--;
+  return s.slice(start, end);
+}
+
 // 'exact' if the quote appears in the resume (ignoring case, spacing, quote and dash
 // styles and bullet symbols), 'approximate' if at least 80% of its words appear in the
 // same order nearby (typical when the model repairs extraction damage), else 'missing'.
 export function quoteMatch(quote, resumeText) {
-  const q = normalize(quote).replace(/^[\s"'.,;:-]+|[\s"'.,;:-]+$/g, '');
+  const q = trimEdges(normalize(quote));
   const r = normalize(resumeText);
   if (q && r.includes(q)) return 'exact';
   const qw = words(quote);
@@ -45,9 +59,24 @@ export function quoteMatch(quote, resumeText) {
   return best >= 0.8 ? 'approximate' : 'missing';
 }
 
-const numbersIn = (s) => (String(s).replace(/\[[^\]]*\]/g, ' ').match(/\d+(?:[.,]\d+)*/g) ?? []);
+// Replaces each [bracketed] span with a space, like .replace(/\[[^\]]*\]/g, ' ') but
+// without re-scanning to the end from every '[' when there is no ']' (javascript:S8786).
+function dropBracketed(s) {
+  let out = '';
+  let pos = 0;
+  for (;;) {
+    const open = s.indexOf('[', pos);
+    if (open === -1) break;
+    const close = s.indexOf(']', open + 1);
+    if (close === -1) break;
+    out += s.slice(pos, open) + ' ';
+    pos = close + 1;
+  }
+  return out + s.slice(pos);
+}
 
-const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/;
+const numbersIn = (s) => (dropBracketed(String(s)).match(/\d+(?:[.,]\d+)*/g) ?? []);
+
 const PHONE = /(?:\+?1[\s.-]?)?\(?\b\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/;
 const REDACTION = /\[(?:email|phone|postal code)(?: removed for privacy)?\]/i;
 // "Your contact section only has placeholders": the same mistake without quoting the marker.
@@ -95,7 +124,7 @@ export function runChecks(feedback, resumeText) {
   });
 
   for (const t of allText(feedback)) {
-    if (EMAIL.test(t) || PHONE.test(t)) add('fail', 'contact-leak', `output repeats contact details: "${t}"`);
+    if (hasEmail(t) || PHONE.test(t)) add('fail', 'contact-leak', `output repeats contact details: "${t}"`);
     // prepareResumeText() puts these in; the job seeker never sees them, so feedback about them is wrong.
     if (REDACTION.test(t)) add('fail', 'redaction-placeholder', `output mentions a redaction placeholder: "${t}"`);
   }

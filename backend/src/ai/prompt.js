@@ -5,6 +5,7 @@
 // Rationale for each rule and the evaluation it was tested against:
 // docs/ai/us10-resume-feedback.md. Bump PROMPT_VERSION on any change to the text.
 import { FEEDBACK_SCHEMA, providerSchema } from './feedback-schema.js';
+import { replaceEmails } from './email.js';
 
 export const PROMPT_VERSION = 'resume-feedback-v3';
 
@@ -51,27 +52,43 @@ What to return
 - Write in the language the resume is written in (English or French), in plain language, without markdown.`;
 
 const CONTROL_CHARS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g;
-const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g;
 // North American numbers like 514-555-0142, (514) 555-0142, +1 514 555 0142, 514.555.0142.
 const PHONE = /(?:\+?1[\s.-]?)?\(?\b\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/g;
 const POSTAL_CODE = /\b[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d\b/g;
-// Anything that could close or reopen our <resume> delimiter.
-const DELIMITER_TAG = /<\s*\/?\s*resume[^>]*>/gi;
+// Anything that could close or reopen our <resume> delimiter: "<", optional "/", "resume",
+// then everything up to the next ">". Same result as .replace(/<\s*\/?\s*resume[^>]*>/gi, ...)
+// but linear: once a tag has no ">" after it, no later tag does either (javascript:S8786).
+const DELIMITER_TAG_START = /<\s*(?:\/\s*)?resume/gi;
+function replaceDelimiterTags(text, replacement) {
+  let out = '';
+  let pos = 0;
+  let tag;
+  DELIMITER_TAG_START.lastIndex = 0;
+  while ((tag = DELIMITER_TAG_START.exec(text))) {
+    const close = text.indexOf('>', DELIMITER_TAG_START.lastIndex);
+    if (close === -1) break;
+    out += text.slice(pos, tag.index) + replacement;
+    pos = close + 1;
+    DELIMITER_TAG_START.lastIndex = pos;
+  }
+  return out + text.slice(pos);
+}
 
 // Cleans extracted resume text before it goes into the prompt: drops control characters,
 // collapses runs of blank lines, removes look-alike <resume> tags, and replaces email
 // addresses, phone numbers and postal codes with placeholders (the review doesn't need
 // them, so they are never sent to the AI service). Truncates at MAX_RESUME_CHARS.
 export function prepareResumeText(raw) {
-  let text = String(raw ?? '')
+  const cleaned = String(raw ?? '')
     .replace(/\r\n?/g, '\n')
     .replace(/\t/g, ' ')
-    .replace(CONTROL_CHARS, '')
-    .replace(DELIMITER_TAG, '[removed tag]')
-    .replace(EMAIL, '[email removed for privacy]')
+    .replace(CONTROL_CHARS, '');
+  let text = replaceEmails(replaceDelimiterTags(cleaned, '[removed tag]'), '[email removed for privacy]')
     .replace(PHONE, '[phone removed for privacy]')
     .replace(POSTAL_CODE, '[postal code removed for privacy]')
-    .replace(/[  ]+\n/g, '\n')
+    // Trailing spaces before a newline; a run not followed by \n is kept as is. Matching
+    // whole runs avoids /[ \u00a0]+\n/ re-scanning each run from every position (S8786).
+    .replace(/[ \u00a0]+(\n)?/g, (run, newline) => (newline ? '\n' : run))
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 
