@@ -59,7 +59,7 @@ jobs:
         run: npm ci
 
       - name: Run tests with coverage
-        run: npx ng test --watch=false --coverage --coverage-reporters=lcov --coverage-reporters=text-summary
+        run: npm test -- --watch=false --coverage --coverage-reporters=lcov --coverage-reporters=text-summary
 
       - name: Upload coverage for SonarQube Cloud
         uses: actions/upload-artifact@v7
@@ -103,7 +103,7 @@ jobs:
 
       - name: SonarQube Cloud scan
         if: env.HAS_SONAR_TOKEN == 'true'
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
