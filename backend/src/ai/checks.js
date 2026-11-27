@@ -149,7 +149,7 @@ const tokenSet = (s) => new Set(words(s).filter((w) => w.length > 2));
 // difference in priorities, is what the hand review should look at.
 export function comparePair(a, b) {
   const count = (fb, p) => fb.improvements.filter((i) => i.priority === p).length;
-  const sections = (fb) => [...new Set(fb.improvements.map((i) => i.section))].sort();
+  const sections = (fb) => [...new Set(fb.improvements.map((i) => i.section))].sort((x, y) => x.localeCompare(y));
   const sa = tokenSet(a.summary);
   const sb = tokenSet(b.summary);
   const overlap = [...sa].filter((w) => sb.has(w)).length;
