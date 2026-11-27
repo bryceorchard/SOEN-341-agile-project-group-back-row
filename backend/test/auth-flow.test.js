@@ -34,6 +34,14 @@ test('signup validates input and rejects duplicates', async () => {
   await api.post('/auth/signup').send({ ...creds, email: 'A@test.com' }).expect(409);
 });
 
+test('signup email check rejects an empty domain label and stays fast on long input', async () => {
+  await api.post('/auth/signup').send({ ...creds, email: 'a@b..c' }).expect(400);
+  const long = `a@${'.'.repeat(30000)}@`; // ~450 ms per call with the old regex
+  const start = performance.now();
+  await api.post('/auth/signup').send({ ...creds, email: long }).expect(400);
+  assert.ok(performance.now() - start < 200, 'email validation should not backtrack');
+});
+
 test('login rejects bad credentials and returns a token', async () => {
   await api.post('/auth/login').send({ ...creds, password: 'wrongpass1' }).expect(401);
   const res = await api.post('/auth/login').send(creds).expect(200);

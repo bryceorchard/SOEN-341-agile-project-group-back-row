@@ -118,6 +118,12 @@ describe('Login', () => {
   });
 
   describe('client-side validation', () => {
+    it('accepts normal addresses and rejects an empty domain label', () => {
+      expect(page.isValidEmail('first.last+tag@mail.example.co')).toBe(true);
+      expect(page.isValidEmail('a@b..c')).toBe(false);
+      expect(page.isValidEmail('a@b')).toBe(false);
+    });
+
     it('blocks registration with an invalid email and sends nothing', async () => {
       fillIn('not-an-email', 'Password123!');
       await render();
