@@ -57,17 +57,16 @@ CareerConnect brings both sides into one platform. Job seekers create a profile,
 ### Prerequisites
 
 - **git**
-- **Node.js** — the backend and frontend pin their own versions:
-  - Backend: Node 22 (see `backend/.nvmrc`; requires `>=22 <25`)
-  - Frontend: Node `^22.22.3`, `^24.15` or `>=26` (Angular 22's requirement; CI uses Node 24). `frontend/CareerConnect/.tool-versions` pins one for asdf users.
-- A Node version manager (**nvm** recommended) so you can switch between them.
+- **Node.js 24** for both the backend and the frontend (`.nvmrc` at the repo root; CI uses the same file).
+  The backend allows `>=22 <25` and Angular 22 needs `^22.22.3`, `^24.15` or `>=26`, so 24 is the version both accept.
+- A Node version manager (**nvm** recommended). `nvm use` in either folder picks up the root `.nvmrc`.
 
 ### Backend setup and start
 
 ```
 cd backend
-nvm install --lts   # Windows: nvm install lts
-nvm use             
+nvm install         # installs the version in .nvmrc (Windows: nvm install 24)
+nvm use             # Windows: nvm use 24
 npm install
 npm run db:migrate  # create tables
 npm run db:seed     # add demo users (password: Password123!)
@@ -79,7 +78,7 @@ npm start
 In a second terminal:
 
 ```
-cd frontend/CareerConnect
+cd frontend
 npm install
 npm start
 ```
@@ -99,21 +98,25 @@ See [`backend/README.md`](backend/README.md) for the full API reference and data
 
 ## Features
 
-Implemented (Sprints 1–2):
+Implemented (Sprints 1–3):
 
 - Registration and login as a job seeker or a recruiter, and profile management
 - Resume upload, replace, view, and delete
 - Job search with keyword, location, and category filters, and a details page for each job
 - Applying to a job, optionally attaching one of your resumes
 - Application dashboard with each application's status (Applied, Under Review, Interview, Offered, Rejected) and a status filter
-- Job postings for recruiters: create, edit, close, and reopen
-- Applicants for each posting, with a status filter and status updates by the recruiter
+- Job postings for recruiters: create, edit, close, reopen, archive, and restore, with application counts per status (US-08)
+- Applicants for each posting, with status and date filters, a candidate review panel, and status updates by the recruiter (US-09)
+- In-app notifications with an unread count: status updates and interview invitations for job seekers, deadline reminders, and new applications for recruiters (US-07, US-22)
+
+In progress (Sprint 3 → 4):
+
+- Application analytics and status history (US-21): API done (`GET /applications/stats`, `GET /applications/:id/history`); dashboard page in #135
+- AI-assisted resume feedback (US-10): API, mock provider, and evaluation done (`POST`/`GET /resumes/:id/feedback`, [design notes](docs/ai/us10-resume-feedback.md)); UI in #140
 
 Planned for later sprints:
 
-- AI-assisted resume feedback (US-10)
 - Saved and favourite jobs (US-04)
-- Notifications and reminders for application deadlines (US-07)
 - More stories in the backlog (US-11 to US-19); see the GitHub issues
 
 ## File Structure
@@ -127,13 +130,6 @@ SOEN-341-agile-project-group-back-row/
 │   ├── workflows/
 │   │   └── ci.yml                     # GitHub Actions: backend and frontend jobs (install, test, build)
 │   └── PULL_REQUEST_TEMPLATE.md       # PR checklist (Definition of Done)
-├── AI-log/                            # Individual AI usage logs, one folder per member (#99)
-│   ├── Bryce/
-│   ├── Gabriel/
-│   ├── Gene/
-│   ├── Luca/
-│   ├── Mahmoud/
-│   └── Zohair/
 ├── backend/                           # Express 5 API with a SQLite database
 │   ├── db/
 │   │   ├── schema.sql                 # Table definitions
@@ -143,37 +139,37 @@ SOEN-341-agile-project-group-back-row/
 │   │   └── eval-resume-feedback.js    # npm run ai:eval: runs the AI feedback evaluation set (#141)
 │   ├── src/
 │   │   ├── ai/                        # AI resume feedback: prompt, response schema, output checks (#141)
-│   │   ├── routes/                    # auth, profile, resumes, jobs, applications
+│   │   ├── routes/                    # auth, profile, resumes, jobs, applications, notifications, resume feedback
 │   │   ├── app.js                     # Express app: middleware and routes
 │   │   ├── server.js                  # Entry point (npm start)
 │   │   ├── config.js                  # Environment variables and defaults
 │   │   ├── middleware.js              # JWT authentication and role checks
-│   │   └── errors.js                  # HTTP error type
+│   │   ├── errors.js                  # HTTP error type
+│   │   ├── notify.js                  # Creates notifications on application events (#136)
+│   │   ├── deadline-reminders.js      # Deadline reminder notifications (#137)
+│   │   └── application-stats.js       # Application analytics and status history (#134)
 │   ├── test/                          # Backend tests (npm test)
 │   │   └── fixtures/                  # AI evaluation resumes and a sample AI reply (#141)
 │   ├── data/                          # SQLite database file (git-ignored)
 │   ├── eval-output/                   # AI evaluation runs (git-ignored)
 │   ├── uploads/                       # Uploaded resumes (git-ignored)
-│   ├── .nvmrc                         # Backend Node version
 │   └── README.md                      # API reference and database notes
 ├── docs/
 │   ├── ai/                            # AI resume feedback: schema, prompt, provider, evaluation, privacy notice (#141)
-│   ├── ContributionLog/               # Contribution logs (#101)
-│   │   ├── Sprint 1/
-│   │   ├── Sprint2/                   # One file per member
-│   │   └── contribution-template.md
-│   ├── minutes/                       # Meeting minutes: attendance, decisions, action items (#27)
-│   │   ├── minutes-template.md        # Template for new meetings
-│   │   └── YYYY_MM_DD_Meeting_Minutes.md
-│   ├── sprint-1/                      # Sprint 1 plan (backlog, priorities, work-plan table) and Appendix A
-│   ├── sprint-2/                      # Sprint 2 plan (goal, ranked backlog, work plan, risks) (#98)
+│   ├── sprint-1/ … sprint-4/          # One folder per sprint (#24, #98, #148)
+│   │   ├── plan.md                    # Sprint plan: goal, ranked backlog / work plan, capacity, risks
+│   │   ├── minutes/                   # Meeting minutes held during the sprint (#27)
+│   │   ├── contributions/             # One contribution log per member (#101, #151)
+│   │   └── ai-log/<Name>/             # Each member's AI usage logs for the sprint (#99)
+│   ├── templates/                     # Minutes and contribution-log templates
 │   ├── user-stories/                  # Requirements, kept separate by source
 │   │   ├── AI Generated User Stories/
 │   │   └── Team Generated User Stories/
 │   ├── CONTRIBUTING.md                # Team process: workflow, branching, PRs, review, DoR/DoD
 │   ├── ERD.md                         # Entity-relationship diagram (current and planned features)
+│   ├── refactor-proposal.md           # Repository restructure proposal (#166, #206)
 │   └── README.md                      # Layout of the docs folder
-├── frontend/CareerConnect/            # Angular 22 app
+├── frontend/                          # Angular 22 app
 │   ├── public/                        # Static assets (favicon)
 │   ├── src/
 │   │   ├── app/                       # Each component has .ts, .html, .css and a .spec.ts unit test
@@ -189,17 +185,20 @@ SOEN-341-agile-project-group-back-row/
 │   │   │   ├── jobs.component.*           # Job search and filters
 │   │   │   ├── job-detail.component.*     # Job details and applying
 │   │   │   ├── my-applications.component.*     # Job seeker's applications dashboard
-│   │   │   ├── recruiter-postings.component.*  # Recruiter's postings: create, edit, close/reopen
-│   │   │   └── posting-applicants.component.*  # Applicants for a posting and status updates
+│   │   │   ├── recruiter-postings.component.*  # Recruiter's postings: create, edit, close/reopen, archive
+│   │   │   ├── posting-applicants.component.*  # Applicants for a posting, filters, candidate review
+│   │   │   ├── notifications.component.*       # Notification list (#138)
+│   │   │   ├── notification.service.ts         # Unread count for the nav bell
+│   │   │   └── us*-acceptance.spec.ts          # Automated acceptance tests, one file per story
 │   │   ├── index.html
 │   │   ├── main.ts
 │   │   └── styles.css                 # Global styles
-│   ├── .tool-versions                 # Frontend Node version (asdf)
 │   ├── angular.json                   # Angular build and test configuration
 │   ├── package.json
 │   ├── tsconfig*.json                 # TypeScript configuration
 │   └── README.md
 ├── .gitignore
+├── .nvmrc                             # Node version for backend, frontend and CI (24)
 ├── LICENSE                            # GNU General Public License v3
 └── README.md                          # This file, the primary README
 ```

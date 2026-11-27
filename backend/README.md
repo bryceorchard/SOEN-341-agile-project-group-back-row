@@ -16,7 +16,7 @@ npm run db:reset     # wipe + migrate + seed
 The database file is created at `backend/data/careerconnect.db` (gitignored). Override with `DB_PATH`.
 
 ## API
-Run: `npm start` (http://localhost:3000, override with `PORT`). Tests: `npm test`.
+Run: `npm start` (http://localhost:3000, override with `PORT`). Tests: `npm test` (`npm run test:coverage` adds a coverage report, as CI does).
 Env: `JWT_SECRET` (set in production), `CORS_ORIGIN` (default `http://localhost:4200`), `DB_PATH`, `UPLOAD_DIR`, `DEADLINE_REMINDER_DAYS` (default `3`).
 AI resume feedback (#139): `AI_API_KEY` (never committed), `AI_MODEL` (default `openai/gpt-oss-120b`), `AI_BASE_URL` (default Groq's OpenAI-compatible endpoint, `https://api.groq.com/openai/v1`), `AI_PROVIDER` (set to `mock` to get a fixed sample reply without calling out; the tests set it themselves). With neither a key nor `AI_PROVIDER=mock`, `POST /resumes/:id/feedback` returns 503 rather than fake feedback. For local development without a key: `AI_PROVIDER=mock npm run dev`. See `.env.example`.
 

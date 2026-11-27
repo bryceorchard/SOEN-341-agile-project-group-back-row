@@ -49,8 +49,10 @@ We use a feature-branch workflow with `main` as the single integration branch.
 - **Required reviews:** at least **one** approving review from someone other than the
   author before merge. For changes that cross areas (e.g. backend + frontend), request
   a reviewer from each affected area.
-- **CI must be green.** The GitHub Actions `CI` workflow (Node 22, `npm ci`, `npm test`
-  in `backend/`) must pass before merge.
+- **CI must be green.** The GitHub Actions `CI` workflow must pass before merge: the
+  `backend` job (`npm ci`, tests with coverage in `backend/`) and the `frontend` job
+  (`npm ci`, tests with coverage and a build in `frontend/`), both on the Node version in
+  the root `.nvmrc`.
 - Resolve all review conversations before merging.
 - **Merge method:** squash and merge, so `main` keeps a clean, linear history. The
   squash commit message should summarize the change and reference the issue.
@@ -91,5 +93,5 @@ An issue/PR is **done** when:
 - [ ] CI is green (build + tests pass).
 - [ ] Tests exist for new behaviour where applicable.
 - [ ] Documentation updated (README / docs / code comments) where relevant.
-- [ ] Any AI assistance used is logged in `AI-log/<name>/` per the AI Usage Log format.
+- [ ] Any AI assistance used is logged in `docs/sprint-N/ai-log/<Name>/` per the AI Usage Log format.
 - [ ] The issue is closed and its board card moved to **Done**.

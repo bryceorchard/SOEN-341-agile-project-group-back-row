@@ -1,7 +1,0 @@
-.angular/
-node_modules/
-package-lock.json
-
-# Personal editor/tool config
-.helix/
-scripts/.vvrill

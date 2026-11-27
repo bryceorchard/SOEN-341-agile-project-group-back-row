@@ -317,7 +317,7 @@ async function main() {
   writeFileSync(path.join(outDir, 'REVIEW.md'), renderReview(meta, results, pairs));
   const valids = results.filter((r) => r.ok).length;
   console.log(`\n${valids}/${results.length} replies schema-valid. Review sheet: ${path.join(outDir, 'REVIEW.md')}`);
-  console.log('After reviewing, copy REVIEW.md to AI-log/Bryce/md/ (see docs/ai/us10-resume-feedback.md).');
+  console.log('After reviewing, copy REVIEW.md to docs/sprint-N/ai-log/Bryce/md/ (see docs/ai/us10-resume-feedback.md).');
 }
 
 main().catch((err) => {
