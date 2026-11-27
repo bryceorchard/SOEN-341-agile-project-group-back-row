@@ -8,7 +8,6 @@ import { RecruiterPostings } from './recruiter-postings.component';
 import { PostingApplicants } from './posting-applicants.component';
 import { authGuard, roleGuard } from './guards';
 import { Notifications } from './notifications.component';
-import { Analytics } from './analytics/analytics.component';
 
 export const routes: Routes = [
   {
@@ -34,9 +33,10 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard('job_seeker')],
   },
   {
-  path: 'applications/analytics',
-  component: Analytics,
-  canActivate: [authGuard, roleGuard('job_seeker')],
+    // Lazy so chart.js stays out of the initial bundle.
+    path: 'applications/analytics',
+    loadComponent: () => import('./analytics/analytics.component').then((m) => m.Analytics),
+    canActivate: [authGuard, roleGuard('job_seeker')],
   },
   {
     path: 'recruiter/postings',
