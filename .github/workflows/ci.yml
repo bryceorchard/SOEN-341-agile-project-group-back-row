@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   backend:
     runs-on: ubuntu-24.04
@@ -19,7 +22,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: backend/package-lock.json
   
@@ -27,13 +30,20 @@ jobs:
         run: npm ci
   
       - name: Run tests with coverage
-        run: npm run test:coverage
+        run: npm run test:lcov
+
+      - name: Upload coverage for SonarQube Cloud
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-lcov
+          path: backend/coverage/lcov.info
+          if-no-files-found: error
   
   frontend:
     runs-on: ubuntu-24.04
     defaults:
       run:
-        working-directory: frontend/CareerConnect
+        working-directory: frontend
     steps:
       - name: Get the code
         uses: actions/checkout@v7
@@ -41,15 +51,62 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: .nvmrc
           cache: npm
-          cache-dependency-path: frontend/CareerConnect/package-lock.json
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run tests with coverage
-        run: npx ng test --watch=false --coverage
+        run: npm test -- --watch=false --coverage --coverage-reporters=lcov --coverage-reporters=text-summary
+
+      - name: Upload coverage for SonarQube Cloud
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-lcov
+          path: frontend/coverage/CareerConnect/lcov.info
+          if-no-files-found: error
 
       - name: Build
         run: npm run build
+
+  sonar:
+    needs: [backend, frontend]
+    runs-on: ubuntu-24.04
+    env:
+      # Only a true/false flag at job level; the token itself is passed to the scan step alone.
+      HAS_SONAR_TOKEN: ${{ secrets.SONAR_TOKEN != '' }}
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Download backend coverage
+        uses: actions/download-artifact@v7
+        with:
+          name: backend-lcov
+          path: backend/coverage
+
+      - name: Download frontend coverage
+        uses: actions/download-artifact@v7
+        with:
+          name: frontend-lcov
+          path: frontend/coverage/CareerConnect
+
+      # LCOV paths are relative to each package; SonarQube Cloud resolves them from the repo root
+      - name: Make coverage paths repo-relative
+        run: |
+          sed -i 's#^SF:#SF:backend/#' backend/coverage/lcov.info
+          sed -i 's#^SF:#SF:frontend/#' frontend/coverage/CareerConnect/lcov.info
+
+      - name: SonarQube Cloud scan
+        if: env.HAS_SONAR_TOKEN == 'true'
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Scan skipped
+        if: env.HAS_SONAR_TOKEN != 'true'
+        run: echo "::warning::SONAR_TOKEN is not set, so the SonarQube Cloud scan was skipped. Add it under Settings > Secrets and variables > Actions."

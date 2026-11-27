@@ -11,6 +11,7 @@
     "dev": "node --watch src/server.js",
     "test": "node --test test/*.test.js",
     "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude=\"test/**\" test/*.test.js",
+    "test:lcov": "node -e \"require('fs').mkdirSync('coverage',{recursive:true})\" && node --test --experimental-test-coverage --test-coverage-exclude=\"test/**\" --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info test/*.test.js",
     "ai:eval": "node scripts/eval-resume-feedback.js"
   },
   "dependencies": {

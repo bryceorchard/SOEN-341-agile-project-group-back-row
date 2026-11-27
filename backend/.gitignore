@@ -3,3 +3,4 @@ data/
 uploads/
 .env
 eval-output/
+coverage/

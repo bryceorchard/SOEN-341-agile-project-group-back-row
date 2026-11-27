@@ -1,0 +1,4 @@
+.canvas-wrap { position: relative; height: 340px; }
+.chart-data { width: 100%; margin-top: 12px; border-collapse: collapse; }
+.chart-data th, .chart-data td { text-align: left; padding: 4px 8px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
