@@ -184,14 +184,15 @@ test('isResume: false is 422 and nothing is saved', async () => {
   assert.equal(get.body.feedback, null);
 });
 
-test('a provider outage is 503 and nothing is saved', async () => {
+test('a provider outage is 503, nothing is saved, and the error is logged on one line', async (t) => {
+  const logged = t.mock.method(console, 'error', () => {});
   resetRateLimitForTests(); // isolate this db's reused user id from diDb's usage above
   const outageDb = new Database(':memory:');
   outageDb.pragma('foreign_keys = ON');
   migrate(outageDb);
   const outageApi = request(buildDiApp(outageDb, {
     extractText: async () => 'some resume text with enough letters to pass the minimum check',
-    getFeedbackReply: async () => { throw new ProviderUnavailableError('boom'); },
+    getFeedbackReply: async () => { throw new ProviderUnavailableError('boom\r\nFAKE 200 OK forged log line'); },
   }));
   const outageToken = await login(outageApi, 'outage@test.com');
   const up = await outageApi.post('/resumes').set('Authorization', `Bearer ${outageToken}`)
@@ -201,6 +202,10 @@ test('a provider outage is 503 and nothing is saved', async () => {
   await outageApi.post(`/resumes/${outageResumeId}/feedback`).set('Authorization', `Bearer ${outageToken}`).expect(503);
   const get = await outageApi.get(`/resumes/${outageResumeId}/feedback`).set('Authorization', `Bearer ${outageToken}`).expect(200);
   assert.equal(get.body.feedback, null);
+  const line = logged.mock.calls.map((call) => call.arguments.join(' ')).find((l) => l.includes('provider unavailable'));
+  assert.ok(line, 'the outage is logged');
+  assert.doesNotMatch(line, /[\r\n]/);
+  assert.match(line, /boom FAKE 200 OK forged log line/);
 });
 
 test('a second POST replaces the stored feedback rather than adding a row', async () => {
