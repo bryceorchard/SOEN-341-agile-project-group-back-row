@@ -13,7 +13,18 @@
       <app-metric-tile label="Last 7 days" [value]="s.submittedLast7Days" />
       <app-metric-tile label="Last 30 days" [value]="s.submittedLast30Days" />
       <app-metric-tile label="Response rate" [value]="s.responseRate + '%'" [hint]="s.responded + ' of ' + s.total + ' got a reply'" />
+      <app-metric-tile label="Postings still open" [value]="s.postings.open" [hint]="s.postings.closed + ' closed'" />
     </div>
+
+    <h2>By status</h2>
+    <table class="status-table">
+      <thead><tr><th scope="col">Status</th><th scope="col">Applications</th><th scope="col">Share</th></tr></thead>
+      <tbody>
+        @for (b of s.byStatus; track b.status) {
+          <tr><th scope="row">{{ b.status }}</th><td>{{ b.count }}</td><td>{{ b.percent }}%</td></tr>
+        }
+      </tbody>
+    </table>
 
     <h2>Application flow</h2>
     <section class="sankey-scroller" aria-label="Application flow by period" tabindex="0">
@@ -25,6 +36,22 @@
     @if (weekSpec(); as w) {
       <h2>Per week</h2>
       <app-chart-view [spec]="w" />
+    }
+
+    <h2>Status history</h2>
+    @if (applicationsError()) {
+      <div class="alert alert-error">{{ applicationsError() }}</div>
+    } @else {
+      <div class="history-apps">
+        @for (a of applications(); track a.id) {
+          <details class="card history-app" (toggle)="onToggle(a.id, $event)">
+            <summary>{{ a.jobTitle }} <span class="badge">{{ a.status }}</span> <span class="applied">Applied {{ appliedDate(a) | date: 'mediumDate' }}</span></summary>
+            @if (opened().has(a.id)) {
+              <app-application-history [applicationId]="a.id" />
+            }
+          </details>
+        }
+      </div>
     }
   }
 }

@@ -1,3 +1,8 @@
 .metric-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
 .sankey-scroller { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 24px; }
 .sankey-panel { flex: 0 0 100%; scroll-snap-align: start; }
+.status-table { border-collapse: collapse; margin-bottom: 24px; }
+.status-table th, .status-table td { text-align: left; padding: 4px 16px 4px 0; }
+.history-apps { display: flex; flex-direction: column; gap: 8px; }
+.history-app summary { cursor: pointer; }
+.applied { color: var(--text-muted); font-size: 0.82rem; }
