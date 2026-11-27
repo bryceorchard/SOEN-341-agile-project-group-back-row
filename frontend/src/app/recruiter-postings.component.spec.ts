@@ -5,6 +5,13 @@ import { provideRouter } from '@angular/router';
 import { RecruiterPostings, Posting } from './recruiter-postings.component';
 import { AuthService, API_BASE } from './auth.service';
 
+// Form controls with no associated <label> (static analysis D8, Web:InputWithoutLabelCheck).
+function unlabelledControls(root: HTMLElement): string[] {
+  return Array.from(root.querySelectorAll<HTMLInputElement>('input, select, textarea'))
+    .filter((c) => !c.labels?.length)
+    .map((c) => c.outerHTML);
+}
+
 describe('RecruiterPostings form validation', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -95,6 +102,18 @@ describe('RecruiterPostings Dashboard Features', () => {
   afterEach(() => {
     // ensure no unexpected HTTP requests were made
     http.verify();
+  });
+
+  it('labels every field of the create form and the edit form', () => {
+    fixture.detectChanges();
+    http.expectOne(`${API_BASE}/jobs/mine?view=active`).flush({ jobs: [MOCK_POSTING] });
+    fixture.detectChanges();
+    expect(unlabelledControls(fixture.nativeElement)).toEqual([]);
+
+    component.startEdit(MOCK_POSTING);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#edit-posting-title')).not.toBeNull();
+    expect(unlabelledControls(fixture.nativeElement)).toEqual([]);
   });
 
   it('loads active postings by default and displays status counts', () => {

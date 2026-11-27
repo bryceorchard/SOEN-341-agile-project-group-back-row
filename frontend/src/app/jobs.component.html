@@ -9,16 +9,16 @@
   <form [formGroup]="filter_form" (ngSubmit)="search()">
     <div class="filters-row">
       <div class="field">
-        <label>Keyword</label>
-        <input formControlName="keyword" placeholder="Title or description" />
+        <label for="jobs-filter-keyword">Keyword</label>
+        <input id="jobs-filter-keyword" formControlName="keyword" placeholder="Title or description" />
       </div>
       <div class="field">
-        <label>Location</label>
-        <input formControlName="location" placeholder="City" />
+        <label for="jobs-filter-location">Location</label>
+        <input id="jobs-filter-location" formControlName="location" placeholder="City" />
       </div>
       <div class="field">
-        <label>Category</label>
-        <select formControlName="category">
+        <label for="jobs-filter-category">Category</label>
+        <select id="jobs-filter-category" formControlName="category">
           <option value="">All categories</option>
           <option *ngFor="let c of categories()" [value]="c">{{ c }}</option>
         </select>

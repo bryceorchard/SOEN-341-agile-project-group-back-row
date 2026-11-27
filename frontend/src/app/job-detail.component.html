@@ -33,8 +33,8 @@
     <div *ngIf="!applied_status(); else appliedMsg">
       <form [formGroup]="apply_form" (ngSubmit)="apply()">
         <div class="field">
-          <label>Resume (optional)</label>
-          <select formControlName="resumeId">
+          <label for="apply-resume-id">Resume (optional)</label>
+          <select id="apply-resume-id" formControlName="resumeId">
             <option value="">No resume attached</option>
             <option *ngFor="let r of resumes()" [value]="r.id">{{ r.originalFilename }}</option>
           </select>
