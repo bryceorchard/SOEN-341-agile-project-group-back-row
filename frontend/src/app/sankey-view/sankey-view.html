@@ -1,0 +1,19 @@
+<figure>
+  <figcaption>{{ spec().title }}</figcaption>
+  <div class="canvas-wrap" [hidden]="!spec().flows.length">
+    <canvas #canvas role="img" [attr.aria-label]="'Sankey diagram: ' + spec().title"></canvas>
+  </div>
+  @if (!spec().flows.length) {
+    <p class="empty">No applications in this period.</p>
+  } @else {
+    <table class="chart-data">
+      <caption class="sr-only">{{ spec().title }} (values)</caption>
+      <thead><tr><th>From</th><th>To</th><th>Applications</th></tr></thead>
+      <tbody>
+        @for (f of spec().flows; track f.to) {
+          <tr><td>{{ f.from }}</td><td>{{ f.to }}</td><td>{{ f.value }}</td></tr>
+        }
+      </tbody>
+    </table>
+  }
+</figure>

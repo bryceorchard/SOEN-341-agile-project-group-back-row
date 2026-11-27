@@ -33,6 +33,12 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard('job_seeker')],
   },
   {
+    // Lazy so chart.js stays out of the initial bundle.
+    path: 'applications/analytics',
+    loadComponent: () => import('./analytics/analytics.component').then((m) => m.Analytics),
+    canActivate: [authGuard, roleGuard('job_seeker')],
+  },
+  {
     path: 'recruiter/postings',
     component: RecruiterPostings,
     canActivate: [authGuard, roleGuard('recruiter')],
