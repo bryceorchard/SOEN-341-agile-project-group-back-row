@@ -1,7 +1,9 @@
 <figure>
   <figcaption>{{ spec().title }}</figcaption>
-  <div class="canvas-wrap" [hidden]="!spec().flows.length">
-    <canvas #canvas role="img" [attr.aria-label]="'Sankey diagram: ' + spec().title"></canvas>
+  <!-- role="img" sits on the wrapper: a <canvas> counts as interactive, so it can't take a
+       non-interactive role (Web:S6843). The canvas inside is presentational. -->
+  <div class="canvas-wrap" [hidden]="!spec().flows.length" role="img" [attr.aria-label]="'Sankey diagram: ' + spec().title">
+    <canvas #canvas aria-hidden="true"></canvas>
   </div>
   @if (!spec().flows.length) {
     <p class="empty">No applications in this period.</p>

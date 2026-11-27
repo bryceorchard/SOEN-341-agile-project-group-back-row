@@ -19,6 +19,9 @@ describe('ChartView', () => {
   it('renders the title and a data table with one row per label', () => {
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector('figcaption')?.textContent).toBe('Applications per week');
+    const img = el.querySelector('[role="img"]')!;
+    expect(img.getAttribute('aria-label')).toBe('Applications per week');
+    expect(img.querySelector('canvas')?.getAttribute('aria-hidden')).toBe('true');
     const rows = [...el.querySelectorAll('.chart-data tbody tr')].map((r) =>
       [...r.children].map((c) => c.textContent),
     );
