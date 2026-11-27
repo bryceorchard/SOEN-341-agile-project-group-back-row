@@ -23,6 +23,10 @@ const toApi = (row) => {
   };
 };
 
+// Provider errors and validation errors can carry text from the AI reply. Strip line
+// breaks and other control characters so one log call is always one log line (log injection).
+const forLog = (s) => String(s).replace(/[\u0000-\u001f\u007f]+/g, ' ');
+
 // `extractText`/`getFeedbackReply` are injectable so tests can exercise every error path
 // (empty text, invalid reply, provider outage) without a real file or network call; the
 // real AI provider already refuses to call out when AI_API_KEY is unset (provider.js).
@@ -56,7 +60,7 @@ export default function resumeFeedbackRoutes(db, { extractText = extractResumeTe
       reply = await getFeedbackReply(prompt);
     } catch (err) {
       if (err instanceof ProviderUnavailableError) {
-        console.error('AI resume feedback provider unavailable:', err.message);
+        console.error('AI resume feedback provider unavailable:', forLog(err.message));
         throw new HttpError(503, 'The AI service is unavailable right now. Please try again later.');
       }
       throw err;
@@ -64,7 +68,7 @@ export default function resumeFeedbackRoutes(db, { extractText = extractResumeTe
 
     const parsed = parseFeedback(reply);
     if (!parsed.ok) {
-      console.error('AI resume feedback failed validation:', parsed.errors);
+      console.error('AI resume feedback failed validation:', forLog(parsed.errors.join('; ')));
       throw new HttpError(502, 'The AI service returned an unexpected reply');
     }
     if (!parsed.feedback.isResume) {
