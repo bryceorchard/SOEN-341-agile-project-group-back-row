@@ -1,0 +1,2 @@
+.history-list { list-style: none; margin: 8px 0 0; padding: 0 0 0 14px; border-left: 2px solid rgba(128,128,128,.3); display: flex; flex-direction: column; gap: 6px; }
+.by { color: var(--text-muted); font-size: 0.82rem; }

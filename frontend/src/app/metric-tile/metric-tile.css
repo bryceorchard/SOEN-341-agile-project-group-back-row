@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+
+.metric-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: inherit;
+}
+
+.tile-label {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.tile-value {
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.tile-hint {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin: 2px 0 0;
+}
