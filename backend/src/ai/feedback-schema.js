@@ -169,11 +169,20 @@ export function normalizeFeedback(value) {
   };
 }
 
+// Strips a ```json ... ``` (or plain ```) fence around the whole reply. Same result as
+// .replace(/^```(?:json)?\s*([\s\S]*?)\s*```$/i, '$1'), which backtracks badly on a long
+// reply that opens a fence but doesn't close it (javascript:S8786).
+function unfence(s) {
+  const open = /^```(?:json)?/i.exec(s);
+  if (!open || s.length < open[0].length + 3 || !s.endsWith('```')) return s;
+  return s.slice(open[0].length, -3).trim();
+}
+
 // Parses the provider's raw text reply. Tolerates a ```json fence (some providers add one
 // in plain JSON mode). Returns { ok: true, feedback } or { ok: false, errors }.
 export function parseFeedback(raw) {
   if (typeof raw !== 'string' || raw.trim() === '') return { ok: false, errors: ['empty reply'] };
-  const unfenced = raw.trim().replace(/^```(?:json)?\s*([\s\S]*?)\s*```$/i, '$1');
+  const unfenced = unfence(raw.trim());
   let value;
   try {
     value = JSON.parse(unfenced);

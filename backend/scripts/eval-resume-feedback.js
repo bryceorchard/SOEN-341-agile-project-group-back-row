@@ -128,7 +128,9 @@ const call = (cfg, prompt) =>
 
 // --- REVIEW.md ------------------------------------------------------------------------
 
-const quote = (s) => String(s).replace(/\s*\n\s*/g, ' ');
+// Joins lines: each whitespace run that contains a newline becomes one space. Same as
+// .replace(/\s*\n\s*/g, ' ') without backtracking on long runs of spaces (javascript:S8786).
+const quote = (s) => String(s).replace(/\s+/g, (ws) => (ws.includes('\n') ? ' ' : ws));
 
 function renderFeedback(fb) {
   const out = [`**Summary.** ${quote(fb.summary)}`, '', `**Is a resume:** ${fb.isResume}`, '', '**Strengths**'];
