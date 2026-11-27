@@ -303,7 +303,7 @@ async function main() {
   const valid = (file) => results.filter((r) => r.fixture.file === file && r.feedback);
   const seen = new Set();
   for (const f of fixtures.filter((x) => x.pairWith)) {
-    const key = [f.file, f.pairWith].sort().join('|');
+    const key = [f.file, f.pairWith].sort((x, y) => x.localeCompare(y)).join('|');
     if (seen.has(key)) continue;
     seen.add(key);
     const [a, b] = [valid(f.file), valid(f.pairWith)];
