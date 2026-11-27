@@ -57,7 +57,7 @@ Other measures:
 | D6 | S8786 Regex backtracking, email check on user input | 2 | **Fix.** Rewrite the email regex in `auth.js` and `login.component.ts` so it cannot backtrack, for example `^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$`. Domain labels can no longer contain dots, so each character has one possible match. The only newly rejected inputs have an empty domain label, like `a@b..c` or `a@b.c.`. |
 | D7 | javascript:S8786 Regex backtracking, resume text and model replies | 8 | **Fix.** Simplify each regex, or cap the input length before matching if a simpler regex would change behaviour. Owner may change individual rows to "won't fix" with a reason. |
 | D8 | Web:InputWithoutLabelCheck + Web:S6853 Unlabelled form inputs | 47 | **Fix.** Give each input an `id` and point its `<label>` at it with `for` (or wrap the input in the label). |
-| D9 | Web:S6845 `tabindex` on a non-interactive element | 1 | **Fix.** Remove the `tabindex`. |
+| D9 | Web:S6845 `tabindex` on a non-interactive element | 1 | **Won't fix.** The element is the Application flow carousel (`overflow-x: auto`, one chart per period). `tabindex="0"` with an `aria-label` is the standard way to let keyboard users scroll a scrollable region (WCAG 2.1.1). Chrome and Firefox make scroll containers focusable on their own, but Safari doesn't, so removing it would block Safari keyboard users. |
 | D10 | Web:S6843 Non-interactive role on an interactive element | 1 | **Fix.** Drop the role, or use a non-interactive element. |
 
 ### Findings
