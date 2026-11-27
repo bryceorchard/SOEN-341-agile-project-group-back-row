@@ -5,7 +5,9 @@ import { JWT_SECRET, JWT_EXPIRES_IN } from '../config.js';
 import { HttpError } from '../errors.js';
 import { requireAuth } from '../middleware.js';
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Domain labels exclude '.', so each character has one possible match and the check stays
+// linear on long input (the old /^[^\s@]+@[^\s@]+\.[^\s@]+$/ backtracked: javascript:S8786).
+const EMAIL_RE = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/;
 const ROLES = ['job_seeker', 'recruiter'];
 
 const publicUser = (u) => ({ id: u.id, email: u.email, role: u.role, createdAt: u.created_at });

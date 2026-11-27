@@ -29,7 +29,8 @@ export class Login {
   backend_error = signal('');
 
   isValidEmail(email: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    // Same check as the backend (backend/src/routes/auth.js); linear time on long input.
+    return /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/.test(email);
   }
 
   login() {
