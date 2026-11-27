@@ -9,11 +9,11 @@ Fixes are tracked in #209 (backend) and #210 (frontend).
 | --- | --- |
 | Tool | SonarQube Cloud (free for public repositories) |
 | Project | [CareerConnect on SonarQube Cloud](https://sonarcloud.io/project/overview?id=bryceorchard_SOEN-341-agile-project-group-back-row) |
-| Scope | `backend/` (src, db, scripts) and `frontend/CareerConnect/src`; tests are analysed as tests |
+| Scope | `backend/` (src, db, scripts) and `frontend/src`; tests are analysed as tests |
 | When it runs | Every PR and every push to `main`, in the `sonar` job of `.github/workflows/ci.yml` |
 | Result on PRs | The SonarQube Cloud quality-gate check and summary comment on each PR |
 | Config | `sonar-project.properties` at the repo root; `SONAR_TOKEN` is a repository secret (never committed) |
-| Coverage | LCOV from the backend (`node --test`) and frontend (Vitest) test runs |
+| Coverage | LCOV from the `backend` (`npm run test:lcov`) and `frontend` (Vitest) CI jobs, passed to the `sonar` job as artifacts |
 
 **Why SonarQube Cloud:** it reports the handout's own categories (bugs, vulnerabilities, code
 smells and maintainability) for both JavaScript and TypeScript in one place. GitHub CodeQL only
