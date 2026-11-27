@@ -1,4 +1,4 @@
-// #temp library till approval (next 3 lines)
+// chart.js plus the sankey controller; registered once, when the analytics chunk loads.
 import { Chart, registerables } from 'chart.js';
 import { SankeyController, Flow } from 'chartjs-chart-sankey';
 Chart.register(...registerables, SankeyController, Flow);
@@ -15,7 +15,6 @@ export interface SankeySpec { title: string; flows: SankeyFlow[]; }
 
 export interface ChartHandle { destroy(): void; }
 
-// #temp library till approval (next 7 lines)
 export function renderChart(canvas: HTMLCanvasElement, spec: ChartSpec): ChartHandle {
   return new Chart(canvas, {
     type: spec.kind,
@@ -24,7 +23,6 @@ export function renderChart(canvas: HTMLCanvasElement, spec: ChartSpec): ChartHa
   });
 }
 
-// #temp library till approval (next 13 lines)
 export function renderSankey(canvas: HTMLCanvasElement, spec: SankeySpec): ChartHandle {
   return new Chart(canvas, {
     type: 'sankey',

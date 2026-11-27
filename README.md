@@ -111,7 +111,7 @@ Implemented (Sprints 1–3):
 
 In progress (Sprint 3 → 4):
 
-- Application analytics and status history (US-21): API done (`GET /applications/stats`, `GET /applications/:id/history`); dashboard page in #135
+- Application analytics and status history (US-21): API (`GET /applications/stats`, `GET /applications/:id/history`) and the Analytics page at `/applications/analytics` (#135) done; acceptance tests in #144
 - AI-assisted resume feedback (US-10): API, mock provider, and evaluation done (`POST`/`GET /resumes/:id/feedback`, [design notes](docs/ai/us10-resume-feedback.md)); UI in #140
 
 Planned for later sprints:
@@ -189,6 +189,11 @@ SOEN-341-agile-project-group-back-row/
 │   │   │   ├── posting-applicants.component.*  # Applicants for a posting, filters, candidate review
 │   │   │   ├── notifications.component.*       # Notification list (#138)
 │   │   │   ├── notification.service.ts         # Unread count for the nav bell
+│   │   │   ├── analytics/                      # US-21 Analytics page (lazy-loaded with chart.js)
+│   │   │   ├── application-history/            # One application's status history
+│   │   │   ├── metric-tile/, chart-view/, sankey-view/  # Building blocks for the Analytics page
+│   │   │   ├── application-stats*.ts           # Stats/history API service and its types
+│   │   │   ├── chart-adapter.ts, sankey-data.ts  # chart.js wrapper and Sankey flow data
 │   │   │   └── us*-acceptance.spec.ts          # Automated acceptance tests, one file per story
 │   │   ├── index.html
 │   │   ├── main.ts
